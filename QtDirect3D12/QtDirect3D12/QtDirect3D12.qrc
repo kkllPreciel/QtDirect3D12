@@ -1,0 +1,4 @@
+<RCC>
+    <qresource prefix="QtDirect3D12">
+    </qresource>
+</RCC>
