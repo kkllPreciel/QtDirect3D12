@@ -19,7 +19,7 @@ namespace Sein
 		/** 
 		 *	@brief	コンストラクタ
 		 */
-		Device::Device() : device(nullptr), swapChain(nullptr)
+		Device::Device() : device(nullptr), swapChain(nullptr), commandQueue(nullptr), commandAllocator(nullptr), commandList(nullptr)
 		{
 
 		}
@@ -152,8 +152,30 @@ namespace Sein
 				}
 			}
 
-			// 描画コマンド関連
-			// コマンドアロケータ生成
+			// コマンドアロケーターの生成
+			// コマンドに使用するバッファ領域を確保する物
+			{
+				if (FAILED(device->CreateCommandAllocator(
+					D3D12_COMMAND_LIST_TYPE_DIRECT,	// コマンドアロケーターの種別(レンダリング関連のコマンドリストを設定)
+					IID_PPV_ARGS(&commandAllocator))))
+				{
+					throw "コマンドアロケーターの生成に失敗しました。";
+				}
+			}
+
+			// コマンドリストの生成
+			// コマンドキューに渡すコマンドのリスト
+			{
+				if (FAILED(device->CreateCommandList(
+					0,									// マルチアダプター(マルチGPU)の場合に使用するアダプター(GPU)の識別子(単一なので0)
+					D3D12_COMMAND_LIST_TYPE_DIRECT,		// コマンドリストの種別(レンダリング関連のコマンドリスト)
+					commandAllocator,					// このコマンドリストで使用するコマンドアロケーター
+					nullptr,							// コマンドリストの初期パイプライン状態(ダミーの初期パイプラインを指定)
+					IID_PPV_ARGS(&commandList))))
+				{
+					throw "コマンドリストの生成に失敗しました。";
+				}
+			}
 
 			// 描画対象・管理
 			// フェンス生成
@@ -166,7 +188,11 @@ namespace Sein
 		 */
 		void Device::Release()
 		{
-
+			commandList->Release();
+			commandAllocator->Release();
+			commandQueue->Release();
+			swapChain->Release();
+			device->Release();
 		}
 
 		/**
