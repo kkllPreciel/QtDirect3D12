@@ -19,7 +19,7 @@ namespace Sein
 		/** 
 		 *	@brief	コンストラクタ
 		 */
-		Device::Device() : device(nullptr), swapChain(nullptr), commandQueue(nullptr), commandAllocator(nullptr), commandList(nullptr)
+		Device::Device() : device(nullptr), swapChain(nullptr), commandQueue(nullptr), commandAllocator(nullptr), commandList(nullptr), descriptorHeap(nullptr), descriptorSize(0)
 		{
 
 		}
@@ -177,9 +177,31 @@ namespace Sein
 				}
 			}
 
+			// Alt + Enterでフルスクリーン化の機能を無効に設定
+			factory->MakeWindowAssociation(handle, DXGI_MWA_NO_ALT_ENTER);
+
+			// ディスクリプターヒープの作成
+			// ディスクリプターはバッファの情報データ(テクスチャバッファ、頂点バッファ等)
+			{
+				D3D12_DESCRIPTOR_HEAP_DESC rtvHeapDesc = {};
+				rtvHeapDesc.NumDescriptors = 2;							// ディスクリプターヒープ内のディスクリプター数(フロントバッファ、バックバッファ)
+				rtvHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_RTV;		// 種別はレンダーターゲットビュー
+				rtvHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;	// シェーダーから参照しない
+
+				if (FAILED(device->CreateDescriptorHeap(
+					&rtvHeapDesc,	// ディスクリプターヒープの設定情報
+					IID_PPV_ARGS(&descriptorHeap
+					))))
+				{
+					throw "ディスクリプターヒープの生成に失敗しました。";
+				}
+
+				// レンダーターゲット分のディスクリプターのサイズを取得する
+				descriptorSize = device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
+			}
+
 			// 描画対象・管理
 			// フェンス生成
-			// ディスクリプターヒープの作成
 			// レンダーターゲットビューの作成
 		}
 
@@ -188,6 +210,7 @@ namespace Sein
 		 */
 		void Device::Release()
 		{
+			descriptorHeap->Release();
 			commandList->Release();
 			commandAllocator->Release();
 			commandQueue->Release();

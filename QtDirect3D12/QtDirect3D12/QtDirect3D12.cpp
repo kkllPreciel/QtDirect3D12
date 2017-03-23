@@ -11,6 +11,8 @@ QtDirect3D12::QtDirect3D12(QWidget *parent)
 
 	// TODO:reinterpret_cast‚ðíœ‚·‚é
 	pDevice->Create(reinterpret_cast<HWND>(this->winId()), this->width(), this->height());
+
+	delete pDevice;
 }
 
 void QtDirect3D12::resizeEvent(QResizeEvent *event)

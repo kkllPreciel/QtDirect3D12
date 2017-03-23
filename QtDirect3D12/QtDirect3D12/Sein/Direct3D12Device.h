@@ -70,6 +70,8 @@ namespace Sein
 			ID3D12CommandQueue*			commandQueue;		///< コマンドキュー
 			ID3D12CommandAllocator*		commandAllocator;	///< コマンドアロケーター
 			ID3D12GraphicsCommandList*	commandList;		///< コマンドリスト
+			ID3D12DescriptorHeap*		descriptorHeap;		///< ディスクリプターヒープ
+			unsigned int				descriptorSize;		///< ディスクリプターのサイズ
 		};
 	};
 };
