@@ -19,9 +19,15 @@ namespace Sein
 		/** 
 		 *	@brief	コンストラクタ
 		 */
-		Device::Device() : device(nullptr), swapChain(nullptr), commandQueue(nullptr), commandAllocator(nullptr), commandList(nullptr), descriptorHeap(nullptr), descriptorSize(0)
+		Device::Device() :
+			device(nullptr), swapChain(nullptr), commandQueue(nullptr), commandAllocator(nullptr),
+			commandList(nullptr), descriptorHeap(nullptr), descriptorSize(0), bufferIndex(0),
+			fence(nullptr), fenceIndex(0), fenceEvent(nullptr)
 		{
-
+			for (auto i = 0; i < FrameCount; ++i)
+			{
+				renderTargetList[i] = nullptr;
+			}
 		}
 
 		/**
@@ -59,49 +65,62 @@ namespace Sein
 			}
 
 			// Direct3D12のデバイスを作成する
-			Microsoft::WRL::ComPtr<IDXGIAdapter1> pAdapter;
-
-			// アダプター(ビデオカード)を列挙する
-			for (auto i = 0; DXGI_ERROR_NOT_FOUND != factory->EnumAdapters1(i, &pAdapter); ++i)
 			{
-				DXGI_ADAPTER_DESC1 desc;
-				pAdapter->GetDesc1(&desc);
-
-				// TODO:調査
-				if (desc.Flags & DXGI_ADAPTER_FLAG_SOFTWARE)
-				{
-					continue;
-				}
-
-				// デバイスを作成
-				if (FAILED(D3D12CreateDevice(pAdapter.Get(), D3D_FEATURE_LEVEL_11_0, IID_PPV_ARGS(&device))))
-				{
-					continue;
-				}
-
-#if _DEBUG
-				std::wostringstream ostr;
-				pAdapter->GetDesc1(&desc);
-				ostr << "D3D12-capable hardware found:" << desc.Description << "(" << (desc.DedicatedVideoMemory >> 20) << "MB)\n";
-				OutputDebugString(ostr.str().c_str());
-#endif
-			}
-			
-			// WARPで生成する
-			if (nullptr == device)
-			{
-#if _DEBUG
-				OutputDebugString(L"WARP software adapter requested.  Initializing...\n");
-#endif
-				if (FAILED(factory->EnumWarpAdapter(IID_PPV_ARGS(&pAdapter))))
-				{
-					throw "WARPアダプターが存在しません。";
-				}
-
-				if (FAILED(D3D12CreateDevice(pAdapter.Get(), D3D_FEATURE_LEVEL_11_0, IID_PPV_ARGS(&device))))
+#if 1
+				// デバイスを生成
+				// アダプターを列挙し作成すると
+				// 環境によってメモリリークが発生したため
+				// デフォルトのアダプターを使用し作成する
+				if (FAILED(D3D12CreateDevice(nullptr, D3D_FEATURE_LEVEL_11_0, IID_PPV_ARGS(&device))))
 				{
 					throw "デバイスの生成に失敗しました。";
 				}
+#else
+				Microsoft::WRL::ComPtr<IDXGIAdapter1> pAdapter;
+
+				// アダプター(ビデオカード)を列挙する
+				for (auto i = 0; DXGI_ERROR_NOT_FOUND != factory->EnumAdapters1(i, &pAdapter); ++i)
+				{
+					DXGI_ADAPTER_DESC1 desc;
+					pAdapter->GetDesc1(&desc);
+
+					// TODO:調査
+					if (desc.Flags & DXGI_ADAPTER_FLAG_SOFTWARE)
+					{
+						continue;
+					}
+
+					// デバイスを作成
+					if (FAILED(D3D12CreateDevice(pAdapter.Get(), D3D_FEATURE_LEVEL_11_0, IID_PPV_ARGS(&device))))
+					{
+						continue;
+					}
+
+#if _DEBUG
+					std::wostringstream ostr;
+					pAdapter->GetDesc1(&desc);
+					ostr << "D3D12-capable hardware found:" << desc.Description << "(" << (desc.DedicatedVideoMemory >> 20) << "MB)\n";
+					OutputDebugString(ostr.str().c_str());
+#endif
+				}
+
+				// WARPで生成する
+				if (nullptr == device)
+				{
+#if _DEBUG
+					OutputDebugString(L"WARP software adapter requested.  Initializing...\n");
+#endif
+					if (FAILED(factory->EnumWarpAdapter(IID_PPV_ARGS(&pAdapter))))
+					{
+						throw "WARPアダプターが存在しません。";
+					}
+
+					if (FAILED(D3D12CreateDevice(pAdapter.Get(), D3D_FEATURE_LEVEL_11_0, IID_PPV_ARGS(&device))))
+					{
+						throw "デバイスの生成に失敗しました。";
+					}
+				}
+#endif
 			}
 
 			// コマンドキューの作成
@@ -125,7 +144,7 @@ namespace Sein
 				DXGI_SWAP_CHAIN_DESC1 swapChainDesc = {};
 				swapChainDesc.Width = width;									// ウィンドウ横幅
 				swapChainDesc.Height = height;									// ウィンドウ縦幅
-				swapChainDesc.BufferCount = 2;									// バッファの数は2個(フロントバッファも含むらしいが、公式サンプル等を見るとバックバッファの数な気がする)
+				swapChainDesc.BufferCount = FrameCount;							// バッファの数は2個(フロントバッファも含むらしいが、公式サンプル等を見るとバックバッファの数な気がする)
 				swapChainDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;				// 恐らくバッファのフォーマット(4 成分、32 ビット符号なし整数)
 				swapChainDesc.Scaling = DXGI_SCALING_NONE;						// 画面サイズとバッファサイズが等しくない時の拡縮動作(拡大縮小は行わない)
 				swapChainDesc.SampleDesc.Quality = 0;							// マルチサンプリングの品質レベル
@@ -150,6 +169,9 @@ namespace Sein
 				{
 					throw "IDXGISwapChain3の生成に失敗しました。";
 				}
+
+				// バックバッファの番号を取得する
+				bufferIndex = swapChain->GetCurrentBackBufferIndex();
 			}
 
 			// コマンドアロケーターの生成
@@ -184,7 +206,7 @@ namespace Sein
 			// ディスクリプターはバッファの情報データ(テクスチャバッファ、頂点バッファ等)
 			{
 				D3D12_DESCRIPTOR_HEAP_DESC rtvHeapDesc = {};
-				rtvHeapDesc.NumDescriptors = 2;							// ディスクリプターヒープ内のディスクリプター数(フロントバッファ、バックバッファ)
+				rtvHeapDesc.NumDescriptors = FrameCount;				// ディスクリプターヒープ内のディスクリプター数(フロントバッファ、バックバッファ)
 				rtvHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_RTV;		// 種別はレンダーターゲットビュー
 				rtvHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;	// シェーダーから参照しない
 
@@ -200,9 +222,53 @@ namespace Sein
 				descriptorSize = device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
 			}
 
-			// 描画対象・管理
-			// フェンス生成
-			// レンダーターゲットビューの作成
+			// ディスクリプターの登録
+			{
+				D3D12_CPU_DESCRIPTOR_HANDLE renderTargetViewHandle(descriptorHeap->GetCPUDescriptorHandleForHeapStart());
+
+				// フレームバッファ数文登録する
+				for (auto i = 0; i < FrameCount; ++i)
+				{
+					if (FAILED(swapChain->GetBuffer(i, IID_PPV_ARGS(&renderTargetList[i]))))
+					{
+						throw "バックバッファの取得に失敗しました。";
+					}
+
+					// レンダーターゲットビューを作成する
+					device->CreateRenderTargetView(
+						renderTargetList[i],	// レンダー ターゲットを表すID3D12Resourceへのポインタ
+						nullptr,				// D3D12_RENDER_TARGET_VIEW_DESCへのポインタ
+						renderTargetViewHandle
+					);
+
+					renderTargetViewHandle.ptr += descriptorSize;
+				}
+			}
+
+			// フェンスの生成
+			// Directx12ではGPUの描画の終了待ちを自動で行わない(同期が取れず画面がおかしくなる)
+			// そのため同期を取るためのオブジェクト(フェンス)を作成する
+			{
+				if (FAILED(device->CreateFence(
+					fenceIndex,				// フェンスの初期値
+					D3D12_FENCE_FLAG_NONE,	// オプションの指定(今回は指定なし)
+					IID_PPV_ARGS(&fence))))
+				{
+					throw "フェンスの生成に失敗しました。";
+				}
+
+				++fenceIndex;
+
+				// 同期待ち用のイベントを生成
+				if (nullptr == (fenceEvent = CreateEvent(nullptr, false, false, nullptr)))
+				{
+					throw "イベントの生成に失敗しました。";
+					// throw HRESULT_FROM_WIN32(GetLastError());
+				}
+
+				// 描画処理を行っている可能性があるので描画終了待ちを行う
+				WaitForGpu();
+			}
 		}
 
 		/**
@@ -210,6 +276,18 @@ namespace Sein
 		 */
 		void Device::Release()
 		{
+			// GPUの描画終了待ちを行う
+			WaitForGpu();
+
+			CloseHandle(fenceEvent);
+
+			fence->Release();
+
+			for (auto i = 0; i < FrameCount; ++i)
+			{
+				renderTargetList[i]->Release();
+			}
+
 			descriptorHeap->Release();
 			commandList->Release();
 			commandAllocator->Release();
@@ -225,5 +303,40 @@ namespace Sein
 		{
 
 		}
+
+		// 後々別クラスへ移動する
+#pragma region Fence
+
+		/**
+		 *	@brief	描画終了待ちを行う
+		 */
+		void Device::WaitForGpu()
+		{
+			// 実行されているコマンドリストが完了したら
+			// フェンスに指定の値を設定するようにする
+			if (FAILED(commandQueue->Signal(fence, fenceIndex)))
+			{
+				throw "コマンドキューのシグナル設定に失敗しました。";
+			}
+
+			// 既に処理が終わっている場合は実行しない
+			if (fence->GetCompletedValue() < fenceIndex)
+			{
+				// フェンスの値が設定した値になったら
+				// 指定したイベントを発行させる
+				if (FAILED(fence->SetEventOnCompletion(fenceIndex, fenceEvent)))
+				{
+					throw "フェンスのイベント発行設定に失敗しました。";
+				}
+
+				// シグナル状態(イベント発行)になるまで待機する
+				WaitForSingleObjectEx(fenceEvent, INFINITE, false);
+			}
+
+			// フェンスの値を更新する
+			++fenceIndex;
+		}
+
+#pragma endregion
 	};
 };

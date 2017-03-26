@@ -65,13 +65,28 @@ namespace Sein
 			void Present();
 
 		private:
-			ID3D12Device*				device;				///< デバイス
-			IDXGISwapChain3*			swapChain;			///< スワップチェイン
-			ID3D12CommandQueue*			commandQueue;		///< コマンドキュー
-			ID3D12CommandAllocator*		commandAllocator;	///< コマンドアロケーター
-			ID3D12GraphicsCommandList*	commandList;		///< コマンドリスト
-			ID3D12DescriptorHeap*		descriptorHeap;		///< ディスクリプターヒープ
-			unsigned int				descriptorSize;		///< ディスクリプターのサイズ
+			ID3D12Device*				device;					///< デバイス
+			IDXGISwapChain3*			swapChain;				///< スワップチェイン
+			ID3D12CommandQueue*			commandQueue;			///< コマンドキュー
+			ID3D12CommandAllocator*		commandAllocator;		///< コマンドアロケーター
+			ID3D12GraphicsCommandList*	commandList;			///< コマンドリスト
+			ID3D12DescriptorHeap*		descriptorHeap;			///< ディスクリプターヒープ
+			unsigned int				descriptorSize;			///< ディスクリプターのサイズ
+
+			// 後々ダブルバッファクラスへ移動
+			static const unsigned int	FrameCount = 2;					///< フレーム数(ダブルバッファ)
+			ID3D12Resource*				renderTargetList[FrameCount];	///< レンダーターゲットのリスト
+			unsigned int				bufferIndex;					///< 現在のバッファ番号
+
+			// 後々フェンスクラスへ移動
+			ID3D12Fence*				fence;		///< フェンス
+			unsigned int				fenceIndex;	///< 現在のフェンス番号
+			HANDLE						fenceEvent;	///< フェンスイベントハンドル
+
+			/**
+			 *	@brief	描画終了待ちを行う
+			 */
+			void WaitForGpu();
 		};
 	};
 };
