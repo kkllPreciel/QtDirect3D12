@@ -11,9 +11,8 @@ QtDirect3D12::QtDirect3D12(QWidget *parent)
 
 	// DirectX12のラッパーを作成
 	// TODO:reinterpret_castを削除する
-	auto pDevice = new Sein::Direct3D12::Device();
-	pDevice->Create(reinterpret_cast<HWND>(this->winId()), this->width(), this->height());
-	delete pDevice;
+	device = new Sein::Direct3D12::Device();
+	device->Create(reinterpret_cast<HWND>(this->winId()), this->width(), this->height());
 
 	// メインループ呼び出し設定
 	connect(timer, SIGNAL(timeout()), this, SLOT(mainLoop()));
@@ -28,11 +27,14 @@ QtDirect3D12::~QtDirect3D12()
 	}
 
 	delete timer;
+	delete device;
 }
 
 void QtDirect3D12::mainLoop()
 {
-	OutputDebugString(L"exe\n");
+	device->BeginScene();
+	device->EndScene();
+	device->Present();
 }
 
 void QtDirect3D12::resizeEvent(QResizeEvent *event)

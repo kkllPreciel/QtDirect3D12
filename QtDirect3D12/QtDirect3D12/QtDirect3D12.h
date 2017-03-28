@@ -2,6 +2,7 @@
 
 #include <QtWidgets/QWidget>
 #include "ui_QtDirect3D12.h"
+#include "Sein/Direct3D12Device.h"
 
 class QtDirect3D12 : public QWidget
 {
@@ -20,4 +21,5 @@ private Q_SLOTS:
 private:
 	Ui::QtDirect3D12Class ui;
 	QTimer* timer;
+	Sein::Direct3D12::Device* device;
 };
