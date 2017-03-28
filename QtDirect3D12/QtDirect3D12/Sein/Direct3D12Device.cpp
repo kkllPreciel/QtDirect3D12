@@ -197,6 +197,9 @@ namespace Sein
 				{
 					throw "コマンドリストの生成に失敗しました。";
 				}
+
+				// 記録を終了する
+				commandList->Close();
 			}
 
 			// Alt + Enterでフルスクリーン化の機能を無効に設定
@@ -297,11 +300,81 @@ namespace Sein
 		}
 
 		/**
+		 *	@brief	シーンを開始する
+		 */
+		void Device::BeginScene()
+		{
+			// コマンドアロケーターをリセット
+			if (FAILED(commandAllocator->Reset()))
+			{
+				throw "コマンドアロケーターのリセットに失敗しました。";
+			}
+
+			// コマンドリストをリセット
+			if (FAILED(commandList->Reset(commandAllocator, nullptr)))
+			{
+				throw "コマンドリストのリセットに失敗しました。";
+			}
+
+			// バックバッファが描画ターゲットとして使用できるようになるまで待つ
+			D3D12_RESOURCE_BARRIER barrier;
+			barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;					// バリアはリソースの状態遷移に対して設置
+			barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+			barrier.Transition.pResource = renderTargetList[bufferIndex];			// リソースは描画ターゲット
+			barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_PRESENT;			// 遷移前はPresent
+			barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;		// 遷移後は描画ターゲット
+			barrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
+			commandList->ResourceBarrier(1, &barrier);
+
+			// バックバッファを描画ターゲットとして設定する
+			D3D12_CPU_DESCRIPTOR_HANDLE handle = descriptorHeap->GetCPUDescriptorHandleForHeapStart();
+			handle.ptr += bufferIndex * descriptorSize;
+			commandList->OMSetRenderTargets(1, &handle, false, nullptr);
+
+			// バックバッファをクリアする
+			const float Color[] = { 0.0f, 0.0f, 0.6f, 1.0f };
+			commandList->ClearRenderTargetView(handle, Color, 0, nullptr);
+		}
+
+		/**
+		 *	@brief	シーンを終了する
+		 */
+		void Device::EndScene()
+		{
+			// バックバッファの描画完了を待つためのバリアを設置
+			D3D12_RESOURCE_BARRIER barrier;
+			barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;					// バリアはリソースの状態遷移に対して設置
+			barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+			barrier.Transition.pResource = renderTargetList[bufferIndex];			// リソースは描画ターゲット
+			barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;	// 遷移前は描画ターゲット
+			barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PRESENT;			// 遷移後はPresent
+			barrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
+			commandList->ResourceBarrier(1, &barrier);
+
+			// コマンドリストをクローズする
+			commandList->Close();
+		}
+
+		/**
 		 *	@brief	画面を更新する
 		 */
 		void Device::Present()
 		{
+			// コマンドリストの実行
+			ID3D12CommandList* ppCommandLists[] = { commandList };
+			commandQueue->ExecuteCommandLists(_countof(ppCommandLists), ppCommandLists);
 
+			// 描画終了待ちを行う
+			WaitForGpu();
+
+			// 画面の更新
+			if (FAILED(swapChain->Present(1, 0)))
+			{
+				throw "画面の更新に失敗しました。";
+			}
+
+			// バッファ番号を更新
+			bufferIndex = swapChain->GetCurrentBackBufferIndex();
 		}
 
 		// 後々別クラスへ移動する

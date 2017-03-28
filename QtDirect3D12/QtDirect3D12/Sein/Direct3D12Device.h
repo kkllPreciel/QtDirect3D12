@@ -60,6 +60,16 @@ namespace Sein
 			void Release();
 
 			/**
+			 *	@brief	シーンを開始する
+			 */
+			void BeginScene();
+
+			/**
+			 *	@brief	シーンを終了する
+			 */
+			void EndScene();
+
+			/**
 			 *	@brief	画面を更新する
 			 */
 			void Present();
