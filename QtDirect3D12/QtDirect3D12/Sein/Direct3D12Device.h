@@ -12,6 +12,7 @@
 #include <wrl\client.h>
 #include <d3d12.h>
 #include <dxgi1_4.h>
+#include <DirectXMath.h>
 
 namespace Sein
 {
@@ -97,6 +98,30 @@ namespace Sein
 			 *	@brief	描画終了待ちを行う
 			 */
 			void WaitForGpu();
+
+			/**
+			 *	@brief	アセットを読み込む
+			 *	@param	width:ウィンドウ横幅
+			 *	@param	height:ウィンドウ縦幅
+			 */
+			void LoadAssets(unsigned int width, unsigned int height);
+
+			// 頂点バッファ関連
+			// 後々別クラスへ移動
+#pragma region VertexBuffer
+			/**
+			 *	@brief	頂点フォーマット
+			 */
+			struct Vertex {
+				DirectX::XMFLOAT3 position; ///< 頂点座標
+				DirectX::XMFLOAT4 color;	///< 頂点色
+			};
+
+			ID3D12Resource*				vertexBuffer;		///< 頂点バッファ
+			D3D12_VERTEX_BUFFER_VIEW	vertexBufferView;	///< 頂点バッファのビュー
+
+#pragma endregion
+
 		};
 	};
 };
