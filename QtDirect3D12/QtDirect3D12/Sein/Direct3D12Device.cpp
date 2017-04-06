@@ -22,7 +22,8 @@ namespace Sein
 		Device::Device() :
 			device(nullptr), swapChain(nullptr), commandQueue(nullptr), commandAllocator(nullptr),
 			commandList(nullptr), descriptorHeap(nullptr), descriptorSize(0), bufferIndex(0),
-			fence(nullptr), fenceIndex(0), fenceEvent(nullptr), vertexBuffer(nullptr)
+			fence(nullptr), fenceIndex(0), fenceEvent(nullptr), vertexBuffer(nullptr),
+			rootSignature(nullptr)
 		{
 			for (auto i = 0; i < FrameCount; ++i)
 			{
@@ -291,6 +292,7 @@ namespace Sein
 			fence->Release();
 
 			vertexBuffer->Release();
+			rootSignature->Release();
 
 			for (auto i = 0; i < FrameCount; ++i)
 			{
@@ -425,6 +427,39 @@ namespace Sein
 		 */
 		void Device::LoadAssets(unsigned int width, unsigned int height)
 		{
+			// ルートシグネチャの作成
+			// 今回は空のルートシグネチャを作成する
+			{
+				D3D12_ROOT_SIGNATURE_DESC rootSignatureDesc;
+				rootSignatureDesc.NumParameters = 0;													// ルートシグネチャのスロット数
+				rootSignatureDesc.pParameters = nullptr;												// スロットの構造?
+				rootSignatureDesc.NumStaticSamplers = 0;												// 静的サンプラー数
+				rootSignatureDesc.pStaticSamplers = nullptr;											// 静的サンプラー設定データのポインタ
+				rootSignatureDesc.Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;	// オプション(描画に使用する)
+
+				// ルートシグネチャのシリアル化
+				Microsoft::WRL::ComPtr<ID3DBlob> signature;
+				if (FAILED(D3D12SerializeRootSignature(
+					&rootSignatureDesc,				// ルートシグネチャの設定
+					D3D_ROOT_SIGNATURE_VERSION_1,	// ルートシグネチャのバージョン
+					&signature,						// シリアライズしたルートシグネチャへアクセスするためのインターフェイス(ポインタ)
+					nullptr							// シリアライザのエラーメッセージへアクセスするためのインターフェイス(ポインタ)
+				)))
+				{
+					throw "ルートシグネチャのシリアライズに失敗しました。";
+				}
+
+				// ルートシグネチャの生成
+				if (FAILED(device->CreateRootSignature(
+					0,									// マルチアダプター(マルチGPU)の場合に使用するアダプター(GPU)の識別子(単一なので0)
+					signature->GetBufferPointer(),		// シリアル化されたシグネチャ設定へのポインタ
+					signature->GetBufferSize(),			// メモリのブロックサイズ
+					IID_PPV_ARGS(&rootSignature))))
+				{
+					throw "ルートシグネチャの生成に失敗しました。";
+				}
+			}
+
 			// 頂点バッファの作成
 			{
 				float aspect = static_cast<float>(width) / static_cast<float>(height);

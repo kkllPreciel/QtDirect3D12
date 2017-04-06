@@ -106,6 +106,14 @@ namespace Sein
 			 */
 			void LoadAssets(unsigned int width, unsigned int height);
 
+			// ルートシグネチャ関連
+			// 後々別クラスへ移動
+#pragma region RootSignature
+
+			ID3D12RootSignature*	rootSignature;	///< ルートシグネチャ
+
+#pragma endregion
+
 			// 頂点バッファ関連
 			// 後々別クラスへ移動
 #pragma region VertexBuffer
