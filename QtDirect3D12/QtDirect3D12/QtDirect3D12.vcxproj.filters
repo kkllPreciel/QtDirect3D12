@@ -78,4 +78,7 @@
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="shaders.hlsl" />
+  </ItemGroup>
 </Project>
