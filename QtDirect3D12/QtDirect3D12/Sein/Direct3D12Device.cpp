@@ -10,6 +10,7 @@
 #include <sstream>
 #endif
 #include <winerror.h>
+#include <d3dcompiler.h>
 #include "Direct3D12Device.h"
 
 namespace Sein
@@ -533,6 +534,99 @@ namespace Sein
 				vertexBufferView.BufferLocation = vertexBuffer->GetGPUVirtualAddress();	// バッファのアドレス
 				vertexBufferView.StrideInBytes  = sizeof(Vertex);						// 1頂点のサイズ(バイト単位)
 				vertexBufferView.SizeInBytes	= vertexBufferSize;						// バッファ(全頂点合計)のサイズ(バイト単位)
+			}
+
+			// パイプラインステートの作成
+			// シェーダーも一緒にコンパイルする
+			// 後々はコンパイル済みのシェーダーを使用する
+			{
+				Microsoft::WRL::ComPtr<ID3DBlob> vertexShader;
+				Microsoft::WRL::ComPtr<ID3DBlob> pixelShader;
+
+				// コンパイルオプションフラグを設定する
+#if defined(_DEBUG)
+				UINT compileFlags = D3DCOMPILE_DEBUG | D3DCOMPILE_SKIP_OPTIMIZATION;
+#else
+				UINT compileFlags = 0;
+#endif
+
+				// 頂点シェーダーのコンパイル
+				if (FAILED(D3DCompileFromFile(
+					L"shaders.hlsl",	// シェーダーファイル名
+					nullptr,			// シェーダーマクロ(今回は使用しない)
+					nullptr,			// インクルードファイルを取り扱うために使用するID3DIncludeインタフェースへのポインタ(今回は使用しない)
+					"VSMain",			// エントリーポイントの関数名
+					"vs_5_0",			// コンパイルターゲット(今回は頂点シェーダーでシェーダーモデル5)
+					compileFlags,		// コンパイルオプション
+					0,					// エフェクトファイルのコンパイルオプション(今回はエフェクトとして使用しないので0)
+					&vertexShader,		// コンパイルされたコードへアクセスするためのID3DBlobインタフェースのポインタ
+					nullptr				// コンパイルエラーメッセージへアクセスするためのID3DBlobインタフェースのポインタ
+				)))
+				{
+					throw "頂点シェーダーのコンパイルに失敗しました。";
+				}
+
+				//helper::ThrowIfFailed(D3DCompileFromFile(GetAssetFullPath(L"shaders.hlsl").c_str(), nullptr, nullptr, "PSMain", "ps_5_0", compileFlags, 0, &pixelShader, nullptr));
+
+				//// Define the vertex input layout.
+				//D3D12_INPUT_ELEMENT_DESC inputElementDescs[] =
+				//{
+				//	{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
+				//	{ "COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 }
+				//};
+
+				//// Describe and create the graphics pipeline state object (PSO).
+				//D3D12_GRAPHICS_PIPELINE_STATE_DESC psoDesc = {};
+				//psoDesc.InputLayout = { inputElementDescs, _countof(inputElementDescs) };
+				//psoDesc.pRootSignature = m_rootSignature.Get();
+
+				//D3D12_SHADER_BYTECODE vs;
+				//vs.pShaderBytecode = vertexShader.Get()->GetBufferPointer();
+				//vs.BytecodeLength = vertexShader.Get()->GetBufferSize();
+				//psoDesc.VS = vs;
+
+				//D3D12_SHADER_BYTECODE ps;
+				//ps.pShaderBytecode = pixelShader.Get()->GetBufferPointer();
+				//ps.BytecodeLength = pixelShader.Get()->GetBufferSize();
+				//psoDesc.PS = ps;
+
+				//D3D12_RASTERIZER_DESC rasterizer_desc;
+				//rasterizer_desc.FillMode = D3D12_FILL_MODE_SOLID;
+				//rasterizer_desc.CullMode = D3D12_CULL_MODE_BACK;
+				//rasterizer_desc.FrontCounterClockwise = FALSE;
+				//rasterizer_desc.DepthBias = D3D12_DEFAULT_DEPTH_BIAS;
+				//rasterizer_desc.DepthBiasClamp = D3D12_DEFAULT_DEPTH_BIAS_CLAMP;
+				//rasterizer_desc.SlopeScaledDepthBias = D3D12_DEFAULT_SLOPE_SCALED_DEPTH_BIAS;
+				//rasterizer_desc.DepthClipEnable = TRUE;
+				//rasterizer_desc.MultisampleEnable = FALSE;
+				//rasterizer_desc.AntialiasedLineEnable = FALSE;
+				//rasterizer_desc.ForcedSampleCount = 0;
+				//rasterizer_desc.ConservativeRaster = D3D12_CONSERVATIVE_RASTERIZATION_MODE_OFF;
+				//psoDesc.RasterizerState = rasterizer_desc;
+
+				//D3D12_BLEND_DESC blend_desc;
+				//blend_desc.AlphaToCoverageEnable = FALSE;
+				//blend_desc.IndependentBlendEnable = FALSE;
+				//const D3D12_RENDER_TARGET_BLEND_DESC defaultRenderTargetBlendDesc =
+				//{
+				//	FALSE,FALSE,
+				//	D3D12_BLEND_ONE, D3D12_BLEND_ZERO, D3D12_BLEND_OP_ADD,
+				//	D3D12_BLEND_ONE, D3D12_BLEND_ZERO, D3D12_BLEND_OP_ADD,
+				//	D3D12_LOGIC_OP_NOOP,
+				//	D3D12_COLOR_WRITE_ENABLE_ALL,
+				//};
+				//for (UINT i = 0; i < D3D12_SIMULTANEOUS_RENDER_TARGET_COUNT; ++i)
+				//	blend_desc.RenderTarget[i] = defaultRenderTargetBlendDesc;
+
+				//psoDesc.BlendState = blend_desc;
+				//psoDesc.DepthStencilState.DepthEnable = FALSE;
+				//psoDesc.DepthStencilState.StencilEnable = FALSE;
+				//psoDesc.SampleMask = UINT_MAX;
+				//psoDesc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
+				//psoDesc.NumRenderTargets = 1;
+				//psoDesc.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM;
+				//psoDesc.SampleDesc.Count = 1;
+				//helper::ThrowIfFailed(m_device->CreateGraphicsPipelineState(&psoDesc, IID_PPV_ARGS(&m_pipelineState)));
 			}
 		}
 	};
