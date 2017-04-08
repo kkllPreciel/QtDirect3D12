@@ -566,14 +566,31 @@ namespace Sein
 					throw "頂点シェーダーのコンパイルに失敗しました。";
 				}
 
-				//helper::ThrowIfFailed(D3DCompileFromFile(GetAssetFullPath(L"shaders.hlsl").c_str(), nullptr, nullptr, "PSMain", "ps_5_0", compileFlags, 0, &pixelShader, nullptr));
+				// ピクセルシェーダーのコンパイル
+				if (FAILED(D3DCompileFromFile(
+					L"shaders.hlsl",	// シェーダーファイル名
+					nullptr,			// シェーダーマクロ(今回は使用しない)
+					nullptr,			// インクルードファイルを取り扱うために使用するID3DIncludeインタフェースへのポインタ(今回は使用しない)
+					"PSMain",			// エントリーポイントの関数名
+					"ps_5_0",			// コンパイルターゲット(今回はピクセルシェーダーでシェーダーモデル5)
+					compileFlags,		// コンパイルオプション
+					0,					// エフェクトファイルのコンパイルオプション(今回はエフェクトとして使用しないので0)
+					&pixelShader,		// コンパイルされたコードへアクセスするためのID3DBlobインタフェースのポインタ
+					nullptr				// コンパイルエラーメッセージへアクセスするためのID3DBlobインタフェースのポインタ
+				)))
+				{
+					throw "ピクセルシェーダーのコンパイルに失敗しました。";
+				}
 
-				//// Define the vertex input layout.
-				//D3D12_INPUT_ELEMENT_DESC inputElementDescs[] =
-				//{
-				//	{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
-				//	{ "COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 }
-				//};
+				// 頂点入力レイアウト
+				D3D12_INPUT_ELEMENT_DESC inputElementDescs[] =
+				{
+					// 頂点座標
+					{ "POSITiON", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
+
+					// 頂点カラー
+					{ "COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 }
+				};
 
 				//// Describe and create the graphics pipeline state object (PSO).
 				//D3D12_GRAPHICS_PIPELINE_STATE_DESC psoDesc = {};
