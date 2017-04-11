@@ -592,20 +592,24 @@ namespace Sein
 					{ "COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 }
 				};
 
-				//// Describe and create the graphics pipeline state object (PSO).
-				//D3D12_GRAPHICS_PIPELINE_STATE_DESC psoDesc = {};
-				//psoDesc.InputLayout = { inputElementDescs, _countof(inputElementDescs) };
-				//psoDesc.pRootSignature = m_rootSignature.Get();
+				// パイプラインステートの設定
+				D3D12_GRAPHICS_PIPELINE_STATE_DESC psoDesc = {};
+				psoDesc.InputLayout = { inputElementDescs, _countof(inputElementDescs) };	// 入力レイアウトの構造
+				psoDesc.pRootSignature = rootSignature;										// ルートシグネチャ
 
-				//D3D12_SHADER_BYTECODE vs;
-				//vs.pShaderBytecode = vertexShader.Get()->GetBufferPointer();
-				//vs.BytecodeLength = vertexShader.Get()->GetBufferSize();
-				//psoDesc.VS = vs;
+				// パイプラインステートの設定に使用する頂点シェーダーのデータ構造を作成
+				D3D12_SHADER_BYTECODE vs;
+				vs.pShaderBytecode = vertexShader.Get()->GetBufferPointer();
+				vs.BytecodeLength = vertexShader.Get()->GetBufferSize();
 
-				//D3D12_SHADER_BYTECODE ps;
-				//ps.pShaderBytecode = pixelShader.Get()->GetBufferPointer();
-				//ps.BytecodeLength = pixelShader.Get()->GetBufferSize();
-				//psoDesc.PS = ps;
+				// パイプラインステートの設定に使用するピクセルシェーダーのデータ構造を作成
+				D3D12_SHADER_BYTECODE ps;
+				ps.pShaderBytecode = pixelShader.Get()->GetBufferPointer();
+				ps.BytecodeLength = pixelShader.Get()->GetBufferSize();
+
+				// 頂点、ピクセルシェーダーのデータ構造をパイプラインステートの設定に使用
+				psoDesc.VS = vs;
+				psoDesc.PS = ps;
 
 				//D3D12_RASTERIZER_DESC rasterizer_desc;
 				//rasterizer_desc.FillMode = D3D12_FILL_MODE_SOLID;
