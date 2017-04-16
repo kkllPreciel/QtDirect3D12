@@ -130,6 +130,12 @@ namespace Sein
 
 #pragma endregion
 
+			// パイプラインステート関連
+			// 後々別クラスへ移動
+#pragma region PipelineState
+			ID3D12PipelineState*	pipelineState;	///< パイプラインステート
+#pragma endregion
+
 		};
 	};
 };

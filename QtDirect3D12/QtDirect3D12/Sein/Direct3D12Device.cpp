@@ -24,7 +24,7 @@ namespace Sein
 			device(nullptr), swapChain(nullptr), commandQueue(nullptr), commandAllocator(nullptr),
 			commandList(nullptr), descriptorHeap(nullptr), descriptorSize(0), bufferIndex(0),
 			fence(nullptr), fenceIndex(0), fenceEvent(nullptr), vertexBuffer(nullptr),
-			rootSignature(nullptr)
+			rootSignature(nullptr), pipelineState(nullptr)
 		{
 			for (auto i = 0; i < FrameCount; ++i)
 			{
@@ -292,6 +292,7 @@ namespace Sein
 			CloseHandle(fenceEvent);
 			fence->Release();
 
+			pipelineState->Release();
 			vertexBuffer->Release();
 			rootSignature->Release();
 
@@ -616,37 +617,59 @@ namespace Sein
 				ps.pShaderBytecode = pixelShader.Get()->GetBufferPointer();
 				ps.BytecodeLength = pixelShader.Get()->GetBufferSize();
 
+				// レンダーターゲットのブレンド状態の設定
+				const D3D12_RENDER_TARGET_BLEND_DESC defaultRenderTarggetBlendDesc = 
+				{
+					false,							// ブレンディングを有効にするか(今回は無効)
+					false,							// 論理演算を有効にするか(今回は無効)
+					D3D12_BLEND_ONE,				// RGB値ピクセルシェーダ出力に対して実行する操作を指定
+					D3D12_BLEND_ZERO,				// レンダーターゲットの現在のRGB値に対して実行する動作を指定する
+					D3D12_BLEND_OP_ADD,				// RGBまたはアルファブレンディング操作を指定(ソース1とソース2を追加)
+					D3D12_BLEND_ONE,				// ピクセルシェーダ出力するアルファ値に対して実行する動作を指定
+					D3D12_BLEND_ZERO,				// レンダーターゲットで現在のアルファ値に対して実行する動作
+					D3D12_BLEND_OP_ADD,				// RBGまたはアルファブレンディング操作を指定(ソース1とソース2を追加)
+					D3D12_LOGIC_OP_NOOP,			// レンダーターゲットに設定する論理演算?(ノーオペレーション、何もしない)
+					D3D12_COLOR_WRITE_ENABLE_ALL	// 
+				};
+
+				// ブレンド状態の設定
+				D3D12_BLEND_DESC blendDesc;
+				blendDesc.AlphaToCoverageEnable = false;	// アルファトゥカバレッジを有効にするか
+				blendDesc.IndependentBlendEnable = false;	// 同時レンダーターゲットに独立したブレンドを有効にするかどうかを指定します
+				for (unsigned int i = 0; i < D3D12_SIMULTANEOUS_RENDER_TARGET_COUNT; ++i)
+					blendDesc.RenderTarget[i] = defaultRenderTarggetBlendDesc;
+
+				// 深度ステンシル状態の設定
+				D3D12_DEPTH_STENCIL_DESC depthStencilDesc = {};
+				depthStencilDesc.DepthEnable = false;	// デプステストを有効にするか?
+				depthStencilDesc.StencilEnable = false;	// ステンシルテストを有効にするか?
+
+				// マルチサンプリングパラメーターの設定
+				DXGI_SAMPLE_DESC sampleDesc = {};
+				sampleDesc.Count = 1;	// ピクセル単位のマルチサンプリングの数
+
 				// パイプラインステートの設定
 				D3D12_GRAPHICS_PIPELINE_STATE_DESC psoDesc = {};
 				psoDesc.InputLayout = { inputElementDescs, _countof(inputElementDescs) };	// 入力レイアウトの構造
 				psoDesc.pRootSignature = rootSignature;										// ルートシグネチャ
-				psoDesc.RasterizerState = rasterizer_desc;
-				psoDesc.VS = vs;
-				psoDesc.PS = ps;				
+				psoDesc.RasterizerState = rasterizer_desc;									// ラスタライザの状態
+				psoDesc.VS = vs;															// 頂点シェーダーの構造
+				psoDesc.PS = ps;															// ピクセルシェーダーの構造
+				psoDesc.BlendState = blendDesc;												// ブレンド状態の構造
+				psoDesc.DepthStencilState = depthStencilDesc;								// 深度ステンシル状態の構造
+				psoDesc.SampleMask = UINT_MAX;												// ブレンドの状態のためのサンプルのマスク
+				psoDesc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;		// 入力プリミティブ(三角形)
+				psoDesc.NumRenderTargets = 1;												// レンダーターゲットのフォーマット数
+				psoDesc.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM;							// 深度ステンシルのフォーマット
+				psoDesc.SampleDesc = sampleDesc;											// サンプリング状態の構造
 
-				//D3D12_BLEND_DESC blend_desc;
-				//blend_desc.AlphaToCoverageEnable = FALSE;
-				//blend_desc.IndependentBlendEnable = FALSE;
-				//const D3D12_RENDER_TARGET_BLEND_DESC defaultRenderTargetBlendDesc =
-				//{
-				//	FALSE,FALSE,
-				//	D3D12_BLEND_ONE, D3D12_BLEND_ZERO, D3D12_BLEND_OP_ADD,
-				//	D3D12_BLEND_ONE, D3D12_BLEND_ZERO, D3D12_BLEND_OP_ADD,
-				//	D3D12_LOGIC_OP_NOOP,
-				//	D3D12_COLOR_WRITE_ENABLE_ALL,
-				//};
-				//for (UINT i = 0; i < D3D12_SIMULTANEOUS_RENDER_TARGET_COUNT; ++i)
-				//	blend_desc.RenderTarget[i] = defaultRenderTargetBlendDesc;
-
-				//psoDesc.BlendState = blend_desc;
-				//psoDesc.DepthStencilState.DepthEnable = FALSE;
-				//psoDesc.DepthStencilState.StencilEnable = FALSE;
-				//psoDesc.SampleMask = UINT_MAX;
-				//psoDesc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
-				//psoDesc.NumRenderTargets = 1;
-				//psoDesc.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM;
-				//psoDesc.SampleDesc.Count = 1;
-				//helper::ThrowIfFailed(m_device->CreateGraphicsPipelineState(&psoDesc, IID_PPV_ARGS(&m_pipelineState)));
+				// グラフィックスパイプラインステートの生成
+				if (FAILED(device->CreateGraphicsPipelineState(
+					&psoDesc,
+					IID_PPV_ARGS(&pipelineState))))
+				{
+					throw "パイプラインステートの生成に失敗しました。";
+				}
 			}
 		}
 	};
