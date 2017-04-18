@@ -33,6 +33,7 @@ QtDirect3D12::~QtDirect3D12()
 void QtDirect3D12::mainLoop()
 {
 	device->BeginScene();
+	device->Render();
 	device->EndScene();
 	device->Present();
 }

@@ -672,5 +672,42 @@ namespace Sein
 				}
 			}
 		}
+
+		/**
+		 *	@brief	描画する				 
+		 */
+		void Device::Render()
+		{
+			D3D12_VIEWPORT viewport;
+			viewport.TopLeftX = 0;
+			viewport.TopLeftY = 0;
+			viewport.Width = 600;
+			viewport.Height = 400;
+			viewport.MinDepth = 0;
+			viewport.MaxDepth = 0;
+
+			D3D12_RECT scissor;
+			scissor.left = 0;
+			scissor.top = 0;
+			scissor.right = 600;
+			scissor.bottom = 400;
+
+			// パイプラインステートの設定(切り替えない場合は、コマンドリストリセット時に設定可能)
+			commandList->SetPipelineState(pipelineState);
+
+			// グラフィックスパイプラインのルートシグネチャを設定する
+			commandList->SetGraphicsRootSignature(rootSignature);
+
+			// ビューポートの設定
+			commandList->RSSetViewports(1, &viewport);
+
+			// シザー矩形(シザーテスト)の設定
+			commandList->RSSetScissorRects(1, &scissor);
+
+			// 描画命令
+			commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+			commandList->IASetVertexBuffers(0, 1, &vertexBufferView);
+			commandList->DrawInstanced(3, 1, 0, 0);
+		}
 	};
 };
