@@ -127,23 +127,46 @@ namespace Sein
 
 			ID3D12Resource*				vertexBuffer;		///< 頂点バッファ
 			D3D12_VERTEX_BUFFER_VIEW	vertexBufferView;	///< 頂点バッファのビュー
-
 #pragma endregion
 
 			// パイプラインステート関連
 			// 後々別クラスへ移動
 #pragma region PipelineState
-
 			ID3D12PipelineState*	pipelineState;	///< パイプラインステート
 
-			public:
-				/**
-				 *	@brief	描画する				 
-				 */
-				void Render();
-
+		public:
+			/**
+			 *	@brief	描画する
+			 */
+			void Render();
 #pragma endregion
 
+			// 定数バッファ関連
+			// 後々別クラスへ移動
+#pragma region ConstantBuffer
+
+			/**
+			 *	@brief	定数バッファ用構造体
+			 */
+			struct ConstantBuffer
+			{
+				DirectX::XMMATRIX world;			///< ワールド行列(世界空間)
+				DirectX::XMMATRIX view;				///< ビュー行列(視線空間)
+				DirectX::XMMATRIX projection;		///< プロジェクション行列(射影空間)
+			};
+
+			ID3D12DescriptorHeap* cbvHeap;			///< 定数バッファ用ディスクリプターヒープ
+			ID3D12Resource* constantBuffer;			///< 定数バッファ
+			unsigned int* constantBufferDataBegin;	///< 定数バッファ(リソース)へのポインタ
+			ConstantBuffer constantBufferData;		///< 定数バッファ用のデータ
+
+		private:
+			/**
+			 *	@brief	定数をバッファを作成する
+			 */
+			void CreateConstantBuffer();
+
+#pragma endregion
 		};
 	};
 };

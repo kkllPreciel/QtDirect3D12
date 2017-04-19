@@ -24,7 +24,8 @@ namespace Sein
 			device(nullptr), swapChain(nullptr), commandQueue(nullptr), commandAllocator(nullptr),
 			commandList(nullptr), descriptorHeap(nullptr), descriptorSize(0), bufferIndex(0),
 			fence(nullptr), fenceIndex(0), fenceEvent(nullptr), vertexBuffer(nullptr),
-			rootSignature(nullptr), pipelineState(nullptr)
+			rootSignature(nullptr), pipelineState(nullptr), cbvHeap(nullptr), constantBuffer(nullptr),
+			constantBufferDataBegin(nullptr)
 		{
 			for (auto i = 0; i < FrameCount; ++i)
 			{
@@ -293,6 +294,9 @@ namespace Sein
 			fence->Release();
 
 			pipelineState->Release();
+			constantBufferDataBegin = nullptr;
+			constantBuffer->Unmap(0, nullptr);
+			constantBuffer->Release();
 			vertexBuffer->Release();
 			rootSignature->Release();
 
@@ -301,6 +305,7 @@ namespace Sein
 				renderTargetList[i]->Release();
 			}
 
+			cbvHeap->Release();
 			descriptorHeap->Release();
 			commandList->Release();
 			commandAllocator->Release();
@@ -429,15 +434,40 @@ namespace Sein
 		 */
 		void Device::LoadAssets(unsigned int width, unsigned int height)
 		{
-			// ルートシグネチャの作成
-			// 今回は空のルートシグネチャを作成する
+			// 定数バッファの生成
 			{
+				CreateConstantBuffer();
+			}
+
+			// ルートシグネチャの作成
+			{
+				// ディスクリプターレンジの設定
+				D3D12_DESCRIPTOR_RANGE descriptorRange;
+				descriptorRange.RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_CBV;								// ディスクリプターの種別(定数バッファビュー)
+				descriptorRange.NumDescriptors = 1;															// ディスクリプターの数
+				descriptorRange.BaseShaderRegister = 0;														// 範囲内のベースシェーダレジスタ
+				descriptorRange.RegisterSpace = 0;															// レジスタ空間(TODO:調べる)
+				descriptorRange.OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;	// ルートシグネチャ開始からのディスクリプタのオフセット?
+
+				// ルートパラメータの設定
+				D3D12_ROOT_PARAMETER rootParameter;
+				rootParameter.ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;				// ルートシグネチャのスロットの種別(ディスクリプタテーブル)
+				rootParameter.DescriptorTable.NumDescriptorRanges = 1;									// ディスクリプターレンジの数
+				rootParameter.DescriptorTable.pDescriptorRanges = &descriptorRange;						// ディスクリプターレンジのポインタ(数が1超なら配列の先頭ポインタ)
+				rootParameter.ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX;						// ルートシグネチャのスロットの内容にアクセスできるシェーダの種別(頂点シェーダのみ)
+
+				// ルートシグネチャの設定
 				D3D12_ROOT_SIGNATURE_DESC rootSignatureDesc;
-				rootSignatureDesc.NumParameters = 0;													// ルートシグネチャのスロット数
-				rootSignatureDesc.pParameters = nullptr;												// スロットの構造?
+				rootSignatureDesc.NumParameters = 1;													// ルートシグネチャのスロット数
+				rootSignatureDesc.pParameters = &rootParameter;											// スロットの構造?
 				rootSignatureDesc.NumStaticSamplers = 0;												// 静的サンプラー数
 				rootSignatureDesc.pStaticSamplers = nullptr;											// 静的サンプラー設定データのポインタ
-				rootSignatureDesc.Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;	// オプション(描画に使用する)
+				rootSignatureDesc.Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT	// オプション(描画に使用する
+					| D3D12_ROOT_SIGNATURE_FLAG_DENY_HULL_SHADER_ROOT_ACCESS							// ハルシェーダからルートシグネチャへのアクセス禁止
+					| D3D12_ROOT_SIGNATURE_FLAG_DENY_DOMAIN_SHADER_ROOT_ACCESS							// ドメインシェーダからルートシグネチャへのアクセス禁止
+					| D3D12_ROOT_SIGNATURE_FLAG_DENY_GEOMETRY_SHADER_ROOT_ACCESS						// ジオメトリシェーダからルートシグネチャへのアクセス禁止
+					| D3D12_ROOT_SIGNATURE_FLAG_DENY_PIXEL_SHADER_ROOT_ACCESS;							// ピクセルシェーダからルートシグネチャへのアクセス禁止
+				
 
 				// ルートシグネチャのシリアル化
 				Microsoft::WRL::ComPtr<ID3DBlob> signature;
@@ -678,6 +708,19 @@ namespace Sein
 		 */
 		void Device::Render()
 		{
+			static float now = 0.0f;
+			static float angle = DirectX::XM_PI / 180.0f;
+
+			// 回転
+			now += angle;
+
+			// ワールド行列を更新
+			constantBufferData.world = DirectX::XMMatrixRotationZ(now);
+
+			// 定数バッファを更新
+			std::memcpy(constantBufferDataBegin, &constantBufferData, sizeof(ConstantBuffer));
+
+			// ビューポートの作成
 			D3D12_VIEWPORT viewport;
 			viewport.TopLeftX = 0;
 			viewport.TopLeftY = 0;
@@ -686,17 +729,24 @@ namespace Sein
 			viewport.MinDepth = 0;
 			viewport.MaxDepth = 0;
 
+			// シザー矩形(シザーテスト)の作成
 			D3D12_RECT scissor;
 			scissor.left = 0;
 			scissor.top = 0;
 			scissor.right = 600;
 			scissor.bottom = 400;
 
-			// パイプラインステートの設定(切り替えない場合は、コマンドリストリセット時に設定可能)
-			commandList->SetPipelineState(pipelineState);
+			// 描画に使用するディスクリプターヒープを設定
+			commandList->SetDescriptorHeaps(1, &cbvHeap);
 
 			// グラフィックスパイプラインのルートシグネチャを設定する
 			commandList->SetGraphicsRootSignature(rootSignature);
+
+			// ディスクリプータヒープテーブルを設定
+			commandList->SetGraphicsRootDescriptorTable(0, cbvHeap->GetGPUDescriptorHandleForHeapStart());
+
+			// パイプラインステートの設定(切り替えない場合は、コマンドリストリセット時に設定可能)
+			commandList->SetPipelineState(pipelineState);
 
 			// ビューポートの設定
 			commandList->RSSetViewports(1, &viewport);
@@ -704,10 +754,98 @@ namespace Sein
 			// シザー矩形(シザーテスト)の設定
 			commandList->RSSetScissorRects(1, &scissor);
 
-			// 描画命令
+			// プリミティブトポロジーの設定
 			commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+			// 頂点バッファビューの設定
 			commandList->IASetVertexBuffers(0, 1, &vertexBufferView);
+
+			// 描画コマンドの生成
 			commandList->DrawInstanced(3, 1, 0, 0);
 		}
+
+		// 後々別クラスへ移動する
+#pragma region ConstantBuffer
+
+		/**
+		 *	@brief	定数をバッファを作成する
+		 */
+		void Device::CreateConstantBuffer()
+		{
+			// 定数バッファ用ディスクリプターヒープを生成
+			{
+				D3D12_DESCRIPTOR_HEAP_DESC cbvHeapDesc = {};
+				cbvHeapDesc.NumDescriptors = 1;									// ディスクリプターヒープ内のディスクリプター数(定数バッファ)
+				cbvHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;		// 定数バッファ or シェーダーリソース(テクスチャ) or ランダムアクセス のどれかのヒープ
+				cbvHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;	// シェーダーからアクセス可
+
+				if (device->CreateDescriptorHeap(&cbvHeapDesc, IID_PPV_ARGS(&cbvHeap)))
+				{
+					throw "定数バッファ用ディスクリプターヒープの生成に失敗しました。";
+				}
+			}
+
+			// 定数バッファを生成
+			{
+				// ヒープの設定
+				D3D12_HEAP_PROPERTIES properties;
+				properties.Type = D3D12_HEAP_TYPE_UPLOAD;						// ヒープの種類(今回はCPU、GPUからアクセス可能なヒープに設定)
+				properties.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;	// CPUページプロパティ(不明に設定)
+				properties.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN;	// ヒープのメモリプール(不明に設定)
+				properties.CreationNodeMask = 1;								// 恐らくヒープが生成されるアダプター(GPU)の番号
+				properties.VisibleNodeMask = 1;									// 恐らくヒープが表示されるアダプター(GPU)の番号
+
+				// リソースの設定
+				D3D12_RESOURCE_DESC resource_desc;
+				resource_desc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;		// リソースの種別(今回はバッファ)
+				resource_desc.Alignment = 0;									// アラインメント
+				resource_desc.Width = sizeof(ConstantBuffer);					// リソースの幅(今回は定数バッファのサイズ)
+				resource_desc.Height = 1;										// リソースの高さ(今回は定数バッファ分の幅を確保しているので1)
+				resource_desc.DepthOrArraySize = 1;								// リソースの深さ(テクスチャ等に使用する物、今回は1)
+				resource_desc.MipLevels = 1;									// ミップマップのレベル(今回は1)
+				resource_desc.Format = DXGI_FORMAT_UNKNOWN;						// リソースデータフォーマット(R8G8B8A8等)(今回は不明)
+				resource_desc.SampleDesc.Count = 1;								// ピクセル単位のマルチサンプリング数
+				resource_desc.SampleDesc.Quality = 0;							// マルチサンプリングの品質レベル
+				resource_desc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;			// テクスチャレイアウトオプション
+				resource_desc.Flags = D3D12_RESOURCE_FLAG_NONE;					// リソース操作オプションフラグ(今回は無し)
+
+				// 定数バッファ用リソースの生成(ヒープも同時に生成される)
+				if (FAILED(device->CreateCommittedResource(
+					&properties,						// ヒープの設定
+					D3D12_HEAP_FLAG_NONE,				// ヒープオプション(設定なし)
+					&resource_desc,						// リソースの設定
+					D3D12_RESOURCE_STATE_GENERIC_READ,	// リソースの状態
+					nullptr,							// クリアカラーのデフォルト値
+					IID_PPV_ARGS(&constantBuffer))))
+				{
+					throw "定数バッファ用リソースの作成に失敗しました。";
+				}
+
+				// 定数バッファビューの設定
+				D3D12_CONSTANT_BUFFER_VIEW_DESC constantBufferViewDesc = {};
+				constantBufferViewDesc.BufferLocation = constantBuffer->GetGPUVirtualAddress();		// バッファのアドレス
+				constantBufferViewDesc.SizeInBytes = (sizeof(ConstantBuffer) + 255) & ~255;			// 定数バッファは256バイトでアラインメントされていなければならない
+
+				// 定数バッファビューを生成
+				device->CreateConstantBufferView(&constantBufferViewDesc, cbvHeap->GetCPUDescriptorHandleForHeapStart());
+
+				// マップ。アプリケーション終了までアンマップしない
+				if (FAILED(constantBuffer->Map(
+					0,									// サブリソースのインデックス番号
+					nullptr,							// CPUからアクセスするメモリの範囲(nullptrは全領域にアクセスする)
+					reinterpret_cast<void**>(&constantBufferDataBegin))))	// リソースデータへのポインタ
+				{
+					throw "定数バッファ用リソースへのポインタの取得に失敗しました。";
+				}
+
+				// 定数バッファデータの初期化
+				auto aspect = static_cast<float>(600) / static_cast<float>(400);
+				constantBufferData.world = DirectX::XMMatrixIdentity();
+				constantBufferData.view = DirectX::XMMatrixIdentity();
+				constantBufferData.view = DirectX::XMMatrixIdentity();
+				std::memcpy(constantBufferDataBegin, &constantBufferData, sizeof(ConstantBuffer));
+			}
+		}
+#pragma endregion
 	};
 };
