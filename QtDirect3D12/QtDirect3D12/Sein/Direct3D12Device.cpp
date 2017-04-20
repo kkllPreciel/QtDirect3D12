@@ -727,7 +727,7 @@ namespace Sein
 			viewport.Width = 600;
 			viewport.Height = 400;
 			viewport.MinDepth = 0;
-			viewport.MaxDepth = 0;
+			viewport.MaxDepth = 1;
 
 			// シザー矩形(シザーテスト)の作成
 			D3D12_RECT scissor;
