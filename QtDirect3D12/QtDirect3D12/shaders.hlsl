@@ -12,9 +12,9 @@
 // コンスタントバッファ
 cbuffer ConstantBuffer : register(b0)
 {
-    float4x4 world;         ///< ワールド行列
-    float4x4 view;          ///< ビュー行列
-    float4x4 projection;    ///< プロジェクション行列
+    float4x4 world;        ///< ワールド行列(列優先行列)
+    float4x4 view;         ///< ビュー行列(列優先行列)
+    float4x4 projection;   ///< プロジェクション行列(列優先行列)
 };
 
 // ピクセルシェーダへの入力 = バーテックスシェーダの出力
@@ -28,7 +28,11 @@ PSInput VSMain(float4 position : POSITION, float4 color : COLOR)
 {
 	PSInput result;
 
-    result.position = mul(position, world);
+    position = mul(world, position);
+    position = mul(view, position);
+    position = mul(projection, position);
+
+    result.position = position;
 	result.color = color;
 
 	return result;
