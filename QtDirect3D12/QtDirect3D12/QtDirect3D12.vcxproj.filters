@@ -58,6 +58,9 @@
     <ClCompile Include="Sein\Direct3D12Device.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="PMX\Loader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="QtDirect3D12.h">
@@ -75,6 +78,9 @@
       <Filter>Generated Files</Filter>
     </ClInclude>
     <ClInclude Include="Sein\Direct3D12Device.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="PMX\Loader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

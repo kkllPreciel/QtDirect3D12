@@ -81,6 +81,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="PMX\Loader.cpp" />
     <ClCompile Include="QtDirect3D12.cpp" />
     <ClCompile Include="Sein\Direct3D12Device.cpp" />
   </ItemGroup>
@@ -110,6 +111,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GeneratedFiles\ui_QtDirect3D12.h" />
+    <ClInclude Include="PMX\Loader.h" />
     <ClInclude Include="Sein\Direct3D12Device.h" />
   </ItemGroup>
   <ItemGroup>
