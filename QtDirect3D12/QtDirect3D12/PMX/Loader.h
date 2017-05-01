@@ -9,6 +9,7 @@
 #pragma once
 
 // include
+#include <string>
 
 namespace Sein
 {
@@ -24,6 +25,34 @@ namespace Sein
 			 *	@brief	コンストラクタ
 			 */
 			Loader();
+
+			/**
+			 *	@brief	デストラクタ
+			 */
+			~Loader();
+
+			/**
+			 *	@brief	読み込みを行う
+			 *	@param	filePath:読み込みを行うPmxファイルのパス
+			 */
+			void Load(std::string filePath);
+
+		private:
+			/**
+			 *	@brief	コピーコンストラクタ
+			 *	@param	other:コピー元のインスタンス
+			 */
+			Loader(const Loader& other) = delete;
+
+			/**
+			 *	@brief	代入演算子オペレータ
+			 *	@param	other:代入元のインスタンス
+			 *	@return	代入後のインスタンス
+			 */
+			Loader& operator = (const Loader& other) = delete;
+
+		private:
+			unsigned int size;	///< ファイルサイズ
 		};
 	};
 };
