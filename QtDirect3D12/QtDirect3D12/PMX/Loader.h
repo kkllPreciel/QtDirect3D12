@@ -52,7 +52,8 @@ namespace Sein
 			Loader& operator = (const Loader& other) = delete;
 
 		private:
-			unsigned int size;	///< ファイルサイズ
+			char*			buffer;	///< バッファ
+			unsigned int	size;	///< ファイルサイズ
 		};
 	};
 };

@@ -17,7 +17,7 @@ namespace Sein
 		/**
 		 *	@brief	コンストラクタ
 		 */
-		Loader::Loader() : size(0)
+		Loader::Loader() : size(0), buffer(nullptr)
 		{
 
 		}
@@ -27,7 +27,11 @@ namespace Sein
 		 */
 		Loader::~Loader()
 		{
-
+			if (nullptr != buffer)
+			{
+				delete buffer;
+				buffer = nullptr;
+			}
 		}
 
 		/**
@@ -55,6 +59,9 @@ namespace Sein
 
 			ifs.seekg(0, std::fstream::beg);
 			unsigned int size = end - ifs.tellg();
+
+			// バッファの確保
+			buffer = new char[size + 1];
 
 			// ファイルサイズがヘッダサイズ未満
 
