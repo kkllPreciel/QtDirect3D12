@@ -14,6 +14,21 @@ namespace Sein
 {
 	namespace Pmx
 	{
+		// アラインメントを1バイトに設定
+#pragma pack( push, 1 )
+		/**
+		 *	@brief	Pmxヘッダデータ構造体
+		 */
+		struct Header
+		{
+			char	signature[4];	///< シグネチャ
+			float	version;		///< バージョン
+			char	globalsCount;	///< エンコード方式、追加UV数などの
+
+		};
+		// アラインメントをデフォルトの設定に戻す
+#pragma pack(pop)
+
 		/**
 		 *	@brief	コンストラクタ
 		 */
@@ -40,28 +55,36 @@ namespace Sein
 		 */
 		void Loader::Load(std::string filePath)
 		{
-			namespace fs = std::experimental::filesystem;
-
-			// ファイルが存在しない
-			if (false == fs::exists(filePath))
+			// ファイル内容の読み込み
 			{
-				return;
+				namespace fs = std::experimental::filesystem;
+
+				// ファイルが存在しない
+				if (false == fs::exists(filePath))
+				{
+					return;
+				}
+
+				std::ifstream ifs(filePath, std::ios::in | std::ios::binary);
+
+				ifs.seekg(0, std::fstream::end);
+				unsigned int end = ifs.tellg();
+
+				// 先頭に戻るために一度clear()をかける。
+				// これをしないと次のseekg()でコケるときがある。
+				ifs.clear();
+
+				ifs.seekg(0, std::fstream::beg);
+				size = end - ifs.tellg();
+
+				// バッファの確保
+				buffer = new char[size + 1];
+
+				ifs.read(buffer, size);
+				ifs.close();
 			}
 
-			std::ifstream ifs(filePath, std::ios::in | std::ios::binary);
-
-			ifs.seekg(0, std::fstream::end);
-			unsigned int end = ifs.tellg();
-
-			// 先頭に戻るために一度clear()をかける。
-			// これをしないと次のseekg()でコケるときがある。
-			ifs.clear();
-
-			ifs.seekg(0, std::fstream::beg);
-			unsigned int size = end - ifs.tellg();
-
-			// バッファの確保
-			buffer = new char[size + 1];
+			// モデルデータ読み込み
 
 			// ファイルサイズがヘッダサイズ未満
 
