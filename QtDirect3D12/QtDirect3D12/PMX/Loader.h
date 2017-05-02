@@ -15,6 +15,8 @@ namespace Sein
 {
 	namespace Pmx
 	{
+		struct Header;
+
 		/**
 		 *	@brief	Pmx読み込み用クラス
 		 */
@@ -54,6 +56,7 @@ namespace Sein
 		private:
 			char*			buffer;	///< バッファ
 			unsigned int	size;	///< ファイルサイズ
+			Header*			header;	///< ヘッダ
 		};
 	};
 };

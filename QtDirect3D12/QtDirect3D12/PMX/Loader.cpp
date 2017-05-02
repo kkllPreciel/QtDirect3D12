@@ -23,8 +23,8 @@ namespace Sein
 		{
 			char	signature[4];	///< シグネチャ
 			float	version;		///< バージョン
-			char	globalsCount;	///< エンコード方式、追加UV数などの
-
+			char	globalsCount;	///< ファイル全体での設定情報の個数(エンコード方式, 追加UV数等)
+			char*	globals;		///< ファイル全体での設定情報
 		};
 		// アラインメントをデフォルトの設定に戻す
 #pragma pack(pop)
@@ -32,7 +32,7 @@ namespace Sein
 		/**
 		 *	@brief	コンストラクタ
 		 */
-		Loader::Loader() : size(0), buffer(nullptr)
+		Loader::Loader() : size(0), buffer(nullptr), header(nullptr)
 		{
 
 		}
@@ -46,6 +46,12 @@ namespace Sein
 			{
 				delete buffer;
 				buffer = nullptr;
+			}
+
+			if (nullptr != header)
+			{
+				delete header;
+				header = nullptr;
 			}
 		}
 
@@ -62,7 +68,7 @@ namespace Sein
 				// ファイルが存在しない
 				if (false == fs::exists(filePath))
 				{
-					return;
+					throw "Pmxファイルが存在しません。";
 				}
 
 				std::ifstream ifs(filePath, std::ios::in | std::ios::binary);
@@ -85,10 +91,17 @@ namespace Sein
 			}
 
 			// モデルデータ読み込み
+			{
+				// ファイルサイズがヘッダサイズ未満
+				if (size < sizeof(Header))
+				{
+					throw "違法なデータのPmxファイルです。";
+				}
 
-			// ファイルサイズがヘッダサイズ未満
-
-			// ヘッダ読み込み
+				// ヘッダ読み込み
+				header = new Header;
+				std::memcpy(header, buffer, sizeof(Header));
+			}
 
 			// 違法データチェック
 		}
