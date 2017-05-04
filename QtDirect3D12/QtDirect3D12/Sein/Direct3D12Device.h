@@ -150,9 +150,9 @@ namespace Sein
 			 */
 			struct ConstantBuffer
 			{
-				DirectX::XMMATRIX world;			///< ワールド行列(世界空間)
-				DirectX::XMMATRIX view;				///< ビュー行列(視線空間)
-				DirectX::XMMATRIX projection;		///< プロジェクション行列(射影空間)
+				DirectX::XMFLOAT4X4 world;			///< ワールド行列(世界空間)
+				DirectX::XMFLOAT4X4 view;			///< ビュー行列(視線空間)
+				DirectX::XMFLOAT4X4 projection;		///< プロジェクション行列(射影空間)
 			};
 
 			ID3D12DescriptorHeap* cbvHeap;			///< 定数バッファ用ディスクリプターヒープ

@@ -715,16 +715,16 @@ namespace Sein
 			now += angle;
 
 			// ワールド行列を更新
-			constantBufferData.world = DirectX::XMMatrixRotationZ(now);
+			DirectX::XMStoreFloat4x4(&(constantBufferData.world), DirectX::XMMatrixRotationZ(now));
 
 			// ビュー行列を作成
 			DirectX::XMVECTORF32 eye = { 0.0f, 0.0f, -0.5f, 0.0f };
 			DirectX::XMVECTORF32 at = { 0.0f, 0.0f, 0.0f, 0.0f };
 			DirectX::XMVECTORF32 up = { 0.0f, 1.0f, 0.0f, 0.0f };
-			constantBufferData.view = DirectX::XMMatrixLookAtLH(eye, at, up);
+			DirectX::XMStoreFloat4x4(&(constantBufferData.view), DirectX::XMMatrixLookAtLH(eye, at, up));
 
 			// プロジェクション行列を作成
-			constantBufferData.projection = DirectX::XMMatrixPerspectiveFovLH(DirectX::XM_PI / 3.0f, 600.0f / 400.0f, 0.1f, 1000.0f);
+			DirectX::XMStoreFloat4x4(&(constantBufferData.projection), DirectX::XMMatrixPerspectiveFovLH(DirectX::XM_PI / 3.0f, 600.0f / 400.0f, 0.1f, 1000.0f));
 
 			// 定数バッファを更新
 			std::memcpy(constantBufferDataBegin, &constantBufferData, sizeof(ConstantBuffer));
@@ -849,9 +849,9 @@ namespace Sein
 
 				// 定数バッファデータの初期化
 				auto aspect = static_cast<float>(600) / static_cast<float>(400);
-				constantBufferData.world = DirectX::XMMatrixIdentity();
-				constantBufferData.view = DirectX::XMMatrixIdentity();
-				constantBufferData.projection = DirectX::XMMatrixIdentity();
+				DirectX::XMStoreFloat4x4(&(constantBufferData.world), DirectX::XMMatrixIdentity());
+				DirectX::XMStoreFloat4x4(&(constantBufferData.view), DirectX::XMMatrixIdentity());
+				DirectX::XMStoreFloat4x4(&(constantBufferData.projection), DirectX::XMMatrixIdentity());
 				std::memcpy(constantBufferDataBegin, &constantBufferData, sizeof(ConstantBuffer));
 			}
 		}
