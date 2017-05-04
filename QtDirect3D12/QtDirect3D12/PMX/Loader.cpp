@@ -24,7 +24,7 @@ namespace Sein
 			char	signature[4];	///< シグネチャ
 			float	version;		///< バージョン
 			char	globalsCount;	///< ファイル全体での設定情報の個数(エンコード方式, 追加UV数等)
-			char*	globals;		///< ファイル全体での設定情報
+			char	globals[8];		///< ファイル全体での設定情報
 		};
 		// アラインメントをデフォルトの設定に戻す
 #pragma pack(pop)
@@ -92,18 +92,45 @@ namespace Sein
 
 			// モデルデータ読み込み
 			{
-				// ファイルサイズがヘッダサイズ未満
-				if (size < sizeof(Header))
+				// ヘッダ読み込み
 				{
-					throw "違法なデータのPmxファイルです。";
+					// ファイルサイズがヘッダサイズ未満
+					if (size < sizeof(Header))
+					{
+						throw "違法なデータのPmxファイルです。";
+					}
+
+					header = new Header;
+					std::memcpy(header, buffer, sizeof(Header));
+
+					// 違法データチェック
+					// シグネチャが「PMX 」でない
+					// バージョンが「2.0」か「2.1」でない
 				}
 
-				// ヘッダ読み込み
-				header = new Header;
-				std::memcpy(header, buffer, sizeof(Header));
+				// モデル情報読み込み
+				{
+					char* buffer = this->buffer + sizeof(Header);
+
+					std::string tes = "あいうえお";
+
+					// モデル名
+					unsigned int nameSize = 0;
+					std::memcpy(&nameSize, buffer, sizeof(nameSize));
+					std::string name(buffer + sizeof(nameSize), buffer + sizeof(nameSize) + nameSize);
+
+					// 英語のモデル名
+
+					// コメント
+
+					// 英語のコメント
+					int i = 0;
+				}
 			}
 
-			// 違法データチェック
+			{
+
+			}
 		}
 	};
 };
