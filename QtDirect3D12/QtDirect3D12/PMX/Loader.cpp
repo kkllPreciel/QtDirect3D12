@@ -8,6 +8,7 @@
 
 #include <filesystem>
 #include <fstream>
+#include <DirectXMath.h>
 #include "Loader.h"
 
 namespace Sein
@@ -15,7 +16,7 @@ namespace Sein
 	namespace Pmx
 	{
 		// アラインメントを1バイトに設定
-#pragma pack( push, 1 )
+#pragma pack(push, 1)
 		/**
 		 *	@brief	Pmxヘッダデータ構造体
 		 */
@@ -25,6 +26,20 @@ namespace Sein
 			float	version;		///< バージョン
 			char	globalsCount;	///< ファイル全体での設定情報の個数(エンコード方式, 追加UV数等)
 			char	globals[8];		///< ファイル全体での設定情報
+		};
+		// アラインメントをデフォルトの設定に戻す
+#pragma pack(pop)
+
+		// アラインメントを1バイトに設定
+#pragma pack(push, 1)
+		/**
+		 *	@brief	Pmx頂点データ構造体
+		 */
+		struct Vertex
+		{
+			DirectX::XMFLOAT3	position;	///< 座標
+			DirectX::XMFLOAT3	normal;		///< 法線
+			DirectX::XMFLOAT2	uv;			///< UV座標
 		};
 		// アラインメントをデフォルトの設定に戻す
 #pragma pack(pop)
@@ -92,6 +107,8 @@ namespace Sein
 
 			// モデルデータ読み込み
 			{
+				char* buffer = this->buffer;
+
 				// ヘッダ読み込み
 				{
 					// ファイルサイズがヘッダサイズ未満
@@ -102,6 +119,7 @@ namespace Sein
 
 					header = new Header;
 					std::memcpy(header, buffer, sizeof(Header));
+					buffer = buffer + sizeof(Header);
 
 					// 違法データチェック
 					// シグネチャが「PMX 」でない
@@ -110,26 +128,54 @@ namespace Sein
 
 				// モデル情報読み込み
 				{
-					char* buffer = this->buffer + sizeof(Header);
-
-					std::string tes = "あいうえお";
-
 					// モデル名
 					unsigned int nameSize = 0;
 					std::memcpy(&nameSize, buffer, sizeof(nameSize));
 					std::string name(buffer + sizeof(nameSize), buffer + sizeof(nameSize) + nameSize);
+					buffer = buffer + sizeof(nameSize) + nameSize;
 
 					// 英語のモデル名
+					unsigned int englishNameSize = 0;
+					std::memcpy(&englishNameSize, buffer, sizeof(englishNameSize));
+					std::string englishName(buffer + sizeof(englishNameSize), buffer + sizeof(englishNameSize) + englishNameSize);
+					buffer = buffer + sizeof(englishNameSize) + englishNameSize;
 
 					// コメント
+					unsigned int commentSize = 0;
+					std::memcpy(&commentSize, buffer, sizeof(commentSize));
+					std::string comment(buffer + sizeof(commentSize), buffer + sizeof(commentSize) + commentSize);
+					buffer = buffer + sizeof(commentSize) + commentSize;
 
 					// 英語のコメント
-					int i = 0;
+					unsigned int englishCommentSize = 0;
+					std::memcpy(&englishCommentSize, buffer, sizeof(englishCommentSize));
+					std::string englishComment(buffer + sizeof(englishCommentSize), buffer + sizeof(englishCommentSize) + englishCommentSize);
+					buffer = buffer + sizeof(englishCommentSize) + englishCommentSize;
 				}
-			}
 
-			{
+				// 頂点データ読み込み
+				{
+					unsigned int vertexCount = 0;
+					std::memcpy(&vertexCount, buffer, sizeof(vertexCount));
+					buffer = buffer + sizeof(vertexCount);
 
+					for (int i = 0; i < vertexCount; ++i)
+					{
+						// 座標
+
+						// 法線
+
+						// UV
+
+						// 追加UV
+
+						// ウェイト変更方式
+
+						// エッジ倍率
+
+					}
+
+				}
 			}
 		}
 	};
