@@ -47,7 +47,7 @@ namespace Sein
 		/**
 		 *	@brief	コンストラクタ
 		 */
-		Loader::Loader() : size(0), buffer(nullptr), header(nullptr)
+		Loader::Loader() : size(0), buffer(nullptr), header(nullptr), vertexCount(0), vertices(nullptr), indexCount(0), indices(nullptr)
 		{
 
 		}
@@ -67,6 +67,18 @@ namespace Sein
 			{
 				delete header;
 				header = nullptr;
+			}
+
+			if (nullptr != vertices)
+			{
+				delete[] vertices;
+				vertices = nullptr;
+			}
+
+			if (nullptr != indices)
+			{
+				delete[] indices;
+				indices = nullptr;
 			}
 		}
 
@@ -155,26 +167,80 @@ namespace Sein
 
 				// 頂点データ読み込み
 				{
-					unsigned int vertexCount = 0;
+					vertexCount = 0;
 					std::memcpy(&vertexCount, buffer, sizeof(vertexCount));
 					buffer = buffer + sizeof(vertexCount);
 
+					unsigned int addUvCount = header->globals[1];
+					unsigned int boneIndexSize = header->globals[5];
+					vertices = new Vertex[vertexCount];
 					for (int i = 0; i < vertexCount; ++i)
 					{
 						// 座標
+						std::memcpy(&(vertices[i].position), buffer, sizeof(vertices[i].position));
+						buffer = buffer + sizeof(vertices[i].position);
 
 						// 法線
+						std::memcpy(&(vertices[i].normal), buffer, sizeof(vertices[i].normal));
+						buffer = buffer + sizeof(vertices[i].normal);
 
 						// UV
+						std::memcpy(&(vertices[i].uv), buffer, sizeof(vertices[i].uv));
+						buffer = buffer + sizeof(vertices[i].uv);
 
 						// 追加UV
+						if (0 < addUvCount)
+						{
+							buffer = buffer + (sizeof(DirectX::XMFLOAT4) * addUvCount);
+						}
 
 						// ウェイト変更方式
+						{
+							unsigned char weightType = 0;
+							std::memcpy(&weightType, buffer, sizeof(weightType));
+							buffer = buffer + sizeof(weightType);
+
+							// ウェイト種別毎のデータ読み込み
+							// 今回は使用しないのでスキップする
+							// TODO:State or Strategyパターン作成
+							switch (weightType)
+							{
+								// BDEF1
+							case 0:
+								buffer = buffer + boneIndexSize;
+								break;
+								// BDEF2
+							case 1:
+								buffer = buffer + (boneIndexSize * 2);
+								buffer = buffer + sizeof(float);
+								break;
+								// BDEF4
+							case 2:
+								buffer = buffer + (boneIndexSize * 4);
+								buffer = buffer + (sizeof(float) * 4);
+								break;
+							case 3:
+								buffer = buffer + (boneIndexSize * 2);
+								buffer = buffer + sizeof(float);
+								buffer = buffer + (sizeof(DirectX::XMFLOAT3) * 3);
+								break;
+							default:
+								throw "違法なウェイト変更方式データです。";
+								break;
+							}
+						}
 
 						// エッジ倍率
-
+						// 使用しないのでスキップ
+						buffer = buffer + sizeof(float);
 					}
+				}
 
+				// ポリゴンデータ読み込み
+				{
+					indexCount = 0;
+					std::memcpy(&indexCount, buffer, sizeof(indexCount));
+					buffer = buffer + sizeof(indexCount);
 				}
 			}
 		}

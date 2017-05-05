@@ -16,6 +16,7 @@ namespace Sein
 	namespace Pmx
 	{
 		struct Header;
+		struct Vertex;
 
 		/**
 		 *	@brief	Pmx読み込み用クラス
@@ -54,9 +55,13 @@ namespace Sein
 			Loader& operator = (const Loader& other) = delete;
 
 		private:
-			char*			buffer;	///< バッファ
-			unsigned int	size;	///< ファイルサイズ
-			Header*			header;	///< ヘッダ
+			char*			buffer;			///< バッファ
+			unsigned int	size;			///< ファイルサイズ
+			Header*			header;			///< ヘッダ
+			unsigned int	vertexCount;	///< 頂点数
+			Vertex*			vertices;		///< 頂点データリスト
+			unsigned int	indexCount;		///< 頂点インデックス数
+			unsigned int*	indices;		///< 頂点インデックスデータリスト
 		};
 	};
 };
