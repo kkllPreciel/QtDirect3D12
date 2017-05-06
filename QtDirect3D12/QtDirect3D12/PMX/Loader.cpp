@@ -47,7 +47,8 @@ namespace Sein
 		/**
 		 *	@brief	コンストラクタ
 		 */
-		Loader::Loader() : size(0), buffer(nullptr), header(nullptr), vertexCount(0), vertices(nullptr), indexCount(0), indices(nullptr)
+		Loader::Loader() : size(0), buffer(nullptr), header(nullptr), vertexCount(0),
+			vertices(nullptr), indexCount(0), indices(nullptr), polygonCount(0)
 		{
 
 		}
@@ -236,12 +237,23 @@ namespace Sein
 					}
 				}
 
-				// ポリゴンデータ読み込み
+				// 頂点インデックスデータ読み込み
 				{
 					indexCount = 0;
 					std::memcpy(&indexCount, buffer, sizeof(indexCount));
 					buffer = buffer + sizeof(indexCount);
+
+					unsigned int vertexIndexSize = header->globals[2];
+					indices = new unsigned int[indexCount];
+					for (unsigned int i = 0; i < indexCount; ++i)
+					{
+						std::memcpy(&(indices[i]), buffer, vertexIndexSize);
+						buffer = buffer + vertexIndexSize;
+					}
 				}
+
+				// ポリゴン数
+				polygonCount = indexCount / 3;
 			}
 		}
 	};

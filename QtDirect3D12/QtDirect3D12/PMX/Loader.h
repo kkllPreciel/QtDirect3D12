@@ -62,6 +62,7 @@ namespace Sein
 			Vertex*			vertices;		///< 頂点データリスト
 			unsigned int	indexCount;		///< 頂点インデックス数
 			unsigned int*	indices;		///< 頂点インデックスデータリスト
+			unsigned int	polygonCount;	///< ポリゴン数
 		};
 	};
 };
