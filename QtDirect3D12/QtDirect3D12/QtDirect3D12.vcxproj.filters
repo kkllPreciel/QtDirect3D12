@@ -55,10 +55,10 @@
     <ClCompile Include="GeneratedFiles\qrc_QtDirect3D12.cpp">
       <Filter>Generated Files</Filter>
     </ClCompile>
-    <ClCompile Include="Sein\Direct3D12Device.cpp">
+    <ClCompile Include="Sein\Direct3D12\Direct3D12Device.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="PMX\Loader.cpp">
+    <ClCompile Include="Sein\PMX\Loader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -77,10 +77,10 @@
     <ClInclude Include="GeneratedFiles\ui_QtDirect3D12.h">
       <Filter>Generated Files</Filter>
     </ClInclude>
-    <ClInclude Include="Sein\Direct3D12Device.h">
+    <ClInclude Include="Sein\Direct3D12\Direct3D12Device.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="PMX\Loader.h">
+    <ClInclude Include="Sein\PMX\Loader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

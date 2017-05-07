@@ -81,9 +81,9 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="PMX\Loader.cpp" />
+    <ClCompile Include="Sein\PMX\Loader.cpp" />
     <ClCompile Include="QtDirect3D12.cpp" />
-    <ClCompile Include="Sein\Direct3D12Device.cpp" />
+    <ClCompile Include="Sein\Direct3D12\Direct3D12Device.cpp" />
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="QtDirect3D12.h">
@@ -111,8 +111,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GeneratedFiles\ui_QtDirect3D12.h" />
-    <ClInclude Include="PMX\Loader.h" />
-    <ClInclude Include="Sein\Direct3D12Device.h" />
+    <ClInclude Include="Sein\PMX\Loader.h" />
+    <ClInclude Include="Sein\Direct3D12\Direct3D12Device.h" />
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="QtDirect3D12.qrc">
