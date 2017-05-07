@@ -83,6 +83,12 @@
     <ClInclude Include="Sein\PMX\Loader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Sein\Direct3D12\VertexBuffer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Sein\Direct3D12\IndexBuffer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="shaders.hlsl" />

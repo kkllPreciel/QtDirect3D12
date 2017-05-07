@@ -111,6 +111,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GeneratedFiles\ui_QtDirect3D12.h" />
+    <ClInclude Include="Sein\Direct3D12\IndexBuffer.h" />
+    <ClInclude Include="Sein\Direct3D12\VertexBuffer.h" />
     <ClInclude Include="Sein\PMX\Loader.h" />
     <ClInclude Include="Sein\Direct3D12\Direct3D12Device.h" />
   </ItemGroup>
