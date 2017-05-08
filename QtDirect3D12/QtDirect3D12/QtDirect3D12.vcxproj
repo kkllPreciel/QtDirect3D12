@@ -81,6 +81,8 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="Sein\Direct3D12\IndexBuffer.cpp" />
+    <ClCompile Include="Sein\Direct3D12\VertexBuffer.cpp" />
     <ClCompile Include="Sein\PMX\Loader.cpp" />
     <ClCompile Include="QtDirect3D12.cpp" />
     <ClCompile Include="Sein\Direct3D12\Direct3D12Device.cpp" />

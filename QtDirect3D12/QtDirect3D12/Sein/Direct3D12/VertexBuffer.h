@@ -34,8 +34,11 @@ namespace Sein
 			/**
 			 *	@brief	頂点バッファの生成を行う
 			 *	@param	device:Direct3D12のデバイス
+			 *	@param	size:頂点バッファのサイズ(全頂点合計サイズ)
+			 *	@param	stride:1頂点のサイズ
+			 *	@param	vertices:頂点データ
 			 */
-			void Create(const ID3D12Device& device);
+			void Create(ID3D12Device* const device, const unsigned int size, const unsigned short stride, const void* const vertices);
 
 		private:
 			/**
