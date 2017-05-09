@@ -256,5 +256,41 @@ namespace Sein
 				polygonCount = indexCount / 3;
 			}
 		}
+
+		/**
+		 *	@brief	頂点数を取得する
+		 *	@return	頂点数
+		 */
+		unsigned int Loader::GetVertexCount() const
+		{
+			return vertexCount;
+		}
+
+		/**
+		 *	@brief	頂点データを取得する
+		 *	@return	頂点データへのポインタ
+		 */
+		const Vertex& Loader::GetVertices() const
+		{
+			return *vertices;
+		}
+
+		/**
+		 *	@brief	頂点インデックス数を取得する
+		 *	@return	頂点インデックス数
+		 */
+		unsigned int Loader::GetIndexCount() const
+		{
+			return indexCount;
+		}
+
+		/**
+		 *	@brief	頂点インデックスデータを取得する
+		 *	@return	頂点インデックスデータへのポインタ
+		 */
+		const unsigned int& Loader::GetIndices() const
+		{
+			return *indices;
+		}
 	};
 };

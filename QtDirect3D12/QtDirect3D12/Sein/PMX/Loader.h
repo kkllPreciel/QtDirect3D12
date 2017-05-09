@@ -40,6 +40,30 @@ namespace Sein
 			 */
 			void Load(std::string filePath);
 
+			/**
+			 *	@brief	頂点数を取得する
+			 *	@return	頂点数
+			 */
+			unsigned int GetVertexCount() const;
+
+			/**
+			 *	@brief	頂点データを取得する
+			 *	@return	頂点データへのポインタ
+			 */
+			const Vertex& GetVertices() const;
+
+			/**
+			 *	@brief	頂点インデックス数を取得する
+			 *	@return	頂点インデックス数
+			 */
+			unsigned int GetIndexCount() const;
+
+			/**
+			*	@brief	頂点インデックスデータを取得する
+			*	@return	頂点インデックスデータへのポインタ
+			*/
+			const unsigned int& GetIndices() const;
+
 		private:
 			/**
 			 *	@brief	コピーコンストラクタ

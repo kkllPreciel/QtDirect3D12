@@ -34,8 +34,11 @@ namespace Sein
 			/**
 			 *	@brief	頂点インデックスバッファの生成を行う
 			 *	@param	device:Direct3D12のデバイス
+			 *	@param	size:頂点インデックスバッファのサイズ(全頂点インデックス合計サイズ)
+			 *	@param	indices:頂点インデックスデータ
+			 *	@param	format:データフォーマット
 			 */
-			void Create(const ID3D12Device& device);
+			void Create(ID3D12Device* const device, const unsigned int size, const void* const indices, DXGI_FORMAT format);
 
 		private:
 			/**
