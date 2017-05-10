@@ -773,6 +773,15 @@ namespace Sein
 			commandList->DrawInstanced(3, 1, 0, 0);
 		}
 
+		/**
+		 *	@brief	デバイスを取得する
+		 *	@return	デバイスへの参照
+		 */
+		ID3D12Device& Device::GetDevice() const
+		{
+			return *device;
+		}
+
 		// 後々別クラスへ移動する
 #pragma region ConstantBuffer
 

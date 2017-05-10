@@ -50,7 +50,13 @@ namespace Sein
 			 *	@brief	頂点データを取得する
 			 *	@return	頂点データへのポインタ
 			 */
-			const Vertex& GetVertices() const;
+			const void* const GetVertices() const;
+
+			/**
+			 *	@brief	頂点のサイズを取得する
+			 *	@return	頂点のサイズ
+			 */
+			unsigned int GetVertexSize() const;
 
 			/**
 			 *	@brief	頂点インデックス数を取得する
@@ -59,10 +65,16 @@ namespace Sein
 			unsigned int GetIndexCount() const;
 
 			/**
-			*	@brief	頂点インデックスデータを取得する
-			*	@return	頂点インデックスデータへのポインタ
-			*/
-			const unsigned int& GetIndices() const;
+			 *	@brief	頂点インデックスデータを取得する
+			 *	@return	頂点インデックスデータへのポインタ
+			 */
+			const void* const GetIndices() const;
+
+			/**
+			 *	@brief	頂点インデックスのサイズを取得する
+			 *	@return	頂点インデックスのサイズ
+			 */
+			const unsigned int GetIndexSize() const;
 
 		private:
 			/**

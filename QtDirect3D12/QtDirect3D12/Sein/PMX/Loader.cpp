@@ -270,9 +270,18 @@ namespace Sein
 		 *	@brief	頂点データを取得する
 		 *	@return	頂点データへのポインタ
 		 */
-		const Vertex& Loader::GetVertices() const
+		const void* const Loader::GetVertices() const
 		{
-			return *vertices;
+			return vertices;
+		}
+
+		/**
+		 *	@brief	頂点のサイズを取得する
+		 *	@return	頂点のサイズ
+		 */
+		unsigned int Loader::GetVertexSize() const
+		{
+			return sizeof(Vertex);
 		}
 
 		/**
@@ -288,9 +297,18 @@ namespace Sein
 		 *	@brief	頂点インデックスデータを取得する
 		 *	@return	頂点インデックスデータへのポインタ
 		 */
-		const unsigned int& Loader::GetIndices() const
+		const void* const Loader::GetIndices() const
 		{
-			return *indices;
+			return indices;
+		}
+
+		/**
+		 *	@brief	頂点インデックスのサイズを取得する
+		 *	@return	頂点インデックスのサイズ
+		 */
+		const unsigned int Loader::GetIndexSize() const
+		{
+			return header->globals[2];
 		}
 	};
 };

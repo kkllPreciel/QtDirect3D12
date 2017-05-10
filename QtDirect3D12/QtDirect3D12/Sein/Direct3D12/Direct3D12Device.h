@@ -75,6 +75,12 @@ namespace Sein
 			 */
 			void Present();
 
+			/**
+			 *	@brief	デバイスを取得する
+			 *	@return	デバイスへの参照
+			 */
+			ID3D12Device& GetDevice() const;
+
 		private:
 			ID3D12Device*				device;					///< デバイス
 			IDXGISwapChain3*			swapChain;				///< スワップチェイン
