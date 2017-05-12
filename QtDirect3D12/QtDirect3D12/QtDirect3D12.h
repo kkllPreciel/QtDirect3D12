@@ -3,6 +3,8 @@
 #include <QtWidgets/QWidget>
 #include "ui_QtDirect3D12.h"
 #include "Sein/Direct3D12/Direct3D12Device.h"
+#include "Sein/Direct3D12/VertexBuffer.h"
+#include "Sein/Direct3D12/IndexBuffer.h"
 
 class QtDirect3D12 : public QWidget
 {
@@ -22,4 +24,6 @@ private:
 	Ui::QtDirect3D12Class ui;
 	QTimer* timer;
 	Sein::Direct3D12::Device* device;
+	Sein::Direct3D12::VertexBuffer* vertexBuffer;
+	Sein::Direct3D12::IndexBuffer* indexBuffer;
 };

@@ -40,6 +40,12 @@ namespace Sein
 			 */
 			void Create(ID3D12Device* const device, const unsigned int size, const unsigned short stride, const void* const vertices);
 
+			/**
+			 *	@brief	ビューを取得する
+			 *	@return	ビューへの参照
+			 */
+			const D3D12_VERTEX_BUFFER_VIEW& GetView() const;			
+
 		private:
 			/**
 			 *	@brief	コピーコンストラクタ

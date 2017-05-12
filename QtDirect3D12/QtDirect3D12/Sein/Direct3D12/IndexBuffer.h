@@ -40,6 +40,12 @@ namespace Sein
 			 */
 			void Create(ID3D12Device* const device, const unsigned int size, const void* const indices, DXGI_FORMAT format);
 
+			/**
+			 *	@brief	ビューを取得する
+			 *	@return	ビューへの参照
+			 */
+			const D3D12_INDEX_BUFFER_VIEW& GetView() const;
+
 		private:
 			/**
 			 *	@brief	コピーコンストラクタ

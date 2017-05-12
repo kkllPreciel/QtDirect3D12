@@ -18,6 +18,9 @@ namespace Sein
 {
 	namespace Direct3D12
 	{
+		class VertexBuffer;
+		class IndexBuffer;
+
 		/**
 		 *	@brief	Direct3D12用デバイスクラス(スワップチェインも一緒)
 		 */
@@ -143,8 +146,10 @@ namespace Sein
 		public:
 			/**
 			 *	@brief	描画する
+			 *	@param	vertexBuffer:頂点バッファ
+			 *	@param	indexBuffer:頂点インデックスバッファ
 			 */
-			void Render();
+			void Render(const VertexBuffer& vertebBuffer, const IndexBuffer& indexBuffer);
 #pragma endregion
 
 			// 定数バッファ関連

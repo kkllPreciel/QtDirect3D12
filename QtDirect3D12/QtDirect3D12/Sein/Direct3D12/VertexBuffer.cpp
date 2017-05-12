@@ -101,5 +101,14 @@ namespace Sein
 			view.SizeInBytes = size;								// バッファ(全頂点合計)のサイズ(バイト単位)
 			view.StrideInBytes = stride;							// 1頂点のサイズ(バイト単位)
 		}
+
+		/**
+		 *	@brief	ビューを取得する
+		 *	@return	ビューへの参照
+		 */
+		const D3D12_VERTEX_BUFFER_VIEW& VertexBuffer::GetView() const
+		{
+			return view;
+		}
 	};
 };

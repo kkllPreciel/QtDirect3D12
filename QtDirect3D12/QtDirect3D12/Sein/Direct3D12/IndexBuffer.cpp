@@ -101,5 +101,14 @@ namespace Sein
 			view.SizeInBytes = size;								// バッファ(全頂点インデックス合計)のサイズ(バイト単位)
 			view.Format = format;									// バッファのフォーマット
 		}
+
+		/**
+		 *	@brief	ビューを取得する
+		 *	@return	ビューへの参照
+		 */
+		const D3D12_INDEX_BUFFER_VIEW& IndexBuffer::GetView() const
+		{
+			return view;
+		}
 	};
 };

@@ -704,9 +704,11 @@ namespace Sein
 		}
 
 		/**
-		 *	@brief	描画する				 
+		 *	@brief	描画する
+		 *	@param	vertexBuffer:頂点バッファ
+		 *	@param	indexBuffer:頂点インデックスバッファ
 		 */
-		void Device::Render()
+		void Device::Render(const VertexBuffer& vertebBuffer, const IndexBuffer& indexBuffer)
 		{
 			static float now = 0.0f;
 			static float angle = DirectX::XM_PI / 180.0f;
