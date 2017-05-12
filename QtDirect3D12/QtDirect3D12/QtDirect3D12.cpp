@@ -35,6 +35,8 @@ QtDirect3D12::~QtDirect3D12()
 		timer->stop();
 	}
 
+	delete indexBuffer;
+	delete vertexBuffer;
 	delete timer;
 	delete device;
 }
