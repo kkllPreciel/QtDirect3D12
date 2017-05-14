@@ -24,16 +24,18 @@ struct PSInput
 	float4 color : COLOR;
 };
 
-PSInput VSMain(float4 position : POSITION, float4 color : COLOR)
+PSInput VSMain(float3 position : POSITION, float3 normal : NORMAL, float2 uv : TEXCOORD0)
 {
 	PSInput result;
 
-    position = mul(world, position);
-    position = mul(view, position);
-    position = mul(projection, position);
+    float4 pos = float4(position, 1.0);
 
-    result.position = position;
-	result.color = color;
+    pos = mul(world, pos);
+    pos = mul(view, pos);
+    pos = mul(projection, pos);
+
+    result.position = pos;
+    result.color = float4(uv.x, uv.y, 1.0, 1.0);
 
 	return result;
 }

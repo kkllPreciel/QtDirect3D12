@@ -245,10 +245,96 @@ namespace Sein
 
 					unsigned int vertexIndexSize = header->globals[2];
 					indices = new unsigned int[indexCount];
-					for (unsigned int i = 0; i < indexCount; ++i)
+
+					std::memcpy(indices, buffer, vertexIndexSize * indexCount);
+					buffer = buffer + (vertexIndexSize * indexCount);
+				}
+
+				// テクスチャ読み込み
+				{
+					unsigned int textureCount = 0;
+					std::memcpy(&textureCount, buffer, sizeof(textureCount));
+					buffer = buffer + sizeof(textureCount);
+
+					for (unsigned int i = 0; i < textureCount; ++i)
 					{
-						std::memcpy(&(indices[i]), buffer, vertexIndexSize);
-						buffer = buffer + vertexIndexSize;
+						// テクスチャパスサイズ
+						unsigned int texturePathSize = 0;
+						std::memcpy(&texturePathSize, buffer, sizeof(texturePathSize));
+						buffer = buffer + sizeof(texturePathSize);
+
+						// テクスチャ
+						buffer = buffer + texturePathSize;
+					}
+				}
+
+				// マテリアル読み込み
+				{
+					unsigned int materialCount = 0;
+					std::memcpy(&materialCount, buffer, sizeof(materialCount));
+					buffer = buffer + sizeof(materialCount);
+
+					for (int i = 0; i < materialCount; ++i)
+					{
+						// マテリアル名
+						unsigned int nameSize = 0;
+						std::memcpy(&nameSize, buffer, sizeof(nameSize));
+						std::string name(buffer + sizeof(nameSize), buffer + sizeof(nameSize) + nameSize);
+						buffer = buffer + sizeof(nameSize) + nameSize;
+
+						// マテリアル名(英語)
+						unsigned int englishNameSize = 0;
+						std::memcpy(&englishNameSize, buffer, sizeof(englishNameSize));
+						std::string englishName(buffer + sizeof(englishNameSize), buffer + sizeof(englishNameSize) + englishNameSize);
+						buffer = buffer + sizeof(englishNameSize) + englishNameSize;
+
+						// 拡散反射光(Diffuse)
+						buffer = buffer + sizeof(DirectX::XMFLOAT4);
+
+						// 鏡面反射光(Specular)
+						buffer = buffer + sizeof(DirectX::XMFLOAT3);
+
+						// 鏡面反射の強度
+						buffer = buffer + sizeof(float);
+
+						// 環境光(Ambient)
+						buffer = buffer + sizeof(DirectX::XMFLOAT3);
+
+						// 描画フラグ
+						buffer = buffer + sizeof(unsigned char);
+
+						// エッジ色
+						buffer = buffer + sizeof(DirectX::XMFLOAT4);
+
+						// エッジサイズ
+						buffer = buffer + sizeof(float);
+
+						// 通常テクスチャ
+						buffer = buffer + header->globals[3];
+
+						// スフィアテクスチャ
+						buffer = buffer + header->globals[3];
+
+						// スフィアモード
+						buffer = buffer + sizeof(unsigned char);
+
+						// 共有Toonフラグ
+						bool is_share = false;
+						std::memcpy(&is_share, buffer, sizeof(is_share));
+						buffer = buffer + sizeof(unsigned char);
+
+						buffer = buffer + (is_share ? sizeof(unsigned char) : header->globals[3]);
+
+						// メモ
+						unsigned int memoSize = 0;
+						std::memcpy(&memoSize, buffer, sizeof(memoSize));
+						std::string memoName(buffer + sizeof(memoSize), buffer + sizeof(memoSize) + memoSize);
+						buffer = buffer + sizeof(memoSize) + memoSize;
+
+						// マテリアルに対応する頂点インデックス数
+						unsigned int vetexCount = 0;
+						std::memcpy(&vetexCount, buffer, sizeof(vetexCount));
+						buffer = buffer + sizeof(vetexCount);
 					}
 				}
 

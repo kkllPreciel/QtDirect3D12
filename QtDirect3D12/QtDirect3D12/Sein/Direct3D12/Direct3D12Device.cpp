@@ -12,6 +12,8 @@
 #include <winerror.h>
 #include <d3dcompiler.h>
 #include "Direct3D12Device.h"
+#include "Sein/Direct3D12/VertexBuffer.h"
+#include "Sein/Direct3D12/IndexBuffer.h"
 
 namespace Sein
 {
@@ -617,16 +619,19 @@ namespace Sein
 				D3D12_INPUT_ELEMENT_DESC inputElementDescs[] =
 				{
 					// 頂点座標
-					{ "POSITiON", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
+					{ "POSITiON", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
 
-					// 頂点カラー
-					{ "COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 }
+					// 頂点の法線
+					{ "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
+
+					// テクスチャ座標
+					{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 }
 				};
 
 				// ラスタライザーステートの設定
 				D3D12_RASTERIZER_DESC rasterizer_desc;
 				rasterizer_desc.FillMode = D3D12_FILL_MODE_SOLID;								// 三角形を描画するときに使用する塗りつぶしモード(今回は塗りつぶし)
-				rasterizer_desc.CullMode = D3D12_CULL_MODE_BACK;								// カリングのモード(裏向きのポリゴンを描画しない)
+				rasterizer_desc.CullMode = D3D12_CULL_MODE_NONE;								// カリングのモード(裏向きのポリゴンを描画しない)
 				rasterizer_desc.FrontCounterClockwise = FALSE;									// ポリゴンの表裏の判定方法(今回は時計回りなら表)
 				rasterizer_desc.DepthBias = D3D12_DEFAULT_DEPTH_BIAS;							// 深度バイアス(Z-Fighting対策?)
 				rasterizer_desc.DepthBiasClamp = D3D12_DEFAULT_DEPTH_BIAS_CLAMP;				// 深度バイアスのクランプ値
@@ -717,11 +722,11 @@ namespace Sein
 			now += angle;
 
 			// ワールド行列を更新
-			DirectX::XMStoreFloat4x4(&(constantBufferData.world), DirectX::XMMatrixRotationZ(now));
+			DirectX::XMStoreFloat4x4(&(constantBufferData.world), DirectX::XMMatrixRotationY(now));
 
 			// ビュー行列を作成
-			DirectX::XMVECTORF32 eye = { 0.0f, 0.0f, -0.5f, 0.0f };
-			DirectX::XMVECTORF32 at = { 0.0f, 0.0f, 0.0f, 0.0f };
+			DirectX::XMVECTORF32 eye = { 0.0f, 5.0f, -30.5f, 0.0f };
+			DirectX::XMVECTORF32 at = { 0.0f, 5.0f, 0.0f, 0.0f };
 			DirectX::XMVECTORF32 up = { 0.0f, 1.0f, 0.0f, 0.0f };
 			DirectX::XMStoreFloat4x4(&(constantBufferData.view), DirectX::XMMatrixLookAtLH(eye, at, up));
 
@@ -766,13 +771,20 @@ namespace Sein
 			commandList->RSSetScissorRects(1, &scissor);
 
 			// プリミティブトポロジーの設定
+			//commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_POINTLIST);
 			commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 			// 頂点バッファビューの設定
-			commandList->IASetVertexBuffers(0, 1, &vertexBufferView);
+			commandList->IASetVertexBuffers(0, 1, &(vertebBuffer.GetView()));
+
+			// 頂点インデックスビューの設定
+			commandList->IASetIndexBuffer(&(indexBuffer.GetView()));
 
 			// 描画コマンドの生成
-			commandList->DrawInstanced(3, 1, 0, 0);
+			// TODO:頂点インデックスを使用して描画する
+			commandList->DrawIndexedInstanced(321567, 1, 0, 0, 0);
+			//commandList->DrawInstanced(88402, 1, 0, 0);
+			//commandList->DrawInstanced(3, 1, 0, 0);
 		}
 
 		/**
