@@ -22,7 +22,7 @@ QtDirect3D12::QtDirect3D12(QWidget *parent)
 	vertexBuffer = new Sein::Direct3D12::VertexBuffer;
 	indexBuffer = new Sein::Direct3D12::IndexBuffer;
 	vertexBuffer->Create(&(device->GetDevice()), loader.GetVertexSize() * loader.GetVertexCount(), loader.GetVertexSize(), loader.GetVertices());
-	indexBuffer->Create(&(device->GetDevice()), loader.GetIndexSize() * loader.GetIndexCount(), loader.GetIndices(), DXGI_FORMAT_R32_FLOAT);
+	indexBuffer->Create(&(device->GetDevice()), loader.GetIndexSize() * loader.GetIndexCount(), loader.GetIndices(), DXGI_FORMAT_R32_UINT);
 
 	// メインループ呼び出し設定
 	connect(timer, SIGNAL(timeout()), this, SLOT(mainLoop()));
