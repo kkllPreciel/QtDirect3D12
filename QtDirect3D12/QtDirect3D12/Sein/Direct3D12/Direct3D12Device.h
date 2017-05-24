@@ -123,21 +123,6 @@ namespace Sein
 
 #pragma endregion
 
-			// 頂点バッファ関連
-			// 後々別クラスへ移動
-#pragma region VertexBuffer
-			/**
-			 *	@brief	頂点フォーマット
-			 */
-			struct Vertex {
-				DirectX::XMFLOAT3 position; ///< 頂点座標
-				DirectX::XMFLOAT4 color;	///< 頂点色
-			};
-
-			ID3D12Resource*				vertexBuffer;		///< 頂点バッファ
-			D3D12_VERTEX_BUFFER_VIEW	vertexBufferView;	///< 頂点バッファのビュー
-#pragma endregion
-
 			// パイプラインステート関連
 			// 後々別クラスへ移動
 #pragma region PipelineState
