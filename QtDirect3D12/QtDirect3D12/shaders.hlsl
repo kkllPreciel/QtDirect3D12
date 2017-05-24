@@ -1,46 +1,75 @@
-//*********************************************************
-//
-// Copyright (c) Microsoft. All rights reserved.
-// This code is licensed under the MIT License (MIT).
-// THIS CODE IS PROVIDED *AS IS* WITHOUT WARRANTY OF
-// ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING ANY
-// IMPLIED WARRANTIES OF FITNESS FOR A PARTICULAR
-// PURPOSE, MERCHANTABILITY, OR NON-INFRINGEMENT.
-//
-//*********************************************************
+/**
+ *	@file		shaders.hlsl
+ *	@brief		シェーダー
+ *	@author		kkllPreciel
+ *	@date		2017/05/18
+ *	@version	1.0
+ */
 
-// コンスタントバッファ
+/**
+ *  @brief  頂点シェーダーの入力形式
+ */
+struct VSInput
+{
+    float3 position : POSITION; ///< 座標
+    float3 normal   : NORMAL;   ///< 法線ベクトル
+    float2 uv       : TEXCOORD; ///< UV座標
+};
+
+/**
+ *  @brief  頂点シェーダーの出力形式
+ */
+struct VSOutput
+{
+    float4 position : SV_POSITION;  ///< 座標
+    float4 color : COLOR;           ///< 色
+};
+
+/**
+ *  @brief  ピクセルシェーダーの出力形式
+ */
+struct PSOutput
+{
+    float4 color : SV_TARGET0; ///< 色
+};
+
+/**
+ *  @brief  コンスタントバッファ
+ */
 cbuffer ConstantBuffer : register(b0)
 {
-    float4x4 world;        ///< ワールド行列(列優先行列)
-    float4x4 view;         ///< ビュー行列(列優先行列)
-    float4x4 projection;   ///< プロジェクション行列(列優先行列)
+    float4x4 world;         ///< ワールド行列(列優先行列)
+    float4x4 view;          ///< ビュー行列(列優先行列)
+    float4x4 projection;    ///< プロジェクション行列(列優先行列)
 };
 
-// ピクセルシェーダへの入力 = バーテックスシェーダの出力
-struct PSInput
+/**
+ *  @brief  エントリーポイント
+ */
+VSOutput VSMain(VSInput input)
 {
-	float4 position : SV_POSITION;
-	float4 color : COLOR;
-};
+    VSOutput result;
 
-PSInput VSMain(float3 position : POSITION, float3 normal : NORMAL, float2 uv : TEXCOORD0)
-{
-	PSInput result;
-
-    float4 pos = float4(position, 1.0);
+    float4 pos = float4(input.position, 1.0);
 
     pos = mul(world, pos);
     pos = mul(view, pos);
     pos = mul(projection, pos);
 
     result.position = pos;
-    result.color = float4(uv.x, uv.y, 1.0, 1.0);
+    result.color = float4(input.uv.x, input.uv.y, 1.0, 1.0);
 
-	return result;
+    return result;
 }
 
-float4 PSMain(PSInput input) : SV_TARGET
+/**
+ *  @brief  エントリーポイント
+ */
+PSOutput PSMain(VSOutput input)
 {
-	return input.color;
+    PSOutput output = (PSOutput) 0;
+
+    output.color = input.color;
+
+    return output;
 }
