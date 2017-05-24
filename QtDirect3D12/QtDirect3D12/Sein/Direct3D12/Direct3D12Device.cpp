@@ -25,7 +25,7 @@ namespace Sein
 		Device::Device() :
 			device(nullptr), swapChain(nullptr), commandQueue(nullptr), commandAllocator(nullptr),
 			commandList(nullptr), descriptorHeap(nullptr), descriptorSize(0), bufferIndex(0),
-			fence(nullptr), fenceIndex(0), fenceEvent(nullptr), vertexBuffer(nullptr),
+			fence(nullptr), fenceIndex(0), fenceEvent(nullptr),
 			rootSignature(nullptr), pipelineState(nullptr), cbvHeap(nullptr), constantBuffer(nullptr),
 			constantBufferDataBegin(nullptr)
 		{
@@ -299,7 +299,6 @@ namespace Sein
 			constantBufferDataBegin = nullptr;
 			constantBuffer->Unmap(0, nullptr);
 			constantBuffer->Release();
-			vertexBuffer->Release();
 			rootSignature->Release();
 
 			for (auto i = 0; i < FrameCount; ++i)
@@ -464,7 +463,7 @@ namespace Sein
 				rootSignatureDesc.pParameters = &rootParameter;											// スロットの構造?
 				rootSignatureDesc.NumStaticSamplers = 0;												// 静的サンプラー数
 				rootSignatureDesc.pStaticSamplers = nullptr;											// 静的サンプラー設定データのポインタ
-				rootSignatureDesc.Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT	// オプション(描画に使用する
+				rootSignatureDesc.Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT	// オプション(描画に使用する)
 					| D3D12_ROOT_SIGNATURE_FLAG_DENY_HULL_SHADER_ROOT_ACCESS							// ハルシェーダからルートシグネチャへのアクセス禁止
 					| D3D12_ROOT_SIGNATURE_FLAG_DENY_DOMAIN_SHADER_ROOT_ACCESS							// ドメインシェーダからルートシグネチャへのアクセス禁止
 					| D3D12_ROOT_SIGNATURE_FLAG_DENY_GEOMETRY_SHADER_ROOT_ACCESS						// ジオメトリシェーダからルートシグネチャへのアクセス禁止
@@ -492,81 +491,6 @@ namespace Sein
 				{
 					throw "ルートシグネチャの生成に失敗しました。";
 				}
-			}
-
-			// 頂点バッファの作成
-			{
-				float aspect = static_cast<float>(width) / static_cast<float>(height);
-
-				// 頂点バッファを作成
-				Vertex triangleVertices[] =
-				{
-					{ { 0.0f, 0.25f * aspect, 0.0f },{ 1.0f, 0.0f, 0.0f, 1.0f } },
-					{ { 0.25f, -0.25f * aspect, 0.0f },{ 0.0f, 1.0f, 0.0f, 1.0f } },
-					{ { -0.25f, -0.25f * aspect, 0.0f },{ 0.0f, 0.0f, 1.0f, 1.0f } }
-				};
-
-				// 頂点バッファサイズ
-				const unsigned int vertexBufferSize = sizeof(triangleVertices);
-
-				// ヒープの設定
-				D3D12_HEAP_PROPERTIES properties;
-				properties.Type = D3D12_HEAP_TYPE_UPLOAD;						// ヒープの種類(今回はCPU、GPUからアクセス可能なヒープに設定)
-				properties.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;	// CPUページプロパティ(不明に設定)
-				properties.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN;	// ヒープのメモリプール(不明に設定)
-				properties.CreationNodeMask = 1;								// 恐らくヒープが生成されるアダプター(GPU)の番号
-				properties.VisibleNodeMask = 1;									// 恐らくヒープが表示されるアダプター(GPU)の番号
-
-				// リソースの設定
-				D3D12_RESOURCE_DESC resource_desc;
-				resource_desc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;		// リソースの種別(今回はバッファ)
-				resource_desc.Alignment = 0;									// アラインメント
-				resource_desc.Width = vertexBufferSize;							// リソースの幅(今回は頂点バッファのサイズ)
-				resource_desc.Height = 1;										// リソースの高さ(今回は頂点バッファ分の幅を確保しているので1)
-				resource_desc.DepthOrArraySize = 1;								// リソースの深さ(テクスチャ等に使用する物、今回は1)
-				resource_desc.MipLevels = 1;									// ミップマップのレベル(今回は1)
-				resource_desc.Format = DXGI_FORMAT_UNKNOWN;						// リソースデータフォーマット(R8G8B8A8等)(今回は不明)
-				resource_desc.SampleDesc.Count = 1;								// ピクセル単位のマルチサンプリング数
-				resource_desc.SampleDesc.Quality = 0;							// マルチサンプリングの品質レベル
-				resource_desc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;			// テクスチャレイアウトオプション
-				resource_desc.Flags = D3D12_RESOURCE_FLAG_NONE;					// リソース操作オプションフラグ(今回は無し)
-
-				// リソースの生成(ヒープも同時に生成される)
-				if (FAILED(device->CreateCommittedResource(
-					&properties,						// ヒープの設定
-					D3D12_HEAP_FLAG_NONE,				// ヒープオプション(設定なし)
-					&resource_desc,						// リソースの設定
-					D3D12_RESOURCE_STATE_GENERIC_READ,	// リソースの状態
-					nullptr,							// クリアカラーのデフォルト値
-					IID_PPV_ARGS(&vertexBuffer))))
-				{
-					throw "頂点バッファの作成に失敗しました。";
-				}
-
-				// 頂点バッファ(リソース)へのポインタ
-				unsigned char* pData;
-
-				if (FAILED(vertexBuffer->Map(
-					0,									// サブリソースのインデックス番号
-					nullptr,							// CPUからアクセスするメモリの範囲(nullptrは全領域にアクセスする)
-					reinterpret_cast<void**>(&pData))))	// リソースデータへのポインタ
-				{
-					throw "頂点バッファ用リソースへのポインタの取得に失敗しました。";
-				}
-
-				// 頂点バッファ(リソース)へ頂点データをコピー
-				std::memcpy(pData, triangleVertices, sizeof(triangleVertices));
-
-				// 頂点バッファ(リソース)へのポインタを無効にする
-				vertexBuffer->Unmap(
-					0,									// サブリソースインデックス番号
-					nullptr								// マップ解除するメモリの範囲、CPUが変更した可能性のある領域(nullptrは全領域)
-				);
-
-				// 頂点バッファのビューを初期化する
-				vertexBufferView.BufferLocation = vertexBuffer->GetGPUVirtualAddress();	// バッファのアドレス
-				vertexBufferView.StrideInBytes  = sizeof(Vertex);						// 1頂点のサイズ(バイト単位)
-				vertexBufferView.SizeInBytes	= vertexBufferSize;						// バッファ(全頂点合計)のサイズ(バイト単位)
 			}
 
 			// パイプラインステートの作成
@@ -619,13 +543,13 @@ namespace Sein
 				D3D12_INPUT_ELEMENT_DESC inputElementDescs[] =
 				{
 					// 頂点座標
-					{ "POSITiON", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
+					{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
 
 					// 頂点の法線
-					{ "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
+					{ "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
 
 					// テクスチャ座標
-					{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 }
+					{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 24, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 }
 				};
 
 				// ラスタライザーステートの設定
@@ -725,8 +649,8 @@ namespace Sein
 			DirectX::XMStoreFloat4x4(&(constantBufferData.world), DirectX::XMMatrixRotationY(now));
 
 			// ビュー行列を作成
-			DirectX::XMVECTORF32 eye = { 0.0f, 5.0f, -30.5f, 0.0f };
-			DirectX::XMVECTORF32 at = { 0.0f, 5.0f, 0.0f, 0.0f };
+			DirectX::XMVECTORF32 eye = { 0.0f, 0.0f, -30.5f, 0.0f };
+			DirectX::XMVECTORF32 at = { 0.0f, 0.0f, 0.0f, 0.0f };
 			DirectX::XMVECTORF32 up = { 0.0f, 1.0f, 0.0f, 0.0f };
 			DirectX::XMStoreFloat4x4(&(constantBufferData.view), DirectX::XMMatrixLookAtLH(eye, at, up));
 
@@ -752,17 +676,14 @@ namespace Sein
 			scissor.right = 600;
 			scissor.bottom = 400;
 
-			// 描画に使用するディスクリプターヒープを設定
-			commandList->SetDescriptorHeaps(1, &cbvHeap);
+			// パイプラインステートの設定(切り替えない場合は、コマンドリストリセット時に設定可能)
+			commandList->SetPipelineState(pipelineState);
 
 			// グラフィックスパイプラインのルートシグネチャを設定する
 			commandList->SetGraphicsRootSignature(rootSignature);
 
-			// ディスクリプータヒープテーブルを設定
-			commandList->SetGraphicsRootDescriptorTable(0, cbvHeap->GetGPUDescriptorHandleForHeapStart());
-
-			// パイプラインステートの設定(切り替えない場合は、コマンドリストリセット時に設定可能)
-			commandList->SetPipelineState(pipelineState);
+			// 描画に使用するディスクリプターヒープを設定
+			commandList->SetDescriptorHeaps(1, &cbvHeap);
 
 			// ビューポートの設定
 			commandList->RSSetViewports(1, &viewport);
@@ -779,6 +700,9 @@ namespace Sein
 
 			// 頂点インデックスビューの設定
 			commandList->IASetIndexBuffer(&(indexBuffer.GetView()));
+
+			// ディスクリプータヒープテーブルを設定
+			commandList->SetGraphicsRootDescriptorTable(0, cbvHeap->GetGPUDescriptorHandleForHeapStart());
 
 			// 描画コマンドの生成
 			// TODO:頂点インデックスを使用して描画する
