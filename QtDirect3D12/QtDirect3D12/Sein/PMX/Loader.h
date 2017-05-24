@@ -41,6 +41,11 @@ namespace Sein
 			void Load(std::string filePath);
 
 			/**
+			 *	@brief	データを開放する
+			 */
+			void Release();
+
+			/**
 			 *	@brief	頂点数を取得する
 			 *	@return	頂点数
 			 */

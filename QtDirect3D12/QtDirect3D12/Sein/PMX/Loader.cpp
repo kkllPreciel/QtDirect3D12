@@ -58,29 +58,7 @@ namespace Sein
 		 */
 		Loader::~Loader()
 		{
-			if (nullptr != buffer)
-			{
-				delete buffer;
-				buffer = nullptr;
-			}
-
-			if (nullptr != header)
-			{
-				delete header;
-				header = nullptr;
-			}
-
-			if (nullptr != vertices)
-			{
-				delete[] vertices;
-				vertices = nullptr;
-			}
-
-			if (nullptr != indices)
-			{
-				delete[] indices;
-				indices = nullptr;
-			}
+			Release();
 		}
 
 		/**
@@ -89,6 +67,9 @@ namespace Sein
 		 */
 		void Loader::Load(std::string filePath)
 		{
+			// リソースの開放
+			Release();
+
 			// ファイル内容の読み込み
 			{
 				namespace fs = std::experimental::filesystem;
@@ -340,6 +321,36 @@ namespace Sein
 
 				// ポリゴン数
 				polygonCount = indexCount / 3;
+			}
+		}
+
+		/**
+		 *	@brief	データを開放する
+		 */
+		void Loader::Release()
+		{
+			if (nullptr != buffer)
+			{
+				delete buffer;
+				buffer = nullptr;
+			}
+
+			if (nullptr != header)
+			{
+				delete header;
+				header = nullptr;
+			}
+
+			if (nullptr != vertices)
+			{
+				delete[] vertices;
+				vertices = nullptr;
+			}
+
+			if (nullptr != indices)
+			{
+				delete[] indices;
+				indices = nullptr;
 			}
 		}
 
