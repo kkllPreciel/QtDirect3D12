@@ -85,6 +85,7 @@
     </ClCompile>
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Sein\Direct3D12\DepthStencilView.cpp" />
+    <ClCompile Include="Sein\Direct3D12\Fence.cpp" />
     <ClCompile Include="Sein\Direct3D12\IndexBuffer.cpp" />
     <ClCompile Include="Sein\Direct3D12\VertexBuffer.cpp" />
     <ClCompile Include="Sein\PMX\Loader.cpp" />
@@ -118,6 +119,7 @@
   <ItemGroup>
     <ClInclude Include="GeneratedFiles\ui_QtDirect3D12.h" />
     <ClInclude Include="Sein\Direct3D12\DepthStencilView.h" />
+    <ClInclude Include="Sein\Direct3D12\Fence.h" />
     <ClInclude Include="Sein\Direct3D12\IndexBuffer.h" />
     <ClInclude Include="Sein\Direct3D12\VertexBuffer.h" />
     <ClInclude Include="Sein\PMX\Loader.h" />

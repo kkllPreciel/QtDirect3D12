@@ -13,6 +13,7 @@
 #include <d3dcompiler.h>
 #include "Direct3D12Device.h"
 #include "DepthStencilView.h"
+#include "Fence.h"
 #include "Sein/Direct3D12/VertexBuffer.h"
 #include "Sein/Direct3D12/IndexBuffer.h"
 
@@ -26,9 +27,8 @@ namespace Sein
 		Device::Device() :
 			device(nullptr), swapChain(nullptr), commandQueue(nullptr), commandAllocator(nullptr),
 			commandList(nullptr), descriptorHeap(nullptr), descriptorSize(0), bufferIndex(0),
-			fence(nullptr), fenceIndex(0), fenceEvent(nullptr),
 			rootSignature(nullptr), pipelineState(nullptr), cbvHeap(nullptr), constantBuffer(nullptr),
-			constantBufferDataBegin(nullptr), depthStencilView(nullptr)
+			constantBufferDataBegin(nullptr), depthStencilView(nullptr), fence(nullptr)
 		{
 			for (auto i = 0; i < FrameCount; ++i)
 			{
@@ -258,22 +258,8 @@ namespace Sein
 			// Directx12ではGPUの描画の終了待ちを自動で行わない(同期が取れず画面がおかしくなる)
 			// そのため同期を取るためのオブジェクト(フェンス)を作成する
 			{
-				if (FAILED(device->CreateFence(
-					fenceIndex,				// フェンスの初期値
-					D3D12_FENCE_FLAG_NONE,	// オプションの指定(今回は指定なし)
-					IID_PPV_ARGS(&fence))))
-				{
-					throw "フェンスの生成に失敗しました。";
-				}
-
-				++fenceIndex;
-
-				// 同期待ち用のイベントを生成
-				if (nullptr == (fenceEvent = CreateEvent(nullptr, false, false, nullptr)))
-				{
-					throw "イベントの生成に失敗しました。";
-					// throw HRESULT_FROM_WIN32(GetLastError());
-				}
+				fence = new Fence;
+				fence->Create(device);
 
 				// 描画処理を行っている可能性があるので描画終了待ちを行う
 				WaitForGpu();
@@ -292,9 +278,14 @@ namespace Sein
 		{
 			// GPUの描画終了待ちを行う
 			WaitForGpu();
-
-			CloseHandle(fenceEvent);
-			fence->Release();
+			
+			// フェンスの削除
+			if (nullptr != fence)
+			{
+				fence->Release();
+				delete fence;
+				fence = nullptr;
+			}
 
 			pipelineState->Release();
 			depthStencilView->Release();
@@ -410,29 +401,7 @@ namespace Sein
 		 */
 		void Device::WaitForGpu()
 		{
-			// 実行されているコマンドリストが完了したら
-			// フェンスに指定の値を設定するようにする
-			if (FAILED(commandQueue->Signal(fence, fenceIndex)))
-			{
-				throw "コマンドキューのシグナル設定に失敗しました。";
-			}
-
-			// 既に処理が終わっている場合は実行しない
-			if (fence->GetCompletedValue() < fenceIndex)
-			{
-				// フェンスの値が設定した値になったら
-				// 指定したイベントを発行させる
-				if (FAILED(fence->SetEventOnCompletion(fenceIndex, fenceEvent)))
-				{
-					throw "フェンスのイベント発行設定に失敗しました。";
-				}
-
-				// シグナル状態(イベント発行)になるまで待機する
-				WaitForSingleObjectEx(fenceEvent, INFINITE, false);
-			}
-
-			// フェンスの値を更新する
-			++fenceIndex;
+			fence->Wait(commandQueue);
 		}
 
 #pragma endregion
@@ -666,8 +635,8 @@ namespace Sein
 			DirectX::XMStoreFloat4x4(&(constantBufferData.world), DirectX::XMMatrixRotationY(now));
 
 			// ビュー行列を作成
-			DirectX::XMVECTORF32 eye = { 0.0f, 0.0f, -30.5f, 0.0f };
-			DirectX::XMVECTORF32 at = { 0.0f, 0.0f, 0.0f, 0.0f };
+			DirectX::XMVECTORF32 eye = { 0.0f, 10.0f, -30.5f, 0.0f };
+			DirectX::XMVECTORF32 at = { 0.0f, 10.0f, 0.0f, 0.0f };
 			DirectX::XMVECTORF32 up = { 0.0f, 1.0f, 0.0f, 0.0f };
 			DirectX::XMStoreFloat4x4(&(constantBufferData.view), DirectX::XMMatrixLookAtLH(eye, at, up));
 

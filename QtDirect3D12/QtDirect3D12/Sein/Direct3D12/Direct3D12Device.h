@@ -21,6 +21,7 @@ namespace Sein
 		class VertexBuffer;
 		class IndexBuffer;
 		class DepthStencilView;
+		class Fence;
 
 		/**
 		 *	@brief	Direct3D12用デバイスクラス(スワップチェインも一緒)
@@ -99,10 +100,7 @@ namespace Sein
 			ID3D12Resource*				renderTargetList[FrameCount];	///< レンダーターゲットのリスト
 			unsigned int				bufferIndex;					///< 現在のバッファ番号
 
-			// 後々フェンスクラスへ移動
-			ID3D12Fence*				fence;		///< フェンス
-			unsigned int				fenceIndex;	///< 現在のフェンス番号
-			HANDLE						fenceEvent;	///< フェンスイベントハンドル
+			Fence*						fence;		///< フェンス
 
 			/**
 			 *	@brief	描画終了待ちを行う

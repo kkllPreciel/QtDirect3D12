@@ -33,6 +33,18 @@ namespace Sein
 			~Fence();
 
 			/**
+			 *	@brief	作成する
+			 *	@param	device:Direct3D12のデバイス
+			 */
+			void Create(ID3D12Device* const device);
+
+			/**
+			 *	@brief	待機する
+			 *	@param	commandQueue:コマンドキュー
+			 */
+			void Wait(ID3D12CommandQueue* const commandQueue);
+
+			/**
 			 *	@brief	リソースを開放する
 			 */
 			void Release();

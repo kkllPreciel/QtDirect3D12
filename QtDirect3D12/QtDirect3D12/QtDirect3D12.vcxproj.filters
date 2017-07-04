@@ -70,6 +70,9 @@
     <ClCompile Include="Sein\Direct3D12\DepthStencilView.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Sein\Direct3D12\Fence.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="QtDirect3D12.h">
@@ -99,6 +102,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Sein\Direct3D12\DepthStencilView.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Sein\Direct3D12\Fence.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
