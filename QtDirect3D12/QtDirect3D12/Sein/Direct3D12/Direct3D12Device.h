@@ -20,6 +20,7 @@ namespace Sein
 	{
 		class VertexBuffer;
 		class IndexBuffer;
+		class DepthStencilView;
 
 		/**
 		 *	@brief	Direct3D12用デバイスクラス(スワップチェインも一緒)
@@ -161,6 +162,21 @@ namespace Sein
 			 *	@brief	定数をバッファを作成する
 			 */
 			void CreateConstantBuffer();
+
+#pragma endregion
+
+			// 深度ステンシルビュー関連
+#pragma region DepthStencilView
+		private:
+			DepthStencilView* depthStencilView;	///< 深度ステンシルビュー
+
+			/**
+			 *	@brief	深度ステンシルビューを作成する
+			 *	@param	width:ウィンドウ横幅
+			 *	@param	height:ウィンドウ縦幅
+			 */
+			void CreateDepthStencilView(unsigned int width, unsigned int height);
+
 
 #pragma endregion
 		};

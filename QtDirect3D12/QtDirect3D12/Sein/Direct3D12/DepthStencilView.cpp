@@ -58,7 +58,7 @@ namespace Sein
 
 				// ヒープの設定
 				D3D12_HEAP_PROPERTIES properties;
-				properties.Type = D3D12_HEAP_TYPE_UPLOAD;						// ヒープの種類(今回はCPU、GPUからアクセス可能なヒープに設定)
+				properties.Type = D3D12_HEAP_TYPE_DEFAULT;						// ヒープの種類(今回はCPU、GPUからアクセス可能なヒープに設定)
 				properties.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;	// CPUページプロパティ(不明に設定)
 				properties.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN;	// ヒープのメモリプール(不明に設定)
 				properties.CreationNodeMask = 1;								// 恐らくヒープが生成されるアダプター(GPU)の番号
@@ -72,10 +72,10 @@ namespace Sein
 				resource_desc.Height = height;									// リソースの高さ(今回はウィンドウのサイズ)
 				resource_desc.DepthOrArraySize = 1;								// リソースの深さ(テクスチャ等に使用する物、今回は1)
 				resource_desc.MipLevels = 0;									// ミップマップのレベル(今回は0)
-				resource_desc.Format = DXGI_FORMAT_UNKNOWN;						// リソースデータフォーマット(R8G8B8A8等)(今回は不明)
+				resource_desc.Format = DXGI_FORMAT_D32_FLOAT;					// リソースデータフォーマット(R8G8B8A8等)(今回は不明)
 				resource_desc.SampleDesc.Count = 1;								// ピクセル単位のマルチサンプリング数
 				resource_desc.SampleDesc.Quality = 0;							// マルチサンプリングの品質レベル
-				resource_desc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;			// テクスチャレイアウトオプション
+				resource_desc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;			// テクスチャレイアウトオプション
 				resource_desc.Flags = D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL;	// リソース操作オプションフラグ(今回は深度ステンシル)
 
 				if (FAILED(device->CreateCommittedResource(
@@ -96,6 +96,15 @@ namespace Sein
 
 				device->CreateDepthStencilView(depthStencil, &depthStencilDesc, depthStencilViewHeap->GetCPUDescriptorHandleForHeapStart());
 			}
+		}
+
+		/**
+		 *	@brief	ディスクリプターハンドルを取得する
+		 *	@return	ディスクリプターハンドル
+		 */
+		D3D12_CPU_DESCRIPTOR_HANDLE DepthStencilView::GetDescriptorHandle() const
+		{
+			return depthStencilViewHeap->GetCPUDescriptorHandleForHeapStart();
 		}
 
 		/**

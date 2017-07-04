@@ -12,6 +12,7 @@
 #include <winerror.h>
 #include <d3dcompiler.h>
 #include "Direct3D12Device.h"
+#include "DepthStencilView.h"
 #include "Sein/Direct3D12/VertexBuffer.h"
 #include "Sein/Direct3D12/IndexBuffer.h"
 
@@ -27,7 +28,7 @@ namespace Sein
 			commandList(nullptr), descriptorHeap(nullptr), descriptorSize(0), bufferIndex(0),
 			fence(nullptr), fenceIndex(0), fenceEvent(nullptr),
 			rootSignature(nullptr), pipelineState(nullptr), cbvHeap(nullptr), constantBuffer(nullptr),
-			constantBufferDataBegin(nullptr)
+			constantBufferDataBegin(nullptr), depthStencilView(nullptr)
 		{
 			for (auto i = 0; i < FrameCount; ++i)
 			{
@@ -296,6 +297,9 @@ namespace Sein
 			fence->Release();
 
 			pipelineState->Release();
+			depthStencilView->Release();
+			delete depthStencilView;
+			depthStencilView = nullptr;
 			constantBufferDataBegin = nullptr;
 			constantBuffer->Unmap(0, nullptr);
 			constantBuffer->Release();
@@ -343,13 +347,18 @@ namespace Sein
 			commandList->ResourceBarrier(1, &barrier);
 
 			// バックバッファを描画ターゲットとして設定する
+			// デバイスへ深度ステンシルビューをバインドする
 			D3D12_CPU_DESCRIPTOR_HANDLE handle = descriptorHeap->GetCPUDescriptorHandleForHeapStart();
 			handle.ptr += bufferIndex * descriptorSize;
-			commandList->OMSetRenderTargets(1, &handle, false, nullptr);
+			D3D12_CPU_DESCRIPTOR_HANDLE depthHandle = depthStencilView->GetDescriptorHandle();
+			commandList->OMSetRenderTargets(1, &handle, false, &depthHandle);
 
 			// バックバッファをクリアする
 			const float Color[] = { 0.0f, 0.0f, 0.6f, 1.0f };
 			commandList->ClearRenderTargetView(handle, Color, 0, nullptr);
+
+			// 深度ステンシルビューをクリアする(深度バッファのみ)
+			commandList->ClearDepthStencilView(depthHandle, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
 		}
 
 		/**
@@ -438,6 +447,11 @@ namespace Sein
 			// 定数バッファの生成
 			{
 				CreateConstantBuffer();
+			}
+
+			// 深度ステンシルビューの作成
+			{
+				CreateDepthStencilView(width, height);
 			}
 
 			// ルートシグネチャの作成
@@ -600,8 +614,10 @@ namespace Sein
 
 				// 深度ステンシル状態の設定
 				D3D12_DEPTH_STENCIL_DESC depthStencilDesc = {};
-				depthStencilDesc.DepthEnable = false;	// デプステストを有効にするか?
-				depthStencilDesc.StencilEnable = false;	// ステンシルテストを有効にするか?
+				depthStencilDesc.DepthEnable = true;							// デプステストを有効にするか?
+				depthStencilDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;	// 深度ステンシル バッファーへの書き込みをオンにします
+				depthStencilDesc.DepthFunc = D3D12_COMPARISON_FUNC_LESS;		// 深度データを既存の深度データと比較する関数です。ソースデータが対象データよりも小さい場合、比較に合格します。
+				depthStencilDesc.StencilEnable = false;							// ステンシルテストを有効にするか?
 
 				// マルチサンプリングパラメーターの設定
 				DXGI_SAMPLE_DESC sampleDesc = {};
@@ -619,7 +635,8 @@ namespace Sein
 				psoDesc.SampleMask = UINT_MAX;												// ブレンドの状態のためのサンプルのマスク
 				psoDesc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;		// 入力プリミティブ(三角形)
 				psoDesc.NumRenderTargets = 1;												// レンダーターゲットのフォーマット数
-				psoDesc.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM;							// 深度ステンシルのフォーマット
+				psoDesc.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM;							// レンダーターゲットのフォーマット
+				psoDesc.DSVFormat = DXGI_FORMAT_D32_FLOAT;									// 深度ステンシルのフォーマット
 				psoDesc.SampleDesc = sampleDesc;											// サンプリング状態の構造
 
 				// グラフィックスパイプラインステートの生成
@@ -801,6 +818,20 @@ namespace Sein
 				DirectX::XMStoreFloat4x4(&(constantBufferData.projection), DirectX::XMMatrixIdentity());
 				std::memcpy(constantBufferDataBegin, &constantBufferData, sizeof(ConstantBuffer));
 			}
+		}
+#pragma endregion
+
+		// 深度ステンシルビュー関連
+#pragma region DepthStencliView
+		/**
+		 *	@brief	深度ステンシルビューを作成する
+		 *	@param	width:ウィンドウ横幅
+		 *	@param	height:ウィンドウ縦幅
+		 */
+		void Device::CreateDepthStencilView(unsigned int width, unsigned int height)
+		{
+			depthStencilView = new DepthStencilView();
+			depthStencilView->Create(device, width, height);
 		}
 #pragma endregion
 	};

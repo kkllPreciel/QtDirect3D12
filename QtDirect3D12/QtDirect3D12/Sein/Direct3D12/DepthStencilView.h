@@ -40,6 +40,12 @@ namespace Sein
 			void Create(ID3D12Device* const device, unsigned int width, unsigned int height);
 
 			/**
+			 *	@brief	ディスクリプターハンドルを取得する
+			 *	@return	ディスクリプターハンドル
+			 */
+			D3D12_CPU_DESCRIPTOR_HANDLE GetDescriptorHandle() const;
+
+			/**
 			 *	@brief	リソースを開放する
 			 */
 			void Release();
