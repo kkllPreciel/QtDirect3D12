@@ -156,7 +156,7 @@ namespace Sein
 					unsigned int addUvCount = header->globals[1];
 					unsigned int boneIndexSize = header->globals[5];
 					vertices = new Vertex[vertexCount];
-					for (int i = 0; i < vertexCount; ++i)
+					for (unsigned int i = 0; i < vertexCount; ++i)
 					{
 						// 座標
 						std::memcpy(&(vertices[i].position), buffer, sizeof(vertices[i].position));
@@ -255,7 +255,7 @@ namespace Sein
 					std::memcpy(&materialCount, buffer, sizeof(materialCount));
 					buffer = buffer + sizeof(materialCount);
 
-					for (int i = 0; i < materialCount; ++i)
+					for (unsigned int i = 0; i < materialCount; ++i)
 					{
 						// マテリアル名
 						unsigned int nameSize = 0;
