@@ -1,8 +1,8 @@
 #include <qevent.h>
 #include <qtimer.h>
+#include <Sein\Direct3D12\Direct3D12Device.h>
+#include <Sein\PMX\Loader.h>
 #include "QtDirect3D12.h"
-#include "Sein/Direct3D12/Direct3D12Device.h"
-#include "Sein/PMX/Loader.h"
 
 QtDirect3D12::QtDirect3D12(QWidget *parent)
 	: QWidget(parent),

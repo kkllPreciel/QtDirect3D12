@@ -1,10 +1,10 @@
 #pragma once
 
 #include <QtWidgets/QWidget>
+#include <Sein/Direct3D12/Direct3D12Device.h>
+#include <Sein/Direct3D12/VertexBuffer.h>
+#include <Sein/Direct3D12/IndexBuffer.h>
 #include "ui_QtDirect3D12.h"
-#include "Sein/Direct3D12/Direct3D12Device.h"
-#include "Sein/Direct3D12/VertexBuffer.h"
-#include "Sein/Direct3D12/IndexBuffer.h"
 
 class QtDirect3D12 : public QWidget
 {
