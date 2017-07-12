@@ -243,3 +243,6 @@ ModelManifest.xml
 
 # FAKE - F# Make
 .fake/
+
+# Resources
+QtDirect3D12/Resources/Pmx/*
