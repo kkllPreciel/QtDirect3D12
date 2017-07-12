@@ -139,6 +139,7 @@
     <ClCompile Include="Sein\Direct3D12\Direct3D12Device.cpp" />
     <ClCompile Include="Sein\Direct3D12\Fence.cpp" />
     <ClCompile Include="Sein\Direct3D12\IndexBuffer.cpp" />
+    <ClCompile Include="Sein\Direct3D12\InstanceBuffer.cpp" />
     <ClCompile Include="Sein\Direct3D12\VertexBuffer.cpp" />
     <ClCompile Include="Sein\PMX\Loader.cpp" />
   </ItemGroup>
@@ -147,6 +148,7 @@
     <ClInclude Include="Sein\Direct3D12\Direct3D12Device.h" />
     <ClInclude Include="Sein\Direct3D12\Fence.h" />
     <ClInclude Include="Sein\Direct3D12\IndexBuffer.h" />
+    <ClInclude Include="Sein\Direct3D12\InstanceBuffer.h" />
     <ClInclude Include="Sein\Direct3D12\VertexBuffer.h" />
     <ClInclude Include="Sein\PMX\Loader.h" />
   </ItemGroup>
