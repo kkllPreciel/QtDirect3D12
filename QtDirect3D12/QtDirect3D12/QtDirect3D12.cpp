@@ -17,7 +17,7 @@ QtDirect3D12::QtDirect3D12(QWidget *parent)
 	device = new Sein::Direct3D12::Device();
 	device->Create(reinterpret_cast<HWND>(this->winId()), this->width(), this->height());
 	Sein::Pmx::Loader loader;
-	loader.Load("D:/DiskD/Study/Qt/QtDirect3D12/QtDirect3D12/Resources/Pmx/YYB式桜ミクv1.00.pmx");
+	loader.Load("../Resources/Pmx/YYB式桜ミクv1.00.pmx");
 	//loader.Load("D:/DiskD/Study/Qt/QtDirect3D12/QtDirect3D12/Resources/Pmx/Tda式初音ミク・アペンド_Ver1.10.pmx");
 	vertexBuffer = new Sein::Direct3D12::VertexBuffer;
 	indexBuffer = new Sein::Direct3D12::IndexBuffer;
