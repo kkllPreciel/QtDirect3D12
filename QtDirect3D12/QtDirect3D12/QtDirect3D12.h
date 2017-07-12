@@ -4,6 +4,7 @@
 #include <Sein/Direct3D12/Direct3D12Device.h>
 #include <Sein/Direct3D12/VertexBuffer.h>
 #include <Sein/Direct3D12/IndexBuffer.h>
+#include <Sein/Direct3D12/InstanceBuffer.h>
 #include "ui_QtDirect3D12.h"
 
 class QtDirect3D12 : public QWidget
@@ -26,4 +27,5 @@ private:
 	Sein::Direct3D12::Device* device;
 	Sein::Direct3D12::VertexBuffer* vertexBuffer;
 	Sein::Direct3D12::IndexBuffer* indexBuffer;
+	Sein::Direct3D12::InstanceBuffer* instanceBuffer;
 };
