@@ -246,3 +246,4 @@ ModelManifest.xml
 
 # Resources
 QtDirect3D12/Resources/Pmx/*
+!.gitkeep
