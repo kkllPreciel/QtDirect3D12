@@ -14,8 +14,9 @@
 #include "Direct3D12Device.h"
 #include "DepthStencilView.h"
 #include "Fence.h"
-#include "../Direct3D12/VertexBuffer.h"
-#include "../Direct3D12/IndexBuffer.h"
+#include "VertexBuffer.h"
+#include "IndexBuffer.h"
+#include "InstanceBuffer.h"
 
 namespace Sein
 {
@@ -624,8 +625,9 @@ namespace Sein
 		 *	@brief	描画する
 		 *	@param	vertexBuffer:頂点バッファ
 		 *	@param	indexBuffer:頂点インデックスバッファ
+		 *	@param	instanceBuffer:インスタンス用バッファ
 		 */
-		void Device::Render(const VertexBuffer& vertebBuffer, const IndexBuffer& indexBuffer)
+		void Device::Render(const VertexBuffer& vertebBuffer, const IndexBuffer& indexBuffer, const InstanceBuffer& instanceBuffer)
 		{
 			static float now = 0.0f;
 			static float angle = DirectX::XM_PI / 180.0f;
@@ -685,6 +687,7 @@ namespace Sein
 
 			// 頂点バッファビューの設定
 			commandList->IASetVertexBuffers(0, 1, &(vertebBuffer.GetView()));
+			// commandList->IASetVertexBuffers(1, 1, &(instanceBuffer.GetView()));
 
 			// 頂点インデックスビューの設定
 			commandList->IASetIndexBuffer(&(indexBuffer.GetView()));
