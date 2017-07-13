@@ -1,6 +1,9 @@
 #include <qevent.h>
 #include <qtimer.h>
 #include <Sein\Direct3D12\Direct3D12Device.h>
+#include <Sein\Direct3D12\VertexBuffer.h>
+#include <Sein\Direct3D12\IndexBuffer.h>
+#include <Sein\Direct3D12\InstanceBuffer.h>
 #include <Sein\PMX\Loader.h>
 #include "QtDirect3D12.h"
 
@@ -9,7 +12,8 @@ QtDirect3D12::QtDirect3D12(QWidget *parent)
 	timer(new QTimer),
 	device(new Sein::Direct3D12::Device()),
 	vertexBuffer(new Sein::Direct3D12::VertexBuffer),
-	indexBuffer(new Sein::Direct3D12::IndexBuffer)
+	indexBuffer(new Sein::Direct3D12::IndexBuffer),
+	instanceBuffer(new Sein::Direct3D12::InstanceBuffer)
 {
 	ui.setupUi(this);
 
@@ -38,7 +42,7 @@ QtDirect3D12::~QtDirect3D12()
 void QtDirect3D12::mainLoop()
 {
 	device->BeginScene();
-	device->Render(*vertexBuffer, *indexBuffer);
+	device->Render(*vertexBuffer, *indexBuffer, *instanceBuffer);
 	device->EndScene();
 	device->Present();
 }

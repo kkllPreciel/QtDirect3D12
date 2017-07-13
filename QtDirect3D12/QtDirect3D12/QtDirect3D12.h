@@ -2,11 +2,16 @@
 
 #include <memory>
 #include <QtWidgets/QWidget>
-#include <Sein/Direct3D12/Direct3D12Device.h>
-#include <Sein/Direct3D12/VertexBuffer.h>
-#include <Sein/Direct3D12/IndexBuffer.h>
-#include <Sein/Direct3D12/InstanceBuffer.h>
 #include "ui_QtDirect3D12.h"
+
+namespace Sein {
+	namespace Direct3D12 {
+		class Device;
+		class VertexBuffer;
+		class IndexBuffer;
+		class InstanceBuffer;
+	};
+};
 
 class QtDirect3D12 : public QWidget
 {
