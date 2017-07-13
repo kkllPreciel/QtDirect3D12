@@ -1,5 +1,6 @@
 #pragma once
 
+#include <memory>
 #include <QtWidgets/QWidget>
 #include <Sein/Direct3D12/Direct3D12Device.h>
 #include <Sein/Direct3D12/VertexBuffer.h>
@@ -23,9 +24,9 @@ private Q_SLOTS:
 
 private:
 	Ui::QtDirect3D12Class ui;
-	QTimer* timer;
-	Sein::Direct3D12::Device* device;
-	Sein::Direct3D12::VertexBuffer* vertexBuffer;
-	Sein::Direct3D12::IndexBuffer* indexBuffer;
-	Sein::Direct3D12::InstanceBuffer* instanceBuffer;
+	std::unique_ptr<QTimer> timer;
+	std::unique_ptr<Sein::Direct3D12::Device> device;
+	std::unique_ptr<Sein::Direct3D12::VertexBuffer> vertexBuffer;
+	std::unique_ptr<Sein::Direct3D12::IndexBuffer> indexBuffer;
+	std::unique_ptr<Sein::Direct3D12::InstanceBuffer> instanceBuffer;
 };
