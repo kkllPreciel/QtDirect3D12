@@ -20,7 +20,6 @@ namespace Sein
 	{
 		class VertexBuffer;
 		class IndexBuffer;
-		class InstanceBuffer;
 		class DepthStencilView;
 		class Fence;
 
@@ -133,9 +132,8 @@ namespace Sein
 			 *	@brief	描画する
 			 *	@param	vertexBuffer:頂点バッファ
 			 *	@param	indexBuffer:頂点インデックスバッファ
-			 *	@param	instanceBuffer:インスタンス用バッファ
 			 */
-			void Render(const VertexBuffer& vertebBuffer, const IndexBuffer& indexBuffer, const InstanceBuffer& instanceBuffer);
+			void Render(const VertexBuffer& vertebBuffer, const IndexBuffer& indexBuffer);
 #pragma endregion
 
 			// 定数バッファ関連

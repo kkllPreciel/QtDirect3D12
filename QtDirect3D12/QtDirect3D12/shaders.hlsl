@@ -11,10 +11,10 @@
  */
 struct VSInput
 {
-    float3		position : POSITION; ///< 座標
-    float3		normal   : NORMAL;   ///< 法線ベクトル
-    float2		uv       : TEXCOORD; ///< UV座標
-	float4x4	world	 : MATRIX;	 ///< 行列
+    float3		position : POSITION;        ///< 座標
+    float3		normal   : NORMAL;          ///< 法線ベクトル
+    float2		uv       : TEXCOORD;        ///< UV座標
+    uint        id       : SV_InstanceID;   ///< インスタンスID
 };
 
 /**
@@ -51,9 +51,12 @@ VSOutput VSMain(VSInput input)
 {
     VSOutput result;
 
+    float4 instance = float4(1.0f, 1.0f, 1.0f, 0);
+
     float4 pos = float4(input.position, 1.0);
 
-	//pos = mul(input.world, pos);
+    pos += (input.id) * instance;
+
     pos = mul(world, pos);
     pos = mul(view, pos);
     pos = mul(projection, pos);

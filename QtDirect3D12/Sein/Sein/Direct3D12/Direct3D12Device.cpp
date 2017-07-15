@@ -16,7 +16,6 @@
 #include "Fence.h"
 #include "VertexBuffer.h"
 #include "IndexBuffer.h"
-#include "InstanceBuffer.h"
 
 namespace Sein
 {
@@ -530,12 +529,6 @@ namespace Sein
 					{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
 					{ "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
 					{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 24, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
-
-					// インスタンスデータ
-					{ "MATRIX", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 0, D3D12_INPUT_CLASSIFICATION_PER_INSTANCE_DATA, 1 },
-					{ "MATRIX", 1, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 16, D3D12_INPUT_CLASSIFICATION_PER_INSTANCE_DATA, 1 },
-					{ "MATRIX", 2, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 32, D3D12_INPUT_CLASSIFICATION_PER_INSTANCE_DATA, 1 },
-					{ "MATRIX", 3, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 48, D3D12_INPUT_CLASSIFICATION_PER_INSTANCE_DATA, 1 },
 				};
 
 				// ラスタライザーステートの設定
@@ -625,9 +618,8 @@ namespace Sein
 		 *	@brief	描画する
 		 *	@param	vertexBuffer:頂点バッファ
 		 *	@param	indexBuffer:頂点インデックスバッファ
-		 *	@param	instanceBuffer:インスタンス用バッファ
 		 */
-		void Device::Render(const VertexBuffer& vertebBuffer, const IndexBuffer& indexBuffer, const InstanceBuffer& instanceBuffer)
+		void Device::Render(const VertexBuffer& vertebBuffer, const IndexBuffer& indexBuffer)
 		{
 			static float now = 0.0f;
 			static float angle = DirectX::XM_PI / 180.0f;
@@ -687,7 +679,6 @@ namespace Sein
 
 			// 頂点バッファビューの設定
 			commandList->IASetVertexBuffers(0, 1, &(vertebBuffer.GetView()));
-			// commandList->IASetVertexBuffers(1, 1, &(instanceBuffer.GetView()));
 
 			// 頂点インデックスビューの設定
 			commandList->IASetIndexBuffer(&(indexBuffer.GetView()));
@@ -696,10 +687,7 @@ namespace Sein
 			commandList->SetGraphicsRootDescriptorTable(0, cbvHeap->GetGPUDescriptorHandleForHeapStart());
 
 			// 描画コマンドの生成
-			// TODO:頂点インデックスを使用して描画する
-			commandList->DrawIndexedInstanced(321567, 1, 0, 0, 0);
-			//commandList->DrawInstanced(88402, 1, 0, 0);
-			//commandList->DrawInstanced(3, 1, 0, 0);
+			commandList->DrawIndexedInstanced(321567, 100, 0, 0, 0);
 		}
 
 		/**

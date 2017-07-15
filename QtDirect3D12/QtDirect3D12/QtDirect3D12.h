@@ -9,7 +9,6 @@ namespace Sein {
 		class Device;
 		class VertexBuffer;
 		class IndexBuffer;
-		class InstanceBuffer;
 	};
 };
 
@@ -33,5 +32,5 @@ private:
 	std::unique_ptr<Sein::Direct3D12::Device> device;
 	std::unique_ptr<Sein::Direct3D12::VertexBuffer> vertexBuffer;
 	std::unique_ptr<Sein::Direct3D12::IndexBuffer> indexBuffer;
-	std::unique_ptr<Sein::Direct3D12::InstanceBuffer> instanceBuffer;
+
 };
