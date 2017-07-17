@@ -35,6 +35,16 @@ struct PSOutput
 };
 
 /**
+ *  @brief  インスタンス毎のデータ
+ */
+struct InstanceBuffer
+{
+    float4x4 world; ///< ワールド行列
+};
+
+StructuredBuffer<InstanceBuffer> cbv : register(t0); ///< インスタンス毎のデータリスト
+
+/**
  *  @brief  コンスタントバッファ
  */
 cbuffer ConstantBuffer : register(b0)

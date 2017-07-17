@@ -703,7 +703,7 @@ namespace Sein
 #pragma region ConstantBuffer
 
 		/**
-		 *	@brief	定数をバッファを作成する
+		 *	@brief	定数バッファを作成する
 		 */
 		void Device::CreateConstantBuffer()
 		{
@@ -794,6 +794,16 @@ namespace Sein
 		{
 			depthStencilView = new DepthStencilView();
 			depthStencilView->Create(device, width, height);
+		}
+#pragma endregion
+
+#pragma region InstanceBuffer
+		/**
+		 *	@brief	インスタンスバッファを作成する
+		 */
+		void Device::CreateInstanceBuffer()
+		{
+
 		}
 #pragma endregion
 	};

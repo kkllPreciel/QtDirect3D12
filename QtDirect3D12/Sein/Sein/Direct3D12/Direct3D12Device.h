@@ -9,6 +9,8 @@
 #pragma once
 
 // include
+#include <memory>
+#include <vector>
 #include <wrl\client.h>
 #include <d3d12.h>
 #include <dxgi1_4.h>
@@ -157,7 +159,7 @@ namespace Sein
 
 		private:
 			/**
-			 *	@brief	定数をバッファを作成する
+			 *	@brief	定数バッファを作成する
 			 */
 			void CreateConstantBuffer();
 
@@ -175,6 +177,31 @@ namespace Sein
 			 */
 			void CreateDepthStencilView(unsigned int width, unsigned int height);
 
+
+#pragma endregion
+
+			// インスタンシング関連
+			// 後々別クラスへ移動
+#pragma region Instancing
+		private:
+			/**
+			 *	@brief	インスタンシング用構造体
+			 */
+			struct InstanceBuffer
+			{
+				DirectX::XMFLOAT4X4 world;			///< ワールド行列(世界空間)
+			};
+
+			std::unique_ptr<ID3D12DescriptorHeap>	instanceHeap;				///< インスタンシング用ディスクリプターヒープ
+			std::unique_ptr<ID3D12Resource>			instanceBuffer;				///< インスタンシング用バッファ
+			unsigned int*							instanceBufferDataBegin;	///< インスタンシング用バッファ(リソース)へのポインタ
+			std::vector<InstanceBuffer>				instanceBufferData;			///< 各インスタンス毎のデータリスト
+
+		private:
+			/**
+			 *	@brief	インスタンスバッファを作成する
+			 */
+			void CreateInstanceBuffer();
 
 #pragma endregion
 		};
