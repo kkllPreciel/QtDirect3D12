@@ -61,12 +61,9 @@ VSOutput VSMain(VSInput input)
 {
     VSOutput result;
 
-    float4 instance = float4(1.0f, 1.0f, 1.0f, 0);
-
     float4 pos = float4(input.position, 1.0);
 
-    pos += (input.id) * instance;
-
+    pos = mul(cbv[input.id].world, pos);
     pos = mul(world, pos);
     pos = mul(view, pos);
     pos = mul(projection, pos);

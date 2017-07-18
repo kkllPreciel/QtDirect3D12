@@ -147,15 +147,15 @@ namespace Sein
 			 */
 			struct ConstantBuffer
 			{
-				DirectX::XMFLOAT4X4 world;			///< ワールド行列(世界空間)
-				DirectX::XMFLOAT4X4 view;			///< ビュー行列(視線空間)
-				DirectX::XMFLOAT4X4 projection;		///< プロジェクション行列(射影空間)
+				DirectX::XMFLOAT4X4 world;						///< ワールド行列(世界空間)
+				DirectX::XMFLOAT4X4 view;						///< ビュー行列(視線空間)
+				DirectX::XMFLOAT4X4 projection;					///< プロジェクション行列(射影空間)
 			};
 
-			ID3D12DescriptorHeap* cbvHeap;			///< 定数バッファ用ディスクリプターヒープ
-			ID3D12Resource* constantBuffer;			///< 定数バッファ
-			unsigned int* constantBufferDataBegin;	///< 定数バッファ(リソース)へのポインタ
-			ConstantBuffer constantBufferData;		///< 定数バッファ用のデータ
+			std::unique_ptr<ID3D12DescriptorHeap>	cbvSrvHeap;	///< 定数バッファビュー、シェーダーリソースビュー用ディスクリプターヒープ
+			ID3D12Resource* constantBuffer;						///< 定数バッファ
+			unsigned int* constantBufferDataBegin;				///< 定数バッファ(リソース)へのポインタ
+			ConstantBuffer constantBufferData;					///< 定数バッファ用のデータ
 
 		private:
 			/**
@@ -192,7 +192,7 @@ namespace Sein
 				DirectX::XMFLOAT4X4 world;			///< ワールド行列(世界空間)
 			};
 
-			std::unique_ptr<ID3D12DescriptorHeap>	instanceHeap;				///< インスタンシング用ディスクリプターヒープ
+			const unsigned int INSTANCE_NUM = 5;								///< インスタンスの数
 			std::unique_ptr<ID3D12Resource>			instanceBuffer;				///< インスタンシング用バッファ
 			unsigned int*							instanceBufferDataBegin;	///< インスタンシング用バッファ(リソース)へのポインタ
 			std::vector<InstanceBuffer>				instanceBufferData;			///< 各インスタンス毎のデータリスト
