@@ -135,6 +135,7 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Sein\Direct3D12\Buffer.cpp" />
     <ClCompile Include="Sein\Direct3D12\DepthStencilView.cpp" />
     <ClCompile Include="Sein\Direct3D12\Direct3D12Device.cpp" />
     <ClCompile Include="Sein\Direct3D12\Fence.cpp" />
@@ -144,6 +145,7 @@
     <ClCompile Include="Sein\PMX\Loader.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Sein\Direct3D12\Buffer.h" />
     <ClInclude Include="Sein\Direct3D12\DepthStencilView.h" />
     <ClInclude Include="Sein\Direct3D12\Direct3D12Device.h" />
     <ClInclude Include="Sein\Direct3D12\Fence.h" />
