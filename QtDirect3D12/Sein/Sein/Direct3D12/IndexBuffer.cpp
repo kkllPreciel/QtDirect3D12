@@ -8,6 +8,7 @@
 
 // include
 #include <cstring>
+#include "Buffer.h"
 #include "IndexBuffer.h"
 
 namespace Sein
@@ -17,7 +18,7 @@ namespace Sein
 		/**
 		 *	@brief	コンストラクタ
 		 */
-		IndexBuffer::IndexBuffer() : buffer(nullptr)
+		IndexBuffer::IndexBuffer() : buffer(new Buffer)
 		{
 
 		}
@@ -27,11 +28,7 @@ namespace Sein
 		 */
 		IndexBuffer::~IndexBuffer()
 		{
-			if (nullptr != buffer)
-			{
-				buffer->Release();
-				buffer = nullptr;
-			}
+			buffer.reset(nullptr);
 		}
 
 		/**
@@ -51,53 +48,36 @@ namespace Sein
 			properties.CreationNodeMask = 1;								// 恐らくヒープが生成されるアダプター(GPU)の番号
 			properties.VisibleNodeMask = 1;									// 恐らくヒープが表示されるアダプター(GPU)の番号
 
-			// リソースの設定
-			D3D12_RESOURCE_DESC resource_desc;
-			resource_desc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;		// リソースの種別(今回はバッファ)
-			resource_desc.Alignment = 0;									// アラインメント
-			resource_desc.Width = size;										// リソースの幅(今回は頂点インデックスバッファのサイズ)
-			resource_desc.Height = 1;										// リソースの高さ(今回は頂点インデックスバッファ分の幅を確保しているので1)
-			resource_desc.DepthOrArraySize = 1;								// リソースの深さ(テクスチャ等に使用する物、今回は1)
-			resource_desc.MipLevels = 1;									// ミップマップのレベル(今回は1)
-			resource_desc.Format = DXGI_FORMAT_UNKNOWN;						// リソースデータフォーマット(R8G8B8A8等)(今回は不明)
-			resource_desc.SampleDesc.Count = 1;								// ピクセル単位のマルチサンプリング数
-			resource_desc.SampleDesc.Quality = 0;							// マルチサンプリングの品質レベル
-			resource_desc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;			// テクスチャレイアウトオプション
-			resource_desc.Flags = D3D12_RESOURCE_FLAG_NONE;					// リソース操作オプションフラグ(今回は無し)
-
-			// リソースの生成(ヒープも同時に生成される)
-			if (FAILED(device->CreateCommittedResource(
-				&properties,						// ヒープの設定
-				D3D12_HEAP_FLAG_NONE,				// ヒープオプション(設定なし)
-				&resource_desc,						// リソースの設定
-				D3D12_RESOURCE_STATE_GENERIC_READ,	// リソースの状態
-				nullptr,							// クリアカラーのデフォルト値
-				IID_PPV_ARGS(&buffer))))
+			try
 			{
-				throw "頂点インデックスバッファの作成に失敗しました。";
+				buffer->Create(device, properties, size, D3D12_RESOURCE_FLAG_NONE);
+			}
+			catch (const char*)
+			{
+				throw "インデックスバッファ用リソースの作成に失敗しました。";
 			}
 
 			// 頂点インデックスバッファ(リソース)へのポインタ
 			unsigned char* pData;
-			if (FAILED(buffer->Map(
+			if (FAILED(buffer->Get().Map(
 				0,									// サブリソースのインデックス番号
 				nullptr,							// CPUからアクセスするメモリの範囲(nullptrは全領域にアクセスする)
 				reinterpret_cast<void**>(&pData))))	// リソースデータへのポインタ
 			{
-				throw "頂点インデックスバッファ用リソースへのポインタの取得に失敗しました。";
+				throw "インデックスバッファ用リソースへのポインタの取得に失敗しました。";
 			}
 
 			// 頂点インデックスバッファ(リソース)へ頂点インデックスデータをコピー
 			std::memcpy(pData, indices, size);
 
 			// 頂点インデックスバッファ(リソース)へのポインタを無効にする
-			buffer->Unmap(
+			buffer->Get().Unmap(
 				0,			// サブリソースインデックス番号
 				nullptr		// マップ解除するメモリの範囲、CPUが変更した可能性のある領域(nullptrは全領域)
 			);
 
 			// 頂点インデックスバッファのビューを初期化する
-			view.BufferLocation = buffer->GetGPUVirtualAddress();	// バッファのアドレス
+			view.BufferLocation = buffer->Get().GetGPUVirtualAddress();	// バッファのアドレス
 			view.SizeInBytes = size;								// バッファ(全頂点インデックス合計)のサイズ(バイト単位)
 			view.Format = format;									// バッファのフォーマット
 		}
