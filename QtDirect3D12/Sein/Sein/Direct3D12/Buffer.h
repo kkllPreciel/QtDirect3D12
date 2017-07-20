@@ -9,9 +9,8 @@
 #pragma once
 
 // include
+#include <d3d12.h>
 #include <memory>
-
-struct ID3D12Resource;
 
 namespace Sein
 {
@@ -51,7 +50,7 @@ namespace Sein
 			 *	@brief	リソース(バッファ)を取得する
 			 *	@return	リソースの参照
 			 */
-			ID3D12Resource& Get() const noexcept(false);
+			ID3D12Resource& Get() const noexcept;
 
 		private:
 			/**

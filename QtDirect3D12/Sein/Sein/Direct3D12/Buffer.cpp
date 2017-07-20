@@ -7,7 +7,6 @@
  */
 
 // include
-#include <d3d12.h>
 #include "Buffer.h"
 
 namespace Sein
@@ -83,9 +82,8 @@ namespace Sein
 		 *	@brief	リソース(バッファ)を取得する
 		 *	@return	リソースの参照
 		 */
-		ID3D12Resource& Buffer::Get() const noexcept(false)
+		ID3D12Resource& Buffer::Get() const noexcept
 		{
-			// TODO:Create関数がコールされる前にコールしてみる
 			return *buffer;
 		}
 	};
