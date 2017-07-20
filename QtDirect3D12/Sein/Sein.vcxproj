@@ -147,6 +147,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Sein\Direct3D12\Buffer.h" />
+    <ClInclude Include="Sein\Direct3D12\ConstantBuffer.h" />
     <ClInclude Include="Sein\Direct3D12\DepthStencilView.h" />
     <ClInclude Include="Sein\Direct3D12\Direct3D12Device.h" />
     <ClInclude Include="Sein\Direct3D12\Fence.h" />

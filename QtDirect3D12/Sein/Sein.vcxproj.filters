@@ -68,5 +68,8 @@
     <ClInclude Include="Sein\Direct3D12\Buffer.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
+    <ClInclude Include="Sein\Direct3D12\ConstantBuffer.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
