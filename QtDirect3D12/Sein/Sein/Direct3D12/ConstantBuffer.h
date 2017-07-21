@@ -38,9 +38,9 @@ namespace Sein
 			 *	@brief	定数バッファを生成する
 			 *	@param	device:Direct3D12のデバイス
 			 *	@param	heap:ディスクリプターヒープ
-			 *	@return	定数バッファへのポインタ
+			 *	@param	size:定数バッファのサイズ
 			 */
-			void Create(ID3D12Device* const device, ID3D12DescriptorHeap* const heap) noexcept(false);
+			void Create(ID3D12Device* const device, ID3D12DescriptorHeap* const heap, const unsigned int size) noexcept(false);
 
 			/**
 			 *	@brief	定数バッファを開放する
@@ -48,10 +48,11 @@ namespace Sein
 			void Release() noexcept;
 
 			/**
-			 *	@brief	定数バッファへのポインタを取得する
-			 *	@return	定数バッファへのポインタ
+			 *	@brief	データのマップを行う
+			 *	@param	data:マップするデータ
+			 *	@param	size:マップするデータのサイズ
 			 */
-			void* Get() const noexcept(false);
+			void Map(const void* const data, const unsigned int size) noexcept(false);
 
 		private:
 			/**

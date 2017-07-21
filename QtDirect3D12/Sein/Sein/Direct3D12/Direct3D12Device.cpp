@@ -16,6 +16,7 @@
 #include "Fence.h"
 #include "VertexBuffer.h"
 #include "IndexBuffer.h"
+#include "ConstantBuffer.h"
 
 namespace Sein
 {
@@ -27,8 +28,8 @@ namespace Sein
 		Device::Device() :
 			device(nullptr), swapChain(nullptr), commandQueue(nullptr), commandAllocator(nullptr),
 			commandList(nullptr), descriptorHeap(nullptr), descriptorSize(0), bufferIndex(0),
-			rootSignature(nullptr), pipelineState(nullptr), cbvSrvHeap(nullptr), constantBuffer(nullptr),
-			constantBufferDataBegin(nullptr), depthStencilView(nullptr), fence(nullptr)
+			rootSignature(nullptr), pipelineState(nullptr), cbvSrvHeap(nullptr), cbvBuffer(nullptr),
+			depthStencilView(nullptr), fence(nullptr)
 		{
 			for (auto i = 0; i < FrameCount; ++i)
 			{
@@ -300,9 +301,7 @@ namespace Sein
 			depthStencilView->Release();
 			delete depthStencilView;
 			depthStencilView = nullptr;
-			constantBufferDataBegin = nullptr;
-			constantBuffer->Unmap(0, nullptr);
-			constantBuffer->Release();
+			cbvBuffer->Release();
 			rootSignature->Release();
 
 			for (auto i = 0; i < FrameCount; ++i)
@@ -665,7 +664,7 @@ namespace Sein
 			DirectX::XMStoreFloat4x4(&(constantBufferData.projection), DirectX::XMMatrixPerspectiveFovLH(DirectX::XM_PI / 3.0f, 600.0f / 400.0f, 0.1f, 1000.0f));
 
 			// 定数バッファを更新
-			std::memcpy(constantBufferDataBegin, &constantBufferData, sizeof(ConstantBuffer));
+			cbvBuffer->Map(&constantBufferData, sizeof(ConstantBufferType));
 
 			// ビューポートの作成
 			D3D12_VIEWPORT viewport;
@@ -754,64 +753,14 @@ namespace Sein
 
 			// 定数バッファを生成
 			{
-				// ヒープの設定
-				D3D12_HEAP_PROPERTIES properties;
-				properties.Type = D3D12_HEAP_TYPE_UPLOAD;						// ヒープの種類(今回はCPU、GPUからアクセス可能なヒープに設定)
-				properties.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;	// CPUページプロパティ(不明に設定)
-				properties.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN;	// ヒープのメモリプール(不明に設定)
-				properties.CreationNodeMask = 1;								// 恐らくヒープが生成されるアダプター(GPU)の番号
-				properties.VisibleNodeMask = 1;									// 恐らくヒープが表示されるアダプター(GPU)の番号
-
-				// リソースの設定
-				D3D12_RESOURCE_DESC resource_desc;
-				resource_desc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;		// リソースの種別(今回はバッファ)
-				resource_desc.Alignment = 0;									// アラインメント
-				resource_desc.Width = sizeof(ConstantBuffer);					// リソースの幅(今回は定数バッファのサイズ)
-				resource_desc.Height = 1;										// リソースの高さ(今回は定数バッファ分の幅を確保しているので1)
-				resource_desc.DepthOrArraySize = 1;								// リソースの深さ(テクスチャ等に使用する物、今回は1)
-				resource_desc.MipLevels = 1;									// ミップマップのレベル(今回は1)
-				resource_desc.Format = DXGI_FORMAT_UNKNOWN;						// リソースデータフォーマット(R8G8B8A8等)(今回は不明)
-				resource_desc.SampleDesc.Count = 1;								// ピクセル単位のマルチサンプリング数
-				resource_desc.SampleDesc.Quality = 0;							// マルチサンプリングの品質レベル
-				resource_desc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;			// テクスチャレイアウトオプション
-				resource_desc.Flags = D3D12_RESOURCE_FLAG_NONE;					// リソース操作オプションフラグ(今回は無し)
-
-				// 定数バッファ用リソース(バッファ)の生成
-				if (FAILED(device->CreateCommittedResource(
-					&properties,						// ヒープの設定
-					D3D12_HEAP_FLAG_NONE,				// ヒープオプション(設定なし)
-					&resource_desc,						// リソースの設定
-					D3D12_RESOURCE_STATE_GENERIC_READ,	// リソースの状態
-					nullptr,							// クリアカラーのデフォルト値
-					IID_PPV_ARGS(&constantBuffer))))
-				{
-					throw "定数バッファ用リソースの作成に失敗しました。";
-				}
-
-				// 定数バッファビューの設定
-				D3D12_CONSTANT_BUFFER_VIEW_DESC constantBufferViewDesc = {};
-				constantBufferViewDesc.BufferLocation = constantBuffer->GetGPUVirtualAddress();		// バッファのアドレス
-				constantBufferViewDesc.SizeInBytes = (sizeof(ConstantBuffer) + 255) & ~255;			// 定数バッファは256バイトでアラインメントされていなければならない
-
-				// 定数バッファビュー用のディスクリプターを生成
-				// ディスクリプターヒープの領域に作成される
-				device->CreateConstantBufferView(&constantBufferViewDesc, cbvSrvHeap->GetCPUDescriptorHandleForHeapStart());
-
-				// マップ。アプリケーション終了までアンマップしない
-				if (FAILED(constantBuffer->Map(
-					0,									// サブリソースのインデックス番号
-					nullptr,							// CPUからアクセスするメモリの範囲(nullptrは全領域にアクセスする)
-					reinterpret_cast<void**>(&constantBufferDataBegin))))	// リソースデータへのポインタ
-				{
-					throw "定数バッファ用リソースへのポインタの取得に失敗しました。";
-				}
+				cbvBuffer.reset(new ConstantBuffer());
+				cbvBuffer->Create(device, cbvSrvHeap.get(), sizeof(ConstantBufferType));
 
 				// 定数バッファデータの初期化
-				auto aspect = static_cast<float>(600) / static_cast<float>(400);
 				DirectX::XMStoreFloat4x4(&(constantBufferData.world), DirectX::XMMatrixIdentity());
 				DirectX::XMStoreFloat4x4(&(constantBufferData.view), DirectX::XMMatrixIdentity());
 				DirectX::XMStoreFloat4x4(&(constantBufferData.projection), DirectX::XMMatrixIdentity());
-				std::memcpy(constantBufferDataBegin, &constantBufferData, sizeof(ConstantBuffer));
+				cbvBuffer->Map(&constantBufferData, sizeof(ConstantBufferType));
 			}
 		}
 #pragma endregion

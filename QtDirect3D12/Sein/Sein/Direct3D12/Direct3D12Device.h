@@ -24,6 +24,7 @@ namespace Sein
 		class IndexBuffer;
 		class DepthStencilView;
 		class Fence;
+		class ConstantBuffer;
 
 		/**
 		 *	@brief	Direct3D12用デバイスクラス(スワップチェインも一緒)
@@ -145,7 +146,7 @@ namespace Sein
 			/**
 			 *	@brief	定数バッファ用構造体
 			 */
-			struct ConstantBuffer
+			struct ConstantBufferType
 			{
 				DirectX::XMFLOAT4X4 world;						///< ワールド行列(世界空間)
 				DirectX::XMFLOAT4X4 view;						///< ビュー行列(視線空間)
@@ -153,9 +154,8 @@ namespace Sein
 			};
 
 			std::unique_ptr<ID3D12DescriptorHeap>	cbvSrvHeap;	///< 定数バッファビュー、シェーダーリソースビュー用ディスクリプターヒープ
-			ID3D12Resource* constantBuffer;						///< 定数バッファ
-			unsigned int* constantBufferDataBegin;				///< 定数バッファ(リソース)へのポインタ
-			ConstantBuffer constantBufferData;					///< 定数バッファ用のデータ
+			std::unique_ptr<ConstantBuffer>			cbvBuffer;	///< 定数バッファ
+			ConstantBufferType constantBufferData;				///< 定数バッファ用のデータ
 
 		private:
 			/**

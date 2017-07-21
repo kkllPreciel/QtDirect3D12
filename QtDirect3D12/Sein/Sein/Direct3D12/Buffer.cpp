@@ -38,6 +38,8 @@ namespace Sein
 		 */
 		void Buffer::Create(ID3D12Device* const device, const D3D12_HEAP_PROPERTIES& properties, const UINT64 width, const D3D12_RESOURCE_FLAGS flag) noexcept(false)
 		{
+			Release();
+
 			// リソースの設定
 			D3D12_RESOURCE_DESC resource_desc;
 			resource_desc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;		// リソースの種別(今回は必ずバッファ)
