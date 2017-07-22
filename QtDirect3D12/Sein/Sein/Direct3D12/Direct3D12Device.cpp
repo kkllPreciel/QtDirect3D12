@@ -17,6 +17,7 @@
 #include "VertexBuffer.h"
 #include "IndexBuffer.h"
 #include "ConstantBuffer.h"
+#include "ShaderResourceBuffer.h"
 
 namespace Sein
 {
@@ -29,7 +30,7 @@ namespace Sein
 			device(nullptr), swapChain(nullptr), commandQueue(nullptr), commandAllocator(nullptr),
 			commandList(nullptr), descriptorHeap(nullptr), descriptorSize(0), bufferIndex(0),
 			rootSignature(nullptr), pipelineState(nullptr), cbvSrvHeap(nullptr), cbvBuffer(nullptr),
-			depthStencilView(nullptr), fence(nullptr)
+			depthStencilView(nullptr), fence(nullptr), srBuffer(nullptr)
 		{
 			for (auto i = 0; i < FrameCount; ++i)
 			{
@@ -291,10 +292,7 @@ namespace Sein
 
 			// インスタンスバッファの削除
 			{
-				// TODO:deleterを使用する
-				instanceBufferDataBegin = nullptr;
-				instanceBuffer->Unmap(0, nullptr);
-				instanceBuffer.release()->Release();
+				srBuffer->Release();
 			}
 
 			pipelineState->Release();
@@ -401,9 +399,6 @@ namespace Sein
 			bufferIndex = swapChain->GetCurrentBackBufferIndex();
 		}
 
-		// 後々別クラスへ移動する
-#pragma region Fence
-
 		/**
 		 *	@brief	描画終了待ちを行う
 		 */
@@ -411,8 +406,6 @@ namespace Sein
 		{
 			fence->Wait(commandQueue);
 		}
-
-#pragma endregion
 
 		/**
 		 *	@brief	アセットを読み込む
@@ -795,56 +788,10 @@ namespace Sein
 				properties.CreationNodeMask = 1;								// 恐らくヒープが生成されるアダプター(GPU)の番号
 				properties.VisibleNodeMask = 1;									// 恐らくヒープが表示されるアダプター(GPU)の番号
 
-				// リソースの設定
-				D3D12_RESOURCE_DESC resource_desc;
-				resource_desc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;		// リソースの種別(今回はバッファ)
-				resource_desc.Alignment = 0;									// アラインメント
-				resource_desc.Width = sizeof(InstanceBuffer) * INSTANCE_NUM;	// リソースの幅(今回はインスタンスバッファのサイズ * インスタンス数)
-				resource_desc.Height = 1;										// リソースの高さ(今回はインスタンスバッファ分の幅を確保しているので1)
-				resource_desc.DepthOrArraySize = 1;								// リソースの深さ(テクスチャ等に使用する物、今回は1)
-				resource_desc.MipLevels = 1;									// ミップマップのレベル(今回は1)
-				resource_desc.Format = DXGI_FORMAT_UNKNOWN;						// リソースデータフォーマット(R8G8B8A8等)(今回は不明)
-				resource_desc.SampleDesc.Count = 1;								// ピクセル単位のマルチサンプリング数
-				resource_desc.SampleDesc.Quality = 0;							// マルチサンプリングの品質レベル
-				resource_desc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;			// テクスチャレイアウトオプション
-				resource_desc.Flags = D3D12_RESOURCE_FLAG_NONE;					// リソース操作オプションフラグ(今回は無し)
-
-				// インスタンスバッファ用リソース(バッファ)の生成
-				ID3D12Resource* buffer = nullptr;
-				if (FAILED(device->CreateCommittedResource(
-					&properties,						// ヒープの設定
-					D3D12_HEAP_FLAG_NONE,				// ヒープオプション(設定なし)
-					&resource_desc,						// リソースの設定
-					D3D12_RESOURCE_STATE_GENERIC_READ,	// リソースの状態
-					nullptr,							// クリアカラーのデフォルト値
-					IID_PPV_ARGS(&buffer))))
-				{
-					throw "インスタンスバッファ用リソースの作成に失敗しました。";
-				}
-				instanceBuffer.reset(buffer);
-
-				// シェーダーリソースビューの設定
-				D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
-				srvDesc.Format = DXGI_FORMAT_UNKNOWN;
-				srvDesc.ViewDimension = D3D12_SRV_DIMENSION_BUFFER;
-				srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-				srvDesc.Buffer.NumElements = INSTANCE_NUM;	// インスタンスの数
-				srvDesc.Buffer.StructureByteStride = sizeof(InstanceBuffer);
-				srvDesc.Buffer.Flags = D3D12_BUFFER_SRV_FLAG_NONE;
-				
-				// シェーダーリソースビューを生成
-				D3D12_CPU_DESCRIPTOR_HANDLE srvHandle(cbvSrvHeap->GetCPUDescriptorHandleForHeapStart());
-				srvHandle.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
-				device->CreateShaderResourceView(instanceBuffer.get(), &srvDesc, srvHandle);
-
-				// マップ。アプリケーション終了までアンマップしない
-				if (FAILED(instanceBuffer->Map(
-					0,														// サブリソースのインデックス番号
-					nullptr,												// CPUからアクセスするメモリの範囲(nullptrは全領域にアクセスする)
-					reinterpret_cast<void**>(&instanceBufferDataBegin))))	// リソースデータへのポインタ
-				{
-					throw "インスタンスバッファ用リソースへのポインタの取得に失敗しました。";
-				}
+				auto handle = cbvSrvHeap->GetCPUDescriptorHandleForHeapStart();
+				handle.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+				srBuffer.reset(new ShaderResourceBuffer());
+				srBuffer->Create(device, handle, INSTANCE_NUM, sizeof(InstanceBuffer));
 
 				// インスタンス個別のデータを初期化
 				instanceBufferData.resize(INSTANCE_NUM);
@@ -857,7 +804,7 @@ namespace Sein
 				DirectX::XMStoreFloat4x4(&(instanceBufferData[2].world), DirectX::XMMatrixMultiply(DirectX::XMMatrixRotationZ(DirectX::XM_PI), DirectX::XMMatrixTranslation(2.0f, 2.0f, 2.0f)));
 				DirectX::XMStoreFloat4x4(&(instanceBufferData[3].world), DirectX::XMMatrixTranslation(-1.0f, -1.0f, -1.0f));
 				DirectX::XMStoreFloat4x4(&(instanceBufferData[4].world), DirectX::XMMatrixTranslation(-2.0f, -2.0f, -2.0f));
-				std::memcpy(instanceBufferDataBegin, &instanceBufferData[0], sizeof(InstanceBuffer) * instanceBufferData.size());
+				srBuffer->Map(&instanceBufferData[0], sizeof(InstanceBuffer) * instanceBufferData.size());
 			}
 		}
 #pragma endregion

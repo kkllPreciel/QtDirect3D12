@@ -25,6 +25,7 @@ namespace Sein
 		class DepthStencilView;
 		class Fence;
 		class ConstantBuffer;
+		class ShaderResourceBuffer;
 
 		/**
 		 *	@brief	Direct3D12用デバイスクラス(スワップチェインも一緒)
@@ -193,9 +194,8 @@ namespace Sein
 			};
 
 			const unsigned int INSTANCE_NUM = 5;								///< インスタンスの数
-			std::unique_ptr<ID3D12Resource>			instanceBuffer;				///< インスタンシング用バッファ
-			unsigned int*							instanceBufferDataBegin;	///< インスタンシング用バッファ(リソース)へのポインタ
 			std::vector<InstanceBuffer>				instanceBufferData;			///< 各インスタンス毎のデータリスト
+			std::unique_ptr<ShaderResourceBuffer>	srBuffer;					///< シェーダーリソースバッファ
 
 		private:
 			/**
