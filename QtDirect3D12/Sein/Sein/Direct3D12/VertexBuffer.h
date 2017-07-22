@@ -10,11 +10,14 @@
 
 // include
 #include <d3d12.h>
+#include <memory>
 
 namespace Sein
 {
 	namespace Direct3D12
 	{
+		class Buffer;
+
 		/**
 		 *	@brief	頂点バッファクラス
 		 */
@@ -61,7 +64,7 @@ namespace Sein
 			VertexBuffer& operator = (const VertexBuffer& other) = delete;
 
 		private:
-			ID3D12Resource*				buffer;	///< 頂点バッファ
+			std::unique_ptr<Buffer>		buffer; ///< バッファ(リソース)
 			D3D12_VERTEX_BUFFER_VIEW	view;	///< 頂点バッファのビュー
 		};
 	};

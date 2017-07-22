@@ -10,11 +10,14 @@
 
 // include
 #include <d3d12.h>
+#include <memory>
 
 namespace Sein
 {
 	namespace Direct3D12
 	{
+		class Buffer;
+
 		/**
 		 *	@brief	頂点インデックスバッファクラス
 		 */
@@ -61,7 +64,7 @@ namespace Sein
 			IndexBuffer& operator = (const IndexBuffer& other) = delete;
 
 		private:
-			ID3D12Resource*				buffer;	///< 頂点インデックスバッファ
+			std::unique_ptr<Buffer>		buffer; ///< バッファ(リソース)
 			D3D12_INDEX_BUFFER_VIEW		view;	///< 頂点インデックスバッファのビュー
 		};
 	};

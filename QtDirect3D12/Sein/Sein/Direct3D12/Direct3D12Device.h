@@ -9,6 +9,8 @@
 #pragma once
 
 // include
+#include <memory>
+#include <vector>
 #include <wrl\client.h>
 #include <d3d12.h>
 #include <dxgi1_4.h>
@@ -22,6 +24,8 @@ namespace Sein
 		class IndexBuffer;
 		class DepthStencilView;
 		class Fence;
+		class ConstantBuffer;
+		class ShaderResourceBuffer;
 
 		/**
 		 *	@brief	Direct3D12用デバイスクラス(スワップチェインも一緒)
@@ -143,21 +147,20 @@ namespace Sein
 			/**
 			 *	@brief	定数バッファ用構造体
 			 */
-			struct ConstantBuffer
+			struct ConstantBufferType
 			{
-				DirectX::XMFLOAT4X4 world;			///< ワールド行列(世界空間)
-				DirectX::XMFLOAT4X4 view;			///< ビュー行列(視線空間)
-				DirectX::XMFLOAT4X4 projection;		///< プロジェクション行列(射影空間)
+				DirectX::XMFLOAT4X4 world;						///< ワールド行列(世界空間)
+				DirectX::XMFLOAT4X4 view;						///< ビュー行列(視線空間)
+				DirectX::XMFLOAT4X4 projection;					///< プロジェクション行列(射影空間)
 			};
 
-			ID3D12DescriptorHeap* cbvHeap;			///< 定数バッファ用ディスクリプターヒープ
-			ID3D12Resource* constantBuffer;			///< 定数バッファ
-			unsigned int* constantBufferDataBegin;	///< 定数バッファ(リソース)へのポインタ
-			ConstantBuffer constantBufferData;		///< 定数バッファ用のデータ
+			std::unique_ptr<ID3D12DescriptorHeap>	cbvSrvHeap;	///< 定数バッファビュー、シェーダーリソースビュー用ディスクリプターヒープ
+			std::unique_ptr<ConstantBuffer>			cbvBuffer;	///< 定数バッファ
+			ConstantBufferType constantBufferData;				///< 定数バッファ用のデータ
 
 		private:
 			/**
-			 *	@brief	定数をバッファを作成する
+			 *	@brief	定数バッファを作成する
 			 */
 			void CreateConstantBuffer();
 
@@ -175,6 +178,30 @@ namespace Sein
 			 */
 			void CreateDepthStencilView(unsigned int width, unsigned int height);
 
+
+#pragma endregion
+
+			// インスタンシング関連
+			// 後々別クラスへ移動
+#pragma region Instancing
+		private:
+			/**
+			 *	@brief	インスタンシング用構造体
+			 */
+			struct InstanceBuffer
+			{
+				DirectX::XMFLOAT4X4 world;			///< ワールド行列(世界空間)
+			};
+
+			const unsigned int INSTANCE_NUM = 5;								///< インスタンスの数
+			std::vector<InstanceBuffer>				instanceBufferData;			///< 各インスタンス毎のデータリスト
+			std::unique_ptr<ShaderResourceBuffer>	srBuffer;					///< シェーダーリソースバッファ
+
+		private:
+			/**
+			 *	@brief	インスタンスバッファを作成する
+			 */
+			void CreateInstanceBuffer();
 
 #pragma endregion
 		};

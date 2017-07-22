@@ -124,6 +124,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
+      <AdditionalIncludeDirectories>C:\Program Files %28x86%29\Windows Kits\10\Include\10.0.10586.0\um;C:\Program Files %28x86%29\Windows Kits\10\Include\10.0.10586.0\shared;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -135,18 +136,26 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Sein\Direct3D12\Buffer.cpp" />
+    <ClCompile Include="Sein\Direct3D12\ConstantBuffer.cpp" />
     <ClCompile Include="Sein\Direct3D12\DepthStencilView.cpp" />
     <ClCompile Include="Sein\Direct3D12\Direct3D12Device.cpp" />
     <ClCompile Include="Sein\Direct3D12\Fence.cpp" />
     <ClCompile Include="Sein\Direct3D12\IndexBuffer.cpp" />
+    <ClCompile Include="Sein\Direct3D12\Mesh.cpp" />
+    <ClCompile Include="Sein\Direct3D12\ShaderResourceBuffer.cpp" />
     <ClCompile Include="Sein\Direct3D12\VertexBuffer.cpp" />
     <ClCompile Include="Sein\PMX\Loader.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Sein\Direct3D12\Buffer.h" />
+    <ClInclude Include="Sein\Direct3D12\ConstantBuffer.h" />
     <ClInclude Include="Sein\Direct3D12\DepthStencilView.h" />
     <ClInclude Include="Sein\Direct3D12\Direct3D12Device.h" />
     <ClInclude Include="Sein\Direct3D12\Fence.h" />
     <ClInclude Include="Sein\Direct3D12\IndexBuffer.h" />
+    <ClInclude Include="Sein\Direct3D12\Mesh.h" />
+    <ClInclude Include="Sein\Direct3D12\ShaderResourceBuffer.h" />
     <ClInclude Include="Sein\Direct3D12\VertexBuffer.h" />
     <ClInclude Include="Sein\PMX\Loader.h" />
   </ItemGroup>
