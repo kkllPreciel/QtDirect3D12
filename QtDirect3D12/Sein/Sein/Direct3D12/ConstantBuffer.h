@@ -40,7 +40,7 @@ namespace Sein
 			 *	@param	descriptor_handle:ディスクリプターハンドル
 			 *	@param	size:定数バッファのサイズ
 			 */
-			void Create(ID3D12Device* const device, const D3D12_CPU_DESCRIPTOR_HANDLE* const descriptor_handle, const unsigned int size) noexcept(false);
+			void Create(ID3D12Device* const device, const D3D12_CPU_DESCRIPTOR_HANDLE descriptor_handle, const unsigned int size) noexcept(false);
 
 			/**
 			 *	@brief	定数バッファを開放する

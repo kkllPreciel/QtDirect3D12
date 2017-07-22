@@ -36,7 +36,7 @@ namespace Sein
 		 *	@param	descriptor_handle:ディスクリプターハンドル
 		 *	@param	size:定数バッファのサイズ
 		 */
-		void ConstantBuffer::Create(ID3D12Device* const device, const D3D12_CPU_DESCRIPTOR_HANDLE* const descriptor_handle, const unsigned int size) noexcept(false)
+		void ConstantBuffer::Create(ID3D12Device* const device, const D3D12_CPU_DESCRIPTOR_HANDLE descriptor_handle, const unsigned int size) noexcept(false)
 		{
 			Release();
 
@@ -65,7 +65,7 @@ namespace Sein
 
 			// 定数バッファビュー用のディスクリプターを生成
 			// ディスクリプターヒープの領域に作成される
-			device->CreateConstantBufferView(&constantBufferViewDesc, *descriptor_handle);
+			device->CreateConstantBufferView(&constantBufferViewDesc, descriptor_handle);
 
 			// マップ。Releaseが呼ばれるまでアンマップしない
 			if (FAILED(buffer->Get().Map(

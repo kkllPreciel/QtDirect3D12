@@ -41,7 +41,7 @@ namespace Sein
 			 *	@param	num:リソース内の要素数
 			 *	@param	size:リソース内の1要素のサイズ			 
 			 */
-			void Create(ID3D12Device* const device, const D3D12_CPU_DESCRIPTOR_HANDLE* const descriptor_handle, const unsigned int num, const unsigned int size) noexcept(false);
+			void Create(ID3D12Device* const device, const D3D12_CPU_DESCRIPTOR_HANDLE descriptor_handle, const unsigned int num, const unsigned int size) noexcept(false);
 
 			/**
 			 *	@brief	シェーダーリソースバッファを開放する

@@ -754,7 +754,7 @@ namespace Sein
 			// 定数バッファを生成
 			{
 				cbvBuffer.reset(new ConstantBuffer());
-				cbvBuffer->Create(device, cbvSrvHeap.get(), sizeof(ConstantBufferType));
+				cbvBuffer->Create(device, cbvSrvHeap.get()->GetCPUDescriptorHandleForHeapStart(), sizeof(ConstantBufferType));
 
 				// 定数バッファデータの初期化
 				DirectX::XMStoreFloat4x4(&(constantBufferData.world), DirectX::XMMatrixIdentity());
