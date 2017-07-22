@@ -37,10 +37,10 @@ namespace Sein
 			/**
 			 *	@brief	定数バッファを生成する
 			 *	@param	device:Direct3D12のデバイス
-			 *	@param	heap:ディスクリプターヒープ
+			 *	@param	descriptor_handle:ディスクリプターハンドル
 			 *	@param	size:定数バッファのサイズ
 			 */
-			void Create(ID3D12Device* const device, ID3D12DescriptorHeap* const heap, const unsigned int size) noexcept(false);
+			void Create(ID3D12Device* const device, const D3D12_CPU_DESCRIPTOR_HANDLE* const descriptor_handle, const unsigned int size) noexcept(false);
 
 			/**
 			 *	@brief	定数バッファを開放する
