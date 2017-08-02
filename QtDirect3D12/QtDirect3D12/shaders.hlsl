@@ -58,7 +58,7 @@ cbuffer ConstantBuffer : register(b0)
 /**
  *  @brief  テクスチャ
  */
-Texture2D g_texture : register(t1);
+Texture2D g_texture : register(t0);
 
 /**
  *  @brief  サンプラー
