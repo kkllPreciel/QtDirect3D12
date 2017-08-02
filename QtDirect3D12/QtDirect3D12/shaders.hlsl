@@ -23,7 +23,8 @@ struct VSInput
 struct VSOutput
 {
     float4 position : SV_POSITION;  ///< 座標
-    float4 color : COLOR;           ///< 色
+    float2 uv       : TEXCOORD;     ///< UV座標
+    float4 color    : COLOR;        ///< 色
 };
 
 /**
@@ -55,6 +56,16 @@ cbuffer ConstantBuffer : register(b0)
 };
 
 /**
+ *  @brief  テクスチャ
+ */
+Texture2D g_texture : register(t1);
+
+/**
+ *  @brief  サンプラー
+ */
+SamplerState g_sampler : register(s0);
+
+/**
  *  @brief  エントリーポイント
  */
 VSOutput VSMain(VSInput input)
@@ -70,6 +81,7 @@ VSOutput VSMain(VSInput input)
 
     result.position = pos;
     result.color = float4(input.uv.x, input.uv.y, 1.0, 1.0);
+    result.uv = input.uv;
 
     return result;
 }
@@ -82,6 +94,7 @@ PSOutput PSMain(VSOutput input)
     PSOutput output = (PSOutput) 0;
 
     output.color = input.color;
+    output.color = g_texture.Sample(g_sampler, input.uv);
 
     return output;
 }
