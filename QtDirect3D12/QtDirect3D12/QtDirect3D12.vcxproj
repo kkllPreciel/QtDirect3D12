@@ -51,7 +51,7 @@
       <AdditionalDependencies>qtmaind.lib;Qt5Cored.lib;Qt5Guid.lib;Qt5OpenGLd.lib;opengl32.lib;glu32.lib;Qt5Widgetsd.lib;d3d12.lib;dxgi.lib;d3dcompiler.lib;Sein.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PreBuildEvent>
-      <Command>for %%1 in ($(SolutionDir)Resources/Shaders/*.hlsl) do fxc.exe $(SolutionDir)Resources/Shaders/%%~n1.hlsl /T fx_5_0 /Fo $(SolutionDir)Resources/Shaders/%%~n1.cfx</Command>
+      <Command>for %%1 in ($(SolutionDir)Resources/Shaders/*.hlsl) do fxc.exe $(SolutionDir)Resources/Shaders/%%~n1.hlsl /T fx_5_0 /Fo $(SolutionDir)Resources/Shaders/%%~n1.cso</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
