@@ -11,6 +11,7 @@ namespace Sein {
     class VertexBuffer;
     class IndexBuffer;
     class ConstantBuffer;
+    class ShaderResourceBuffer;
   };
 };
 
@@ -46,5 +47,16 @@ private:
   };
   ConstantBufferType constantBuffer;                                    ///< 定数バッファ
   std::unique_ptr<Sein::Direct3D12::ConstantBuffer> constantBufferView; ///< 定数バッファビュー
+
+  /**
+   *  @brief  インスタンシング用構造体
+   */
+  struct InstanceBuffer
+  {
+    DirectX::XMFLOAT4X4 world;  ///< ワールド行列(世界空間)
+  };
+  std::vector<InstanceBuffer> instanceBufferData;                               ///< 各インスタンス毎のデータリスト
+  std::unique_ptr<Sein::Direct3D12::ShaderResourceBuffer> shaderResourceBuffer; ///< シェーダーリソースバッファビュー
+  const unsigned int INSTANCE_NUM = 5;                                          ///< インスタンスの数
 
 };

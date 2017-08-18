@@ -5,6 +5,7 @@
 #include <Sein\Direct3D12\vertex_buffer.h>
 #include <Sein\Direct3D12\index_buffer.h>
 #include <Sein\Direct3D12\constant_buffer.h>
+#include <Sein\Direct3D12\shader_resource_buffer.h>
 #include <Sein\PMX\loader.h>
 #include "QtDirect3D12.h"
 
@@ -14,7 +15,8 @@ QtDirect3D12::QtDirect3D12(QWidget *parent)
   device(new Sein::Direct3D12::Device()),
   vertexBuffer(new Sein::Direct3D12::VertexBuffer),
   indexBuffer(new Sein::Direct3D12::IndexBuffer),
-  constantBufferView(nullptr)
+  constantBufferView(nullptr),
+  shaderResourceBuffer(nullptr)
 {
   ui.setupUi(this);
 
@@ -28,6 +30,20 @@ QtDirect3D12::QtDirect3D12(QWidget *parent)
 
   // 定数バッファを作成
   constantBufferView.reset(device->CreateConstantBuffer(sizeof(ConstantBufferType)));
+
+  {
+    // シェーダーリソースバッファを作成
+    shaderResourceBuffer.reset(device->CreateShaderResourceBuffer(INSTANCE_NUM, sizeof(InstanceBuffer)));
+
+    // インスタンス個別のデータを初期化
+    instanceBufferData.resize(INSTANCE_NUM);
+    DirectX::XMStoreFloat4x4(&(instanceBufferData[0].world), DirectX::XMMatrixIdentity());
+    DirectX::XMStoreFloat4x4(&(instanceBufferData[1].world), DirectX::XMMatrixTranslation(1.0f, 1.0f, 1.0f));
+    DirectX::XMStoreFloat4x4(&(instanceBufferData[2].world), DirectX::XMMatrixMultiply(DirectX::XMMatrixRotationZ(DirectX::XM_PI), DirectX::XMMatrixTranslation(2.0f, 2.0f, 2.0f)));
+    DirectX::XMStoreFloat4x4(&(instanceBufferData[3].world), DirectX::XMMatrixTranslation(-1.0f, -1.0f, -1.0f));
+    DirectX::XMStoreFloat4x4(&(instanceBufferData[4].world), DirectX::XMMatrixTranslation(-2.0f, -2.0f, -2.0f));
+    shaderResourceBuffer->Map(&instanceBufferData[0], sizeof(InstanceBuffer) * instanceBufferData.size());
+  }
 
   // メインループ呼び出し設定
   connect(timer.get(), SIGNAL(timeout()), this, SLOT(mainLoop()));
@@ -87,7 +103,7 @@ void QtDirect3D12::mainLoop()
   }
 
   device->BeginScene();
-  device->Render(*vertexBuffer, *indexBuffer);
+  device->Render(*vertexBuffer, *indexBuffer, instanceBufferData.size());
   device->EndScene();
   device->Present();
 }
