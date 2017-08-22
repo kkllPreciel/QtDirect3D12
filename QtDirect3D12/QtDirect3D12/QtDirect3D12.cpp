@@ -29,11 +29,11 @@ QtDirect3D12::QtDirect3D12(QWidget *parent)
   indexBuffer->Create(&(device->GetDevice()), loader.GetIndexSize() * loader.GetIndexCount(), loader.GetIndices(), DXGI_FORMAT_R32_UINT);
 
   // 定数バッファを作成
-  constantBufferView.reset(device->CreateConstantBuffer(sizeof(ConstantBufferType)));
+  constantBufferView = device->CreateConstantBuffer(sizeof(ConstantBufferType));
 
   {
     // シェーダーリソースバッファを作成
-    shaderResourceBuffer.reset(device->CreateShaderResourceBuffer(INSTANCE_NUM, sizeof(InstanceBuffer)));
+    shaderResourceBuffer = device->CreateShaderResourceBuffer(INSTANCE_NUM, sizeof(InstanceBuffer));
 
     // インスタンス個別のデータを初期化
     instanceBufferData.resize(INSTANCE_NUM);
