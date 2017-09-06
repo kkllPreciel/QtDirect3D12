@@ -11,10 +11,10 @@
 
 QtDirect3D12::QtDirect3D12(QWidget *parent)
   : QWidget(parent),
-  timer(new QTimer),
-  device(new Sein::Direct3D12::Device()),
-  vertexBuffer(new Sein::Direct3D12::VertexBuffer),
-  indexBuffer(new Sein::Direct3D12::IndexBuffer),
+  timer(std::make_unique<QTimer>()),
+  device(std::make_unique<Sein::Direct3D12::Device>()),
+  vertexBuffer(std::make_unique<Sein::Direct3D12::VertexBuffer>()),
+  indexBuffer(std::make_unique<Sein::Direct3D12::IndexBuffer>()),
   constantBufferView(nullptr),
   shaderResourceBuffer(nullptr)
 {
