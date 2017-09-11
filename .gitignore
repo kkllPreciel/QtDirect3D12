@@ -247,3 +247,7 @@ ModelManifest.xml
 # Resources
 QtDirect3D12/Resources/Pmx/*
 !QtDirect3D12/Resources/Pmx/.gitkeep
+
+# Textures
+QtDirect3D12/Resources/Texture/*
+!QtDirect3D12/Resources/Texture/.gitkeep
