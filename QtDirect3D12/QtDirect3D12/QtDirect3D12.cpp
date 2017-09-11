@@ -8,6 +8,7 @@
 #include <Sein\Direct3D12\shader_resource_buffer.h>
 #include <Sein\PMX\loader.h>
 #include "QtDirect3D12.h"
+#include <qimage.h>
 
 QtDirect3D12::QtDirect3D12(QWidget *parent)
   : QWidget(parent),
@@ -48,6 +49,17 @@ QtDirect3D12::QtDirect3D12(QWidget *parent)
   // メインループ呼び出し設定
   connect(timer.get(), SIGNAL(timeout()), this, SLOT(mainLoop()));
   timer->start(1000 / 60);
+
+  QImage image;
+  if (image.load("../Resources/Texture/body01.png"))
+  {
+    QSize size = image.size();
+    auto byteCount = image.byteCount();
+    auto depth = image.depth();
+    auto format = image.format();
+    //image.convertToFormat(QImage::Format::)
+    int i = 0;
+  }
 }
 
 QtDirect3D12::~QtDirect3D12()
