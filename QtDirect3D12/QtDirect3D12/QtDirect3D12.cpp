@@ -53,12 +53,12 @@ QtDirect3D12::QtDirect3D12(QWidget *parent)
   QImage image;
   if (image.load("../Resources/Texture/body01.png"))
   {
-    QSize size = image.size();
-    auto byteCount = image.byteCount();
-    auto depth = image.depth();
     auto format = image.format();
-    //image.convertToFormat(QImage::Format::)
-    int i = 0;
+    auto bytesPerLine = image.bytesPerLine();
+    auto height = image.height();
+    auto buffer = std::make_unique<uchar[]>(bytesPerLine * height);
+    std::memcpy(buffer.get(), image.constBits(), bytesPerLine * height);
+    buffer.reset(nullptr);
   }
 }
 
