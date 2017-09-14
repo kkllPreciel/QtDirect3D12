@@ -46,20 +46,25 @@ QtDirect3D12::QtDirect3D12(QWidget *parent)
     shaderResourceBuffer->Map(&instanceBufferData[0], sizeof(InstanceBuffer) * instanceBufferData.size());
   }
 
-  // メインループ呼び出し設定
-  connect(timer.get(), SIGNAL(timeout()), this, SLOT(mainLoop()));
-  timer->start(1000 / 60);
-
   QImage image;
-  if (image.load("../Resources/Texture/body01.png"))
+  if (image.load("../Resources/Texture/A.png"))
   {
     auto format = image.format();
     auto bytesPerLine = image.bytesPerLine();
+    auto width = image.width();
     auto height = image.height();
     auto buffer = std::make_unique<uchar[]>(bytesPerLine * height);
-    std::memcpy(buffer.get(), image.constBits(), bytesPerLine * height);
+    std::memcpy(buffer.get(), image.convertToFormat(QImage::Format::Format_RGBA8888).constBits(), bytesPerLine * height);
+
+    // テクスチャバッファを作成
+    device->CreateTextureBuffer(buffer.get(), width, height, 4);
+
     buffer.reset(nullptr);
   }
+
+  // メインループ呼び出し設定
+  connect(timer.get(), SIGNAL(timeout()), this, SLOT(mainLoop()));
+  timer->start(1000 / 60);
 }
 
 QtDirect3D12::~QtDirect3D12()
