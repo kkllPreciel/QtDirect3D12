@@ -334,9 +334,6 @@ void getSpotDirectLightIrradiance(const in SpotLight spotLight, const in Geometr
     }
 }
 
-// light uniforms
-#define LIGHT_MAX 4
-
 // BRDFs
 
 // Normalized Lambert
@@ -433,20 +430,14 @@ PSOutput PSMain(VSOutput input)
 
     IncidentLight directLight;
 
-    DirectionalLight directionalLights[LIGHT_MAX];
-    int numDirectionalLights = LIGHT_MAX;
+	DirectionalLight directionalLight;
 
   // directional light
-    for (int i = 0; i < LIGHT_MAX; ++i)
-    {
-        directionalLights[i].direction = float3(0, 0, 1);
-        directionalLights[i].color = float3(1, 1, 1);
-
-        if (i >= numDirectionalLights)
-            break;
-        getDirectionalDirectLightIrradiance(directionalLights[i], geometry, directLight);
-        RE_Direct(directLight, geometry, material, reflectedLight);
-    }
+	directionalLight.direction = float3(0, 0, 1);
+	directionalLight.color = float3(1, 1, 1);
+	
+	getDirectionalDirectLightIrradiance(directionalLight, geometry, directLight);
+	RE_Direct(directLight, geometry, material, reflectedLight);
 
     float3 outgoingLight = emissive + reflectedLight.directDiffuse + reflectedLight.directSpecular + reflectedLight.indirectDiffuse + reflectedLight.indirectSpecular;
 
