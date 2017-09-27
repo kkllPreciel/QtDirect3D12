@@ -120,7 +120,8 @@ void QtDirect3D12::mainLoop()
   }
 
   device->BeginScene();
-  device->Render(*vertexBuffer, *indexBuffer, instanceBufferData.size());
+  //device->Render(*vertexBuffer, *indexBuffer, instanceBufferData.size());
+  device->Render(*vertexBuffer, *indexBuffer, 1);
   device->EndScene();
   device->Present();
 }

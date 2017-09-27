@@ -23,10 +23,10 @@ struct VSInput
 struct VSOutput
 {
     float4 position : SV_POSITION;  ///< 座標
-    float3 normal   : COLOR0;       ///< ワールド空間での法線ベクトル
+    float4 wPos     : COLOR0;       ///< ワールド空間での座標
+    float4 normal   : COLOR1;       ///< ワールド空間での法線ベクトル
     float2 uv       : TEXCOORD;     ///< UV座標
-    float4 color    : COLOR1;       ///< 色
-    float4 view     : COLOR2;       ///< 視点へのベクトル
+    float4 color    : COLOR2;       ///< 色
 };
 
 /**
@@ -84,12 +84,12 @@ VSOutput VSMain(VSInput input)
     result.position = pos;
     result.color = float4(input.uv.x, input.uv.y, 1.0, 1.0);
     result.uv = input.uv;
-
-    // 視点へのベクトル
-    result.view = -mul(view, mul(world, mul(cbv[input.id].world, pos)));
     
-    // ビュー空間での法線ベクトル(近似値)
-    result.normal = mul(view, mul(world, mul(cbv[input.id].world, pos)));
+    // ワールド空間での法線ベクトル(近似値)
+    result.normal = mul(world, mul(cbv[input.id].world, float4(input.normal, 1.0)));
+
+    // ワールド空間での座標
+    result.wPos = mul(world, mul(cbv[input.id].world, float4(input.position, 1.0)));
 
     return result;
 }
@@ -405,17 +405,15 @@ PSOutput PSMain(VSOutput input)
 {
     PSOutput output = (PSOutput) 0;
 
-    output.color = input.color;
-    output.color = g_texture.Sample(g_sampler, input.uv);
-
     GeometricContext geometry;
-    geometry.position = -input.view;
+    geometry.position = input.wPos;
     geometry.normal = normalize(input.normal);
-    geometry.viewDir = normalize(input.view);
+    geometry.viewDir = normalize(float4(0, 10, -30.5, 1) - input.wPos);
 
-    float metallic = 0.5;
-    float roughness = 0.5;
+    float metallic = 0.2;
+    float roughness = 0.1;
     float3 albedo = float3(1, 1, 1);
+    //g_texture.Sample(g_sampler, input.uv);
 
     Material material;
     material.diffuseColor = lerp(albedo, (float3) 0, metallic);
@@ -430,14 +428,13 @@ PSOutput PSMain(VSOutput input)
 
     IncidentLight directLight;
 
-	DirectionalLight directionalLight;
+    DirectionalLight directionalLight;
 
   // directional light
-	directionalLight.direction = float3(0, 0, 1);
-	directionalLight.color = float3(1, 1, 1);
-	
-	getDirectionalDirectLightIrradiance(directionalLight, geometry, directLight);
-	RE_Direct(directLight, geometry, material, reflectedLight);
+    directionalLight.direction = float3(-0.5, -0.5, 0);
+    directionalLight.color = float3(1, 1, 1);
+    getDirectionalDirectLightIrradiance(directionalLight, geometry, directLight);
+    RE_Direct(directLight, geometry, material, reflectedLight);
 
     float3 outgoingLight = emissive + reflectedLight.directDiffuse + reflectedLight.directSpecular + reflectedLight.indirectDiffuse + reflectedLight.indirectSpecular;
 
