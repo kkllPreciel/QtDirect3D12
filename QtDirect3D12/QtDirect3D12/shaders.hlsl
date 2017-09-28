@@ -94,119 +94,6 @@ VSOutput VSMain(VSInput input)
     return result;
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 // defines
 #define PI 3.14159265359
 #define PI2 6.28318530718
@@ -337,16 +224,21 @@ void getSpotDirectLightIrradiance(const in SpotLight spotLight, const in Geometr
 // BRDFs
 
 // Normalized Lambert
+// 正規化ランバートを使用したのDiffuse(拡散反射)のBRDF(双方向反射率分布関数)
+// BRDFはある方向からの入射光が各方向へどれだけ反射されるか。
 float3 DiffuseBRDF(float3 diffuseColor)
 {
     return diffuseColor / PI;
 }
 
+// フレネル反射
+// Schlickの近似式を使用数
 float3 F_Schlick(float3 specularColor, float3 H, float3 V)
 {
     return (specularColor + (1.0 - specularColor) * pow(1.0 - saturate(dot(V, H)), 5.0));
 }
 
+// GGXを使用したマイクロファセット(微細表面)の分布関数
 float D_GGX(float a, float dotNH)
 {
     float a2 = a * a;
@@ -355,6 +247,8 @@ float D_GGX(float a, float dotNH)
     return a2 / (PI * d * d);
 }
 
+// 幾何減衰率(マイクロファセットによる自己遮蔽)
+// Smith モデルの Schlick 近似
 float G_Smith_Schlick_GGX(float a, float dotNV, float dotNL)
 {
     float k = a * a * 0.5 + EPSILON;
@@ -364,6 +258,8 @@ float G_Smith_Schlick_GGX(float a, float dotNV, float dotNL)
 }
 
 // Cook-Torrance
+// クックトランスを使用したSpecular(鏡面反射)のBRDF(双方向反射率分布関数)
+// BRDFはある方向からの入射光が各方向へどれだけ反射されるか。
 float3 SpecularBRDF(const in IncidentLight directLight, const in GeometricContext geometry, float3 specularColor, float roughnessFactor)
 {
 
@@ -391,7 +287,7 @@ void RE_Direct(const in IncidentLight directLight, const in GeometricContext geo
     float dotNL = saturate(dot(geometry.normal, directLight.direction));
     float3 irradiance = dotNL * directLight.color;
 
-  // punctual light
+    // Punctual Light
     irradiance *= PI;
 
     reflectedLight.directDiffuse += irradiance * DiffuseBRDF(material.diffuseColor);
@@ -405,32 +301,31 @@ PSOutput PSMain(VSOutput input)
 {
     PSOutput output = (PSOutput) 0;
 
+    // 座標・向き・法線
     GeometricContext geometry;
-    geometry.position = input.wPos;
-    geometry.normal = normalize(input.normal);
-    geometry.viewDir = normalize(float4(0, 10, -30.5, 1) - input.wPos);
-
+    geometry.position = input.wPos;                                     // ワールド空間での座標
+    geometry.normal = normalize(input.normal);                          // ワールド空間での法線ベクトル
+    geometry.viewDir = normalize(float4(0, 10, -30.5, 1) - input.wPos); // 視点への向きベクトル
+    
+    // 物体の表面情報(金属度・粗さ・アルベド)
     float metallic = 0.2;
     float roughness = 0.1;
-    float3 albedo = float3(1, 1, 1);
-    //g_texture.Sample(g_sampler, input.uv);
+    float3 albedo = g_texture.Sample(g_sampler, input.uv);
 
+    // 物体の材質
     Material material;
-    material.diffuseColor = lerp(albedo, (float3) 0, metallic);
-    material.specularColor = lerp((float3)0.04, albedo, metallic);
-    material.specularRoughness = roughness;
-
-  // Lighting
+    material.diffuseColor = lerp(albedo, (float3) 0, metallic);     // 拡散反射光の割合
+    material.specularColor = lerp((float3)0.04, albedo, metallic);  // 鏡面反射光の割合
+    material.specularRoughness = roughness;                         // 表面の粗さ
 
     ReflectedLight reflectedLight = (ReflectedLight) 0;
     float3 emissive = (float3) 0;
     float opacity = 1.0;
 
     IncidentLight directLight;
-
     DirectionalLight directionalLight;
 
-  // directional light
+    // 並行光源
     directionalLight.direction = float3(-0.5, -0.5, 0);
     directionalLight.color = float3(1, 1, 1);
     getDirectionalDirectLightIrradiance(directionalLight, geometry, directLight);
