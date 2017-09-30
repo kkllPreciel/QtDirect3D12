@@ -148,6 +148,7 @@ float punctualLightIntensityToIrradianceFactor(const in float lightDistance, con
     return 1.0;
 }
 
+// 並行光源(太陽)
 struct DirectionalLight
 {
     float3 direction;
@@ -161,6 +162,7 @@ void getDirectionalDirectLightIrradiance(const in DirectionalLight directionalLi
     directLight.visible = true;
 }
 
+// ポイントライト
 struct PointLight
 {
     float3 position;
@@ -188,6 +190,7 @@ void getPointDirectLightIrradiance(const in PointLight pointLight, const in Geom
     }
 }
 
+// スポットライト
 struct SpotLight
 {
     float3 position;
