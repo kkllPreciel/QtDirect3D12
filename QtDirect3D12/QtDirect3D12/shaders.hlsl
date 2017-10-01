@@ -225,6 +225,7 @@ void getSpotDirectLightIrradiance(const in SpotLight spotLight, const in Geometr
 }
 
 // BRDFs
+// 双方向反射率分布関数
 
 // Normalized Lambert
 // 正規化ランバートを使用したのDiffuse(拡散反射)のBRDF(双方向反射率分布関数)
