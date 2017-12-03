@@ -1,4 +1,4 @@
-# 3D Model Viewer in Qt Direct3D12
+# 3D Model Viewer in Direct3D12 with Qt
 
 * C++11
 * Qt
