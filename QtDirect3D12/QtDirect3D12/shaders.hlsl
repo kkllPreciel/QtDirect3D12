@@ -307,14 +307,14 @@ PSOutput PSMain(VSOutput input)
 
     // 座標・向き・法線
     GeometricContext geometry;
-    geometry.position = input.wPos;                                     // ワールド空間での座標
-    geometry.normal = normalize(input.normal);                          // ワールド空間での法線ベクトル
-    geometry.viewDir = normalize(float4(0, 10, -30.5, 1) - input.wPos); // 視点への向きベクトル
+    geometry.position = (float3)input.wPos;                                     // ワールド空間での座標
+    geometry.normal = (float3)normalize(input.normal);                          // ワールド空間での法線ベクトル
+    geometry.viewDir = (float3)normalize(float4(0, 10, -30.5, 1) - input.wPos); // 視点への向きベクトル
     
     // 物体の表面情報(金属度・粗さ・アルベド)
     float metallic = 0.2;
     float roughness = 0.1;
-    float3 albedo = g_texture.Sample(g_sampler, input.uv);
+    float3 albedo = (float3)g_texture.Sample(g_sampler, input.uv);
 
     // 物体の材質
     Material material;
