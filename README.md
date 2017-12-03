@@ -1,4 +1,4 @@
-# QtDirect3D12
+# 3D Model Viewer in Qt Direct3D12
 
 * C++11
 * Qt
@@ -6,3 +6,4 @@
 * Class Diagram
 * unittest(MSTest or Google Test)
 * static code analysis(cppcheck or cpplint or visual studio)
+* PBR
