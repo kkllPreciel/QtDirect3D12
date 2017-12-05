@@ -9,6 +9,7 @@
 #include <Sein\PMX\loader.h>
 #include "QtDirect3D12.h"
 #include <qimage.h>
+#include <qmimedata.h>
 
 QtDirect3D12::QtDirect3D12(QWidget *parent)
   : QWidget(parent),
@@ -20,6 +21,9 @@ QtDirect3D12::QtDirect3D12(QWidget *parent)
   shaderResourceBuffer(nullptr)
 {
   ui.setupUi(this);
+
+  // ドロップを許可する
+  setAcceptDrops(true);
 
   // DirectX12のラッパーを作成
   // TODO:reinterpret_castを削除する
@@ -129,4 +133,18 @@ void QtDirect3D12::mainLoop()
 void QtDirect3D12::resizeEvent(QResizeEvent *event)
 {
   QSize size = event->size();
+}
+
+void QtDirect3D12::dragEnterEvent(QDragEnterEvent *event)
+{
+    // ファイル形式のみ受け付ける
+    if (event->mimeData()->hasUrls())
+    {
+        event->acceptProposedAction();
+    }
+}
+
+void QtDirect3D12::dropEvent(QDropEvent* event)
+{
+    QString file = event->mimeData()->urls().first().toLocalFile();
 }

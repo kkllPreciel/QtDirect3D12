@@ -25,6 +25,8 @@ public:
 
 protected:
   void resizeEvent(QResizeEvent *event) Q_DECL_FINAL;
+  void dragEnterEvent(QDragEnterEvent *event) Q_DECL_FINAL;
+  void dropEvent(QDropEvent *event) Q_DECL_FINAL;
 
 private Q_SLOTS:
   void mainLoop();
