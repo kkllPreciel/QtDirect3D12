@@ -1,6 +1,6 @@
 # 3D Model Viewer in Direct3D12 with Qt
 
-* C++11
+* C++14
 * Qt
 * Multithreading
 * Class Diagram
