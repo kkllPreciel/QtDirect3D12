@@ -10,6 +10,7 @@
 #include "QtDirect3D12.h"
 #include <qimage.h>
 #include <qmimedata.h>
+#include <qprogressdialog.h>
 
 QtDirect3D12::QtDirect3D12(QWidget *parent)
   : QWidget(parent),
@@ -147,4 +148,27 @@ void QtDirect3D12::dragEnterEvent(QDragEnterEvent *event)
 void QtDirect3D12::dropEvent(QDropEvent* event)
 {
     QString file = event->mimeData()->urls().first().toLocalFile();
+
+    QProgressDialog progress(
+        u8"しばらくお待ちください・・・",
+        u8"キャンセル",
+        0,
+        0,
+        this,
+        0
+    );
+    progress.setFixedSize(progress.sizeHint());     // ウィンドウをリサイズできないようにする
+    progress.setWindowModality(Qt::WindowModal);
+    progress.setWindowTitle(u8"処理中");
+    progress.show();
+
+    for (int cnt = 0; cnt<200; cnt += 20) {
+        QApplication::processEvents(QEventLoop::ExcludeUserInputEvents);
+        progress.setValue(cnt);
+        if (progress.wasCanceled()) {
+            break;
+        }
+        Sleep(500);
+    }
+    progress.setValue(200);
 }
