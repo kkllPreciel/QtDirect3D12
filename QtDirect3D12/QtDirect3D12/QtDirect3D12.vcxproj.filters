@@ -71,6 +71,12 @@
     <ClInclude Include="GeneratedFiles\ui_QtDirect3D12.h">
       <Filter>Generated Files</Filter>
     </ClInclude>
+    <ClInclude Include="Loader\loader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Loader\loader_factory.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="shaders.hlsl" />
