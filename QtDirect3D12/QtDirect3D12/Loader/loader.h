@@ -20,6 +20,16 @@ namespace App
   {
   public:
     /**
+     *  @brief  ステータスコード
+     */
+    enum StatusCode
+    {
+      SUCCESS,        ///< 成功
+      FILE_NOT_FOUND, ///< ファイルが存在しない
+      UNSUPPORTED,    ///< 未対応のフォーマット
+    };
+
+    /**
      *  @brief  デストラクタ
      */
     virtual ~ILoader() {};
@@ -27,8 +37,9 @@ namespace App
     /**
      *  @brief  読み込みを行う
      *  @param  filePath:読み込みを行うファイルのパス
+     *  @return ステータスコード
      */
-    virtual void Load(std::string filePath) = 0;
+    virtual StatusCode Load(std::string filePath) = 0;
 
     /**
      *  @brief  データを開放する
