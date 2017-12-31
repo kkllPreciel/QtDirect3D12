@@ -115,6 +115,7 @@
     <ClInclude Include="GeneratedFiles\ui_QtDirect3D12.h" />
     <ClInclude Include="Loader\loader.h" />
     <ClInclude Include="Loader\loader_factory.h" />
+    <ClInclude Include="Loader\model.h" />
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="QtDirect3D12.qrc">
