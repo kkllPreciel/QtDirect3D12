@@ -55,6 +55,9 @@
     <ClCompile Include="GeneratedFiles\qrc_QtDirect3D12.cpp">
       <Filter>Generated Files</Filter>
     </ClCompile>
+    <ClCompile Include="Loader\obj_loader.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="QtDirect3D12.h">
@@ -78,6 +81,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Loader\model.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Loader\obj_loader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
