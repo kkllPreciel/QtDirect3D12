@@ -9,7 +9,9 @@
 #pragma once
 
  // include
+#include <memory>
 #include <string>
+#include "model.h"
 
 namespace App
 {
@@ -36,14 +38,10 @@ namespace App
 
     /**
      *  @brief  読み込みを行う
-     *  @param  filePath:読み込みを行うファイルのパス
-     *  @return ステータスコード
+     *  @param  file_path:読み込みを行うファイルのパス
+     *  @param  status_code:読み込み結果のステータスコード
+     *  @return モデルインターフェイスへのポインタ
      */
-    virtual StatusCode Load(std::string filePath) = 0;
-
-    /**
-     *  @brief  データを開放する
-     */
-    virtual void Release() = 0;
+    virtual std::unique_ptr<IModel> Load(const std::string& file_path, StatusCode* const status_code) = 0;
   };
 };
