@@ -187,8 +187,11 @@ namespace App
          */
         std::unique_ptr<IModel> Load(const std::string& file_path, StatusCode* const status_code) override
         {
-          *status_code = StatusCode::UNSUPPORTED;
           std::unique_ptr<Model> model = nullptr;
+          if (nullptr != status_code)
+          {
+            *status_code = StatusCode::UNSUPPORTED;
+          }
 
           // 拡張子チェック
 
