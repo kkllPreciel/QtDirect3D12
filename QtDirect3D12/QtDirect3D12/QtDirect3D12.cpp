@@ -145,9 +145,14 @@ void QtDirect3D12::dragEnterEvent(QDragEnterEvent *event)
     }
 }
 
+#include "../Loader/obj_loader.h"
+
 void QtDirect3D12::dropEvent(QDropEvent* event)
 {
     QString file = event->mimeData()->urls().first().toLocalFile();
+
+    auto loader = App::Loader::Obj::CreateLoader();
+    loader->Load(file.toLocal8Bit().toStdString(), nullptr);
 
     QProgressDialog progress(
         u8"ÇµÇŒÇÁÇ≠Ç®ë“ÇøÇ≠ÇæÇ≥Ç¢ÅEÅEÅE",
