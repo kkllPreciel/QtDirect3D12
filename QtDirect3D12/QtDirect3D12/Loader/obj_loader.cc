@@ -8,6 +8,7 @@
 
  // include
 #include "obj_loader.h"
+#include <fstream>
 
 namespace App
 {
@@ -195,9 +196,34 @@ namespace App
 
           // 拡張子チェック
 
-          // ファイル存在チェック
+
+          if (nullptr != status_code)
+          {
+            *status_code = StatusCode::FILE_NOT_FOUND;
+          }
+
+          std::ifstream stream;
+          stream.open(file_path, std::ifstream::in | std::ifstream::binary);
+          if (false == stream.operator bool())
+          {
+            return model;
+          }
 
           // 読み込み実行
+          stream.seekg(0, stream.end);
+          std::streampos length = stream.tellg();
+          stream.seekg(0, stream.beg);
+          auto buffer = std::make_unique<char[]>(length);
+          stream.read(buffer.get(), length);
+
+          // 読み込み失敗(取得したサイズより読み込んだデータサイズが少ない)
+          if (false == stream.operator bool())
+          {
+            return model;
+          }
+
+          // モデルデータ読み込み
+
           model = std::make_unique<Model>();
 
           return model;
