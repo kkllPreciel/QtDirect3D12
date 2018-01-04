@@ -9,6 +9,7 @@
  // include
 #include "obj_loader.h"
 #include <fstream>
+#include <sstream>
 
 namespace App
 {
@@ -210,22 +211,41 @@ namespace App
           }
 
           // 読み込み実行
-          stream.seekg(0, stream.end);
-          std::streampos length = stream.tellg();
-          stream.seekg(0, stream.beg);
-          auto buffer = std::make_unique<char[]>(length);
-          stream.read(buffer.get(), length);
+          std::istreambuf_iterator<char> it(stream);
+          std::istreambuf_iterator<char> last;
+          std::string data(it, last);
+          stream.close();
 
-          // 読み込み失敗(取得したサイズより読み込んだデータサイズが少ない)
-          if (false == stream.operator bool())
+          // モデルデータ読み込み(行単位で処理を行う)
+          std::stringstream ss(data);
+          std::string datum;
+          while (std::getline(ss, datum, '\n'))
           {
-            return model;
+            // スペースまでの文字数を取得
+            auto position = datum.find(' ');
+
+            // スペースが存在しない(対応しない)
+            if (std::string::npos == position)
+            {
+              continue;
+            }
+
+
+            // キーワードを取得する
+            // 「#」キーワード行
+            // 「mtllib」キーワード行
+            // 「g」キーワード行
+            // 「usemtl」キーワード行
+            // 「v」キーワード行
+            // 「vt」キーワード行
+            // 「vn」キーワード行
+            // 「f」キーワード行
+            auto keyword = datum.substr(0, position);
+
+            // データを取得する
           }
 
-          // モデルデータ読み込み
-
           model = std::make_unique<Model>();
-
           return model;
         }
       };
