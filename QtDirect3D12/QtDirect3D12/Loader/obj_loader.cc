@@ -18,6 +18,42 @@ namespace App
   {
     namespace Obj
     {
+      namespace
+      {
+        enum ObjKeywords {
+          kIllegal = 0,
+          kComment,
+          kMaterialFileName,
+          kGroup,
+          kUseMaterial,
+          kVertex,
+          kVertexTexture,
+          kVertexNormal,
+          kPolygon,
+        };
+
+        ObjKeywords GetID(std::string keyword)
+        {
+          std::map<std::string, ObjKeywords> map = {
+            { "#", ObjKeywords::kComment },
+            { "mtllib", ObjKeywords::kMaterialFileName },
+            { "g", ObjKeywords::kGroup },
+            { "usemtl", ObjKeywords::kUseMaterial },
+            { "v", ObjKeywords::kVertex },
+            { "vt", ObjKeywords::kVertexTexture },
+            { "vn", ObjKeywords::kVertexNormal },
+            { "f", ObjKeywords::kPolygon },
+          };
+
+          if (map.count(keyword) == 0)
+          {
+            return ObjKeywords::kIllegal;
+          }
+
+          return map.at(keyword);
+        }
+      };
+
       /**
        *  @brief  OBJファイルモデル用クラス
        */
@@ -231,41 +267,39 @@ namespace App
               continue;
             }
 
-            // キーワードのマップ(TODO:定数化)
-            std::map<std::string, uint8_t> map = {
-              { "#", 1 },
-              { "mtllib", 2 },
-              { "g", 3 },
-              { "usemtl", 4 },
-              { "v", 5 },
-              { "vt", 6 },
-              { "vn", 7 },
-              { "f", 8 },
-            };
-
             // キーワードを取得し対応する処理を行う
-            switch (map.at(datum.substr(0, position)))
+            switch (GetID(datum.substr(0, position)))
             {
-            case 1: // コメント
+              // コメント
+            case ObjKeywords::kComment:
               continue;
               break;
-            case 2: // マテリアルファイル名
-              continue;
-              break;              
-            case 3: // グループ
+              // マテリアルファイル名
+            case ObjKeywords::kMaterialFileName:
               continue;
               break;
-            case 4: // 現在のグループデータが使用するマテリアル名
+              // グループ
+            case ObjKeywords::kGroup:
+              continue;
               break;
-            case 5: // 頂点座標
+              // 現在のグループデータが使用するマテリアル名
+            case ObjKeywords::kUseMaterial:
               break;
-            case 6: // テクスチャ座標
+              // 頂点座標
+            case ObjKeywords::kVertex:
               break;
-            case 7: // 頂点法線ベクトル
+              // テクスチャ座標
+            case ObjKeywords::kVertexTexture:
               break;
-            case 8: // ポリゴンデータ
+              // 頂点法線ベクトル
+            case ObjKeywords::kVertexNormal:
               break;
+              // ポリゴンデータ
+            case ObjKeywords::kPolygon:
+              break;
+              // 不明キーワード
             default:
+              continue;
               break;
             }
           }
