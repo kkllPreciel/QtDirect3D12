@@ -10,6 +10,7 @@
 #include "obj_loader.h"
 #include <fstream>
 #include <sstream>
+#include <map>
 
 namespace App
 {
@@ -230,19 +231,43 @@ namespace App
               continue;
             }
 
+            // キーワードのマップ(TODO:定数化)
+            std::map<std::string, uint8_t> map = {
+              { "#", 1 },
+              { "mtllib", 2 },
+              { "g", 3 },
+              { "usemtl", 4 },
+              { "v", 5 },
+              { "vt", 6 },
+              { "vn", 7 },
+              { "f", 8 },
+            };
 
-            // キーワードを取得する
-            // 「#」キーワード行
-            // 「mtllib」キーワード行
-            // 「g」キーワード行
-            // 「usemtl」キーワード行
-            // 「v」キーワード行
-            // 「vt」キーワード行
-            // 「vn」キーワード行
-            // 「f」キーワード行
-            auto keyword = datum.substr(0, position);
-
-            // データを取得する
+            // キーワードを取得し対応する処理を行う
+            switch (map.at(datum.substr(0, position)))
+            {
+            case 1: // コメント
+              continue;
+              break;
+            case 2: // マテリアルファイル名
+              continue;
+              break;              
+            case 3: // グループ
+              continue;
+              break;
+            case 4: // 現在のグループデータが使用するマテリアル名
+              break;
+            case 5: // 頂点座標
+              break;
+            case 6: // テクスチャ座標
+              break;
+            case 7: // 頂点法線ベクトル
+              break;
+            case 8: // ポリゴンデータ
+              break;
+            default:
+              break;
+            }
           }
 
           model = std::make_unique<Model>();
