@@ -63,7 +63,7 @@ namespace App
         /**
          *  @brief  コンストラクタ
          */
-        Model() : vertex_count_(0), polygon_count_(0), index_count_(0)
+        Model() : vertices_(0), polygon_count_(0), indices_(0)
         {
 
         }
@@ -73,7 +73,7 @@ namespace App
          */
         ~Model() override
         {
-
+          Release();
         }
 
         /**
@@ -103,57 +103,48 @@ namespace App
         Model& operator = (Model&& other) = delete;
 
         /**
-         *  @brief  頂点数を取得する
-         *  @return 頂点数
+         *  @brief  頂点座標データを取得する
+         *  @return 頂点座標データのリスト
          */
-        uint32_t GetVertexCount() override
+        const std::vector<DirectX::XMFLOAT4A>& GetVertices() const override
         {
-          return vertex_count_;
+          return vertices_;
         }
 
         /**
-         *  @brief  頂点数を設定する
-         *  @param  vertex_count:頂点数
+         *  @brief  頂点数を取得する
+         *  @return 頂点数
          */
-        void SetVertexCount(uint32_t vertex_count)
+        std::size_t GetVertexCount() const override
         {
-          vertex_count_ = vertex_count;
+          return vertices_.size();
         }
 
         /**
          *  @brief  ポリゴン数を取得する
          *  @return ポリゴン数
          */
-        uint32_t GetPolygonCount() override
+        std::size_t GetPolygonCount() const override
         {
           return polygon_count_;
         }
 
         /**
-         *  @brief  ポリゴン数を設定する
-         *  @param  polygon_count:ポリゴン数
+         *  @brief  頂点インデックスデータを取得する
+         *  @return 頂点インデックスデータのリスト
          */
-        void SetPolygonCount(uint32_t polygon_count)
+        const std::vector<uint32_t>& GetIndices() const override
         {
-          polygon_count_ = polygon_count;
+          return indices_;
         }
 
         /**
          *  @brief  頂点インデックス数を取得する
          *  @return 頂点インデックス数
          */
-        uint32_t GetIndexCount() override
+        std::size_t GetIndexCount() const override
         {
-          return index_count_;
-        }
-
-        /**
-         *  @brief  頂点インデックス数を設定する
-         *  @param  index_count:頂点インデックス数
-         */
-        void SetIndexCount(uint32_t index_count)
-        {
-          index_count_ = index_count;
+          return indices_.size();
         }
 
         /**
@@ -161,13 +152,44 @@ namespace App
          */
         void Release() override
         {
+          vertices_.clear();
+          polygon_count_ = 0;
+          indices_.clear();
+        }
 
+        /**
+         *  @brief  頂点座標を追加する
+         *  @param  vertex:追加する頂点座標
+         */
+        void AddVertex(const DirectX::XMFLOAT4A& vertex)
+        {
+          vertices_.emplace_back(vertex);
+        }
+
+        /**
+         *  @brief  ポリゴンを追加する
+         */
+        void AddPolygon()
+        {
+          ++polygon_count_;
+        }
+
+        /**
+         *  @brief  頂点インデックスを追加する
+         *  @param  polygon_indices:追加する頂点インデックスのポリゴン単位でのリスト
+         */
+        void AddIndex(const std::vector<uint32_t>& polygon_indices)
+        {
+          for (auto index : polygon_indices)
+          {
+            indices_.emplace_back(index);
+          }
         }
 
       private:
-        uint32_t vertex_count_;
-        uint32_t polygon_count_;
-        uint32_t index_count_;
+        std::vector<DirectX::XMFLOAT4A> vertices_;  ///< 頂点座標リスト
+        std::size_t polygon_count_;                 ///< ポリゴン数
+        std::vector<uint32_t> indices_;             ///< 頂点インデックスリスト
       };
 
       /**
@@ -304,7 +326,35 @@ namespace App
             }
           }
 
+          // ダミーデータを作成し返す
           model = std::make_unique<Model>();
+          model->AddVertex(DirectX::XMFLOAT4A(1.0f, -1.0f, -1.0f, 0.0f));
+          model->AddVertex(DirectX::XMFLOAT4A(1.0f, -1.0f, 1.0f, 0.0f));
+          model->AddVertex(DirectX::XMFLOAT4A(-1.0f, -1.0f, 1.0f, 0.0f));
+          model->AddVertex(DirectX::XMFLOAT4A(-1.0f, -1.0f, -1.0f, 0.0f));
+          model->AddVertex(DirectX::XMFLOAT4A(1.0f, 1.0f, -1.0f, 0.0f));
+          model->AddVertex(DirectX::XMFLOAT4A(1.0f, 1.0f, 1.0f, 0.0f));
+          model->AddVertex(DirectX::XMFLOAT4A(-1.0f, 1.0f, 1.0f, 0.0f));
+          model->AddVertex(DirectX::XMFLOAT4A(-1.0f, 1.0f, -1.0f, 0.0f));
+
+          for (auto i = 0; i < 12; ++i)
+            model->AddPolygon();
+
+          model->AddIndex(std::vector<uint32_t> {
+            1, 2, 3,
+            1, 3, 4,
+            5, 8, 7,
+            5, 7, 6,
+            1, 5, 6,
+            1, 6, 2,
+            2, 6, 7,
+            2, 7, 3,
+            3, 7, 8,
+            3, 8, 4,
+            5, 1, 4,
+            5, 4, 8,
+          });
+
           return model;
         }
       };

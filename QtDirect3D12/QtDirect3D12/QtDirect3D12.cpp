@@ -152,7 +152,11 @@ void QtDirect3D12::dropEvent(QDropEvent* event)
     QString file = event->mimeData()->urls().first().toLocalFile();
 
     auto loader = App::Loader::Obj::CreateLoader();
-    loader->Load(file.toLocal8Bit().toStdString(), nullptr);
+    auto model = loader->Load(file.toLocal8Bit().toStdString(), nullptr);
+
+    assert(model->GetVertexCount() == 8);
+    assert(model->GetIndexCount() == 36);
+    assert(model->GetPolygonCount() == 12);
 
     QProgressDialog progress(
         u8"ÇµÇŒÇÁÇ≠Ç®ë“ÇøÇ≠ÇæÇ≥Ç¢ÅEÅEÅE",
