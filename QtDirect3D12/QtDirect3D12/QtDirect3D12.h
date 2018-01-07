@@ -4,6 +4,7 @@
 #include <QtWidgets/QWidget>
 #include <DirectXMath.h>
 #include "ui_QtDirect3D12.h"
+#include "./Loader/model.h"
 
 namespace Sein {
   namespace Direct3D12 {
@@ -37,6 +38,7 @@ private:
   std::unique_ptr<Sein::Direct3D12::Device> device;
   std::unique_ptr<Sein::Direct3D12::VertexBuffer> vertexBuffer;
   std::unique_ptr<Sein::Direct3D12::IndexBuffer> indexBuffer;
+  std::unique_ptr<App::IModel> model_;
 
   /**
    *  @brief  定数バッファ用構造体

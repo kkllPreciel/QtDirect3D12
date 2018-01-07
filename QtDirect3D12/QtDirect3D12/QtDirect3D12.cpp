@@ -11,6 +11,7 @@
 #include <qimage.h>
 #include <qmimedata.h>
 #include <qprogressdialog.h>
+#include "./Loader/obj_loader.h"
 
 QtDirect3D12::QtDirect3D12(QWidget *parent)
   : QWidget(parent),
@@ -124,9 +125,15 @@ void QtDirect3D12::mainLoop()
     constantBufferView->Map(&constantBuffer, sizeof(ConstantBufferType));
   }
 
+  auto index_count = 321567;
+  if (model_ != nullptr)
+  {
+    index_count = model_->GetIndexCount();
+  }
+
   device->BeginScene();
   //device->Render(*vertexBuffer, *indexBuffer, instanceBufferData.size());
-  device->Render(*vertexBuffer, *indexBuffer, 1);
+  device->Render(*vertexBuffer, *indexBuffer, index_count, 1);
   device->EndScene();
   device->Present();
 }
@@ -145,39 +152,59 @@ void QtDirect3D12::dragEnterEvent(QDragEnterEvent *event)
     }
 }
 
-#include "../Loader/obj_loader.h"
-
 void QtDirect3D12::dropEvent(QDropEvent* event)
 {
-    QString file = event->mimeData()->urls().first().toLocalFile();
+  // 読み込み中ダイアログを表示
+  QProgressDialog progress(
+    u8"しばらくお待ちください・・・",
+    u8"キャンセル",
+    0,
+    0,
+    this,
+    0
+  );
 
-    auto loader = App::Loader::Obj::CreateLoader();
-    auto model = loader->Load(file.toLocal8Bit().toStdString(), nullptr);
+  progress.setFixedSize(progress.sizeHint());     // ウィンドウをリサイズできないようにする
+  progress.setWindowModality(Qt::WindowModal);
+  progress.setWindowTitle(u8"処理中");
+  progress.show();
+  progress.setValue(100);
 
-    assert(model->GetVertexCount() == 8);
-    assert(model->GetIndexCount() == 36);
-    assert(model->GetPolygonCount() == 12);
+  QString file = event->mimeData()->urls().first().toLocalFile();
+  auto loader = App::Loader::Obj::CreateLoader();
+  const auto model = loader->Load(file.toLocal8Bit().toStdString(), nullptr);
 
-    QProgressDialog progress(
-        u8"しばらくお待ちください・・・",
-        u8"キャンセル",
-        0,
-        0,
-        this,
-        0
-    );
-    progress.setFixedSize(progress.sizeHint());     // ウィンドウをリサイズできないようにする
-    progress.setWindowModality(Qt::WindowModal);
-    progress.setWindowTitle(u8"処理中");
-    progress.show();
+  // アラインメントを1バイトに設定
+#pragma pack(push, 1)
+  // アラインメントを1バイトに設定
+  struct Vertex
+  {
+    DirectX::XMFLOAT3 position;
+    DirectX::XMFLOAT3 normal;
+    DirectX::XMFLOAT2 texcoord;
+  };
+#pragma pack(pop)
 
-    for (int cnt = 0; cnt<200; cnt += 20) {
-        QApplication::processEvents(QEventLoop::ExcludeUserInputEvents);
-        progress.setValue(cnt);
-        if (progress.wasCanceled()) {
-            break;
-        }
-        Sleep(500);
-    }
-    progress.setValue(200);
+
+  auto vertex_size = sizeof(Vertex);
+  std::vector<Vertex> vertices(model->GetVertexCount());
+  const auto base_vertices = model->GetVertices();
+
+  auto begin_iterator = vertices.begin();
+  // TODO:range-based forにする(ID抽出はboost::adaptors:indexedを使用する)
+  for (auto iterator = vertices.begin(); iterator != vertices.end(); ++iterator)
+  {
+    auto index = std::distance(begin_iterator, iterator);
+    iterator->position.x = base_vertices[index].x;
+    iterator->position.y = base_vertices[index].y;
+    iterator->position.z = base_vertices[index].z;
+    iterator->normal.x = iterator->normal.y = iterator->normal.z = 1.0f;
+    iterator->texcoord.x = iterator->texcoord.y = 0.5f;
+  }
+
+  const auto indices = model->GetIndices();
+
+  // 頂点データ、インデックスバッファの更新
+  vertexBuffer->Create(&(device->GetDevice()), vertex_size * model->GetVertexCount(), vertex_size, &(vertices[0]));
+  indexBuffer->Create(&(device->GetDevice()), sizeof(uint32_t) * model->GetIndexCount(), &(indices[0]), DXGI_FORMAT_R32_UINT);
 }
