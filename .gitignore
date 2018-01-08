@@ -251,3 +251,11 @@ QtDirect3D12/Resources/Pmx/*
 # Textures
 QtDirect3D12/Resources/Texture/*
 !QtDirect3D12/Resources/Texture/.gitkeep
+
+# Boost Header
+QtDirect3D12/QtDirect3D12/boost/1_66_0/boost/*
+!QtDirect3D12/QtDirect3D12/boost/1_66_0/boost/.gitkeep
+
+# Boost Library
+QtDirect3D12/QtDirect3D12/boost/1_66_0/lib64-msvc-14.1/*
+!QtDirect3D12/QtDirect3D12/boost/1_66_0/lib64-msvc-14.1/.gitkeep
