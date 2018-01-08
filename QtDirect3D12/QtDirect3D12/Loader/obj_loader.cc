@@ -11,6 +11,7 @@
 #include <fstream>
 #include <sstream>
 #include <map>
+#include <boost/1_66_0/boost/algorithm/string.hpp>
 
 namespace App
 {
@@ -275,22 +276,34 @@ namespace App
           std::string data(it, last);
           stream.close();
 
-          // モデルデータ読み込み(行単位で処理を行う)
-          std::stringstream ss(data);
-          std::string datum;
-          while (std::getline(ss, datum, '\n'))
-          {
-            // スペースまでの文字数を取得
-            auto position = datum.find(' ');
+          // C4996警告を無効にする
+#if defined(_MSC_VER) && _MSC_VER >= 1400
+#pragma warning(push)
+#pragma warning(disable:4996)
+#endif
+          // 行毎に分割する
+          std::vector<std::string> list;
+          boost::split(list, data, boost::is_any_of("\r\n"));
+#if defined(_MSC_VER) && _MSC_VER >= 1400
+#pragma warning(pop)
+#endif
 
-            // スペースが存在しない(対応しない)
-            if (std::string::npos == position)
+          model = std::make_unique<Model>();
+
+          // モデルデータ読み込み(行単位で処理を行う)
+          for (auto line : list)
+          {
+            std::vector<std::string> parts;
+            boost::split(parts, line, boost::is_space());
+
+            // 分割出来なかった(違法なデータ)
+            if (parts.size() <= 1)
             {
               continue;
             }
 
             // キーワードを取得し対応する処理を行う
-            switch (GetID(datum.substr(0, position)))
+            switch (GetID(parts.at(0)))
             {
               // コメント
             case ObjKeywords::kComment:
@@ -309,6 +322,8 @@ namespace App
               break;
               // 頂点座標
             case ObjKeywords::kVertex:
+              // TODO:要素数が4でない場合は違法データとして戻す
+              model->AddVertex(DirectX::XMFLOAT4A(std::stof(parts[1]), std::stof(parts[2]), std::stof(parts[3]), 0.0f));
               break;
               // テクスチャ座標
             case ObjKeywords::kVertexTexture:
@@ -318,6 +333,16 @@ namespace App
               break;
               // ポリゴンデータ
             case ObjKeywords::kPolygon:
+              {
+                std::vector<uint32_t> indices;
+                for (decltype(parts.size()) i = 1; i < parts.size(); ++i)
+                {
+                  // 頂点は0番目からなので、(頂点インデックス - 1)を行う
+                  indices.emplace_back(std::stoi(parts[i].substr(0, parts[i].find('/'))) - 1);
+                }
+                model->AddIndex(indices);
+                model->AddPolygon();
+              }
               break;
               // 不明キーワード
             default:
@@ -325,35 +350,6 @@ namespace App
               break;
             }
           }
-
-          // ダミーデータを作成し返す
-          model = std::make_unique<Model>();
-          model->AddVertex(DirectX::XMFLOAT4A(1.0f, -1.0f, -1.0f, 0.0f));
-          model->AddVertex(DirectX::XMFLOAT4A(1.0f, -1.0f, 1.0f, 0.0f));
-          model->AddVertex(DirectX::XMFLOAT4A(-1.0f, -1.0f, 1.0f, 0.0f));
-          model->AddVertex(DirectX::XMFLOAT4A(-1.0f, -1.0f, -1.0f, 0.0f));
-          model->AddVertex(DirectX::XMFLOAT4A(1.0f, 1.0f, -1.0f, 0.0f));
-          model->AddVertex(DirectX::XMFLOAT4A(1.0f, 1.0f, 1.0f, 0.0f));
-          model->AddVertex(DirectX::XMFLOAT4A(-1.0f, 1.0f, 1.0f, 0.0f));
-          model->AddVertex(DirectX::XMFLOAT4A(-1.0f, 1.0f, -1.0f, 0.0f));
-
-          for (auto i = 0; i < 12; ++i)
-            model->AddPolygon();
-
-          model->AddIndex(std::vector<uint32_t> {
-            1 - 1, 2 - 1, 3 - 1,
-            1 - 1, 3 - 1, 4 - 1,
-            5 - 1, 8 - 1, 7 - 1,
-            5 - 1, 7 - 1, 6 - 1,
-            1 - 1, 5 - 1, 6 - 1,
-            1 - 1, 6 - 1, 2 - 1,
-            2 - 1, 6 - 1, 7 - 1,
-            2 - 1, 7 - 1, 3 - 1,
-            3 - 1, 7 - 1, 8 - 1,
-            3 - 1, 8 - 1, 4 - 1,
-            5 - 1, 1 - 1, 4 - 1,
-            5 - 1, 4 - 1, 8 - 1,
-          });
 
           return model;
         }
