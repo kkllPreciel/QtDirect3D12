@@ -68,6 +68,10 @@ QtDirect3D12::QtDirect3D12(QWidget *parent)
     buffer.reset(nullptr);
   }
 
+  // 視点・注視点を初期化
+  eye_ = { 0.0f, 10.f, -30.5f };
+  at_ = { 0.0f, 10.0f, 0.0f };
+
   // メインループ呼び出し設定
   connect(timer.get(), SIGNAL(timeout()), this, SLOT(mainLoop()));
   timer->start(1000 / 60);
@@ -113,8 +117,8 @@ void QtDirect3D12::mainLoop()
     DirectX::XMStoreFloat4x4(&(constantBuffer.world), DirectX::XMMatrixRotationY(now));
 
     // ビュー行列を作成
-    DirectX::XMVECTORF32 eye = { 0.0f, 10.0f, -30.5f, 0.0f };
-    DirectX::XMVECTORF32 at = { 0.0f, 10.0f, 0.0f, 0.0f };
+    DirectX::XMVECTOR eye = DirectX::XMLoadFloat3(&eye_);
+    DirectX::XMVECTOR at = DirectX::XMLoadFloat3(&at_);
     DirectX::XMVECTORF32 up = { 0.0f, 1.0f, 0.0f, 0.0f };
     DirectX::XMStoreFloat4x4(&(constantBuffer.view), DirectX::XMMatrixLookAtLH(eye, at, up));
 
@@ -207,4 +211,22 @@ void QtDirect3D12::dropEvent(QDropEvent* event)
   // 頂点データ、インデックスバッファの更新
   vertexBuffer->Create(&(device->GetDevice()), vertex_size * model->GetVertexCount(), vertex_size, &(vertices[0]));
   indexBuffer->Create(&(device->GetDevice()), sizeof(uint32_t) * model->GetIndexCount(), &(indices[0]), DXGI_FORMAT_R32_UINT);
+}
+
+void QtDirect3D12::wheelEvent(QWheelEvent* event)
+{
+  QPoint degrees = event->angleDelta() / 8;
+
+  // 視点から注視点へのベクトルを作成
+  DirectX::XMVECTOR eye = DirectX::XMLoadFloat3(&eye_);
+  DirectX::XMVECTOR at = DirectX::XMLoadFloat3(&at_);
+  DirectX::XMVECTOR dir = DirectX::XMVectorSubtract(at, eye);
+  
+  // 視点から注視点への距離を取得
+  float distance = 0.0f;
+  DirectX::XMStoreFloat(&distance, DirectX::XMVector3Length(dir));
+
+  // TODO:一定距離以上は近づけないようにする
+  // TODO:注視点との距離で移動量に補正をつける
+  DirectX::XMStoreFloat3(&eye_, DirectX::XMVectorAdd(eye, DirectX::XMVectorScale(DirectX::XMVector3Normalize(dir), degrees.y() / std::abs(degrees.y()) * distance)));
 }

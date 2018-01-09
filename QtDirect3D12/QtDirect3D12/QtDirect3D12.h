@@ -28,6 +28,7 @@ protected:
   void resizeEvent(QResizeEvent *event) Q_DECL_FINAL;
   void dragEnterEvent(QDragEnterEvent *event) Q_DECL_FINAL;
   void dropEvent(QDropEvent *event) Q_DECL_FINAL;
+  void wheelEvent(QWheelEvent *event) Q_DECL_FINAL;
 
 private Q_SLOTS:
   void mainLoop();
@@ -38,7 +39,9 @@ private:
   std::unique_ptr<Sein::Direct3D12::Device> device;
   std::unique_ptr<Sein::Direct3D12::VertexBuffer> vertexBuffer;
   std::unique_ptr<Sein::Direct3D12::IndexBuffer> indexBuffer;
-  std::unique_ptr<App::IModel> model_;
+  std::unique_ptr<App::IModel> model_;  ///< モデルインターフェイス
+  DirectX::XMFLOAT3 eye_;               ///< 視点座標
+  DirectX::XMFLOAT3 at_;                ///< 注視点座標
 
   /**
    *  @brief  定数バッファ用構造体
