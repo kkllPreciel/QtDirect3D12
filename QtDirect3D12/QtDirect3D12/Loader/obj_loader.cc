@@ -64,7 +64,7 @@ namespace App
         /**
          *  @brief  コンストラクタ
          */
-        Model() : vertices_(0), polygon_count_(0), indices_(0)
+        Model() : vertices_(0), polygon_count_(0), indices_(0), normals_(0)
         {
 
         }
@@ -149,6 +149,24 @@ namespace App
         }
 
         /**
+         *  @brief  頂点法線ベクトルリストを取得する
+         *  @return 頂点法線ベクトルのリスト
+         */
+        const std::vector<DirectX::XMFLOAT3>& GetNormals() const override
+        {
+          return normals_;
+        }
+
+        /**
+         *  @brief  頂点法線ベクトル数を取得する
+         *  @return 頂点法線ベクトル数
+         */
+        std::size_t GetNormalCount() const override
+        {
+          return normals_.size();
+        }
+
+        /**
          *  @brief  データを開放する
          */
         void Release() override
@@ -156,6 +174,7 @@ namespace App
           vertices_.clear();
           polygon_count_ = 0;
           indices_.clear();
+          normals_.clear();
         }
 
         /**
@@ -187,10 +206,20 @@ namespace App
           }
         }
 
+        /**
+         *  @brief  法線ベクトルを追加する
+         *  @param  normal:追加する法線ベクトル
+         */
+        void AddNormal(const DirectX::XMFLOAT3& normal)
+        {
+          normals_.emplace_back(normal);
+        }
+
       private:
         std::vector<DirectX::XMFLOAT4A> vertices_;  ///< 頂点座標リスト
         std::size_t polygon_count_;                 ///< ポリゴン数
         std::vector<uint32_t> indices_;             ///< 頂点インデックスリスト
+        std::vector<DirectX::XMFLOAT3> normals_;    ///< 法線ベクトルリスト
       };
 
       /**
@@ -330,6 +359,8 @@ namespace App
               break;
               // 頂点法線ベクトル
             case ObjKeywords::kVertexNormal:
+              // TODO:要素数が4でない場合は違法データとして戻す
+              model->AddNormal(DirectX::XMFLOAT3(std::stof(parts[1]), std::stof(parts[2]), std::stof(parts[3])));
               break;
               // ポリゴンデータ
             case ObjKeywords::kPolygon:

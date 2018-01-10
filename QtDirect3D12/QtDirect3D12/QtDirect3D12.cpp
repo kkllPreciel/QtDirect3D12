@@ -189,10 +189,13 @@ void QtDirect3D12::dropEvent(QDropEvent* event)
   };
 #pragma pack(pop)
 
+  // 1頂点1法線ベクトルの筈
+  assert(model->GetVertexCount() == model->GetNormalCount());
 
   auto vertex_size = sizeof(Vertex);
   std::vector<Vertex> vertices(model->GetVertexCount());
   const auto base_vertices = model->GetVertices();
+  const auto normals = model->GetNormals();
 
   auto begin_iterator = vertices.begin();
   // TODO:range-based forにする(ID抽出はboost::adaptors:indexedを使用する)
@@ -202,7 +205,9 @@ void QtDirect3D12::dropEvent(QDropEvent* event)
     iterator->position.x = base_vertices[index].x;
     iterator->position.y = base_vertices[index].y;
     iterator->position.z = base_vertices[index].z;
-    iterator->normal.x = iterator->normal.y = iterator->normal.z = 1.0f;
+    iterator->normal.x = normals[index].x;
+    iterator->normal.y = normals[index].y;
+    iterator->normal.z = normals[index].z;
     iterator->texcoord.x = iterator->texcoord.y = 0.5f;
   }
 
@@ -225,6 +230,12 @@ void QtDirect3D12::wheelEvent(QWheelEvent* event)
   // 視点から注視点への距離を取得
   float distance = 0.0f;
   DirectX::XMStoreFloat(&distance, DirectX::XMVector3Length(dir));
+
+  // 注視点との距離が一定以下なら近づけないようにする
+  if (distance < 1.0f)
+  {
+    return;
+  }
 
   // TODO:一定距離以上は近づけないようにする
   // TODO:注視点との距離で移動量に補正をつける

@@ -57,6 +57,18 @@ namespace App
     virtual std::size_t GetIndexCount() const = 0;
 
     /**
+     *  @brief  頂点法線ベクトルリストを取得する
+     *  @return 頂点法線ベクトルのリスト
+     */
+    virtual const std::vector<DirectX::XMFLOAT3>& GetNormals() const = 0;
+
+    /**
+     *  @brief  頂点法線ベクトル数を取得する
+     *  @return 頂点法線ベクトル数
+     */
+    virtual std::size_t GetNormalCount() const = 0;
+
+    /**
      *  @brief  データを開放する
      */
     virtual void Release() = 0;
