@@ -176,7 +176,7 @@ void QtDirect3D12::dropEvent(QDropEvent* event)
 
   QString file = event->mimeData()->urls().first().toLocalFile();
   auto loader = App::Loader::Obj::CreateLoader();
-  const auto model = loader->Load(file.toLocal8Bit().toStdString(), nullptr);
+  model_ = loader->Load(file.toLocal8Bit().toStdString(), nullptr);
 
   // アラインメントを1バイトに設定
 #pragma pack(push, 1)
@@ -189,13 +189,18 @@ void QtDirect3D12::dropEvent(QDropEvent* event)
   };
 #pragma pack(pop)
 
-  // 1頂点1法線ベクトルの筈
-  assert(model->GetVertexCount() == model->GetNormalCount());
+  // 座標・法線ベクトル・テクスチャ座標・ポリゴンデータから頂点を生成する
+
+  // ポリゴンデータの下記3項目の数は同じ筈(0でなければ)
+  // 頂点座標インデックス数
+  // 頂点法線ベクトルインデックス数
+  // 頂点テクスチャ座標インデックス数
 
   auto vertex_size = sizeof(Vertex);
-  std::vector<Vertex> vertices(model->GetVertexCount());
-  const auto base_vertices = model->GetVertices();
-  const auto normals = model->GetNormals();
+  std::vector<Vertex> vertices(model_->GetControlPointCount());
+  const auto base_vertices = model_->GetControlPoints();
+  const auto normals = model_->GetNormals();
+  const auto texture_coords = model_->GetTextureCoords();
 
   auto begin_iterator = vertices.begin();
   // TODO:range-based forにする(ID抽出はboost::adaptors:indexedを使用する)
@@ -205,17 +210,18 @@ void QtDirect3D12::dropEvent(QDropEvent* event)
     iterator->position.x = base_vertices[index].x;
     iterator->position.y = base_vertices[index].y;
     iterator->position.z = base_vertices[index].z;
-    iterator->normal.x = normals[index].x;
-    iterator->normal.y = normals[index].y;
-    iterator->normal.z = normals[index].z;
-    iterator->texcoord.x = iterator->texcoord.y = 0.5f;
+    //iterator->normal.x = normals[index].x;
+    //iterator->normal.y = normals[index].y;
+    //iterator->normal.z = normals[index].z;
+    //iterator->texcoord.x = texture_coords[index].x;
+    //iterator->texcoord.y = texture_coords[index].y;
   }
 
-  const auto indices = model->GetIndices();
+  const auto indices = model_->GetIndices();
 
   // 頂点データ、インデックスバッファの更新
-  vertexBuffer->Create(&(device->GetDevice()), vertex_size * model->GetVertexCount(), vertex_size, &(vertices[0]));
-  indexBuffer->Create(&(device->GetDevice()), sizeof(uint32_t) * model->GetIndexCount(), &(indices[0]), DXGI_FORMAT_R32_UINT);
+  vertexBuffer->Create(&(device->GetDevice()), vertex_size * model_->GetControlPointCount(), vertex_size, &(vertices[0]));
+  indexBuffer->Create(&(device->GetDevice()), sizeof(uint32_t) * model_->GetIndexCount(), &(indices[0]), DXGI_FORMAT_R32_UINT);
 }
 
 void QtDirect3D12::wheelEvent(QWheelEvent* event)

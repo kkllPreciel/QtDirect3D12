@@ -27,16 +27,16 @@ namespace App
     virtual ~IModel() {};
 
     /**
-     *  @brief  頂点座標データを取得する
-     *  @return 頂点座標データのリスト
+     *  @brief  頂点座標リストを取得する
+     *  @return 頂点座標のリスト
      */
-    virtual const std::vector<DirectX::XMFLOAT4A>& GetVertices() const = 0;
+    virtual const std::vector<DirectX::XMFLOAT3>& GetControlPoints() const = 0;
 
     /**
-     *  @brief  頂点数を取得する
-     *  @return 頂点数
+     *  @brief  頂点座標数を取得する
+     *  @return 頂点座標数
      */
-    virtual std::size_t GetVertexCount() const = 0;
+    virtual std::size_t GetControlPointCount() const = 0;
 
     /**
      *  @brief  ポリゴン数を取得する
@@ -67,6 +67,18 @@ namespace App
      *  @return 頂点法線ベクトル数
      */
     virtual std::size_t GetNormalCount() const = 0;
+
+    /**
+     *  @brief  頂点テクスチャ座標リストを取得する
+     *  @return 頂点テクスチャ座標のリスト
+     */
+    virtual const std::vector<DirectX::XMFLOAT2>& GetTextureCoords() const = 0;
+
+    /**
+     *  @brief  テクスチャ座標数を取得する
+     *  @return テクスチャ座標数
+     */
+    virtual std::size_t GetTextureCoordCount() const = 0;
 
     /**
      *  @brief  データを開放する

@@ -27,7 +27,7 @@ namespace App
           kMaterialFileName,
           kGroup,
           kUseMaterial,
-          kVertex,
+          kControlPoint,
           kVertexTexture,
           kVertexNormal,
           kPolygon,
@@ -40,7 +40,7 @@ namespace App
             { "mtllib", ObjKeywords::kMaterialFileName },
             { "g", ObjKeywords::kGroup },
             { "usemtl", ObjKeywords::kUseMaterial },
-            { "v", ObjKeywords::kVertex },
+            { "v", ObjKeywords::kControlPoint },
             { "vt", ObjKeywords::kVertexTexture },
             { "vn", ObjKeywords::kVertexNormal },
             { "f", ObjKeywords::kPolygon },
@@ -64,7 +64,7 @@ namespace App
         /**
          *  @brief  コンストラクタ
          */
-        Model() : vertices_(0), polygon_count_(0), indices_(0), normals_(0)
+        Model() : points_(0), polygon_count_(0), indices_(0), normals_(0), texture_coords_(0)
         {
 
         }
@@ -104,21 +104,21 @@ namespace App
         Model& operator = (Model&& other) = delete;
 
         /**
-         *  @brief  頂点座標データを取得する
-         *  @return 頂点座標データのリスト
+         *  @brief  頂点座標リストを取得する
+         *  @return 頂点座標のリスト
          */
-        const std::vector<DirectX::XMFLOAT4A>& GetVertices() const override
+        const std::vector<DirectX::XMFLOAT3>& GetControlPoints() const override
         {
-          return vertices_;
+          return points_;
         }
 
         /**
-         *  @brief  頂点数を取得する
-         *  @return 頂点数
+         *  @brief  頂点座標数を取得する
+         *  @return 頂点座標数
          */
-        std::size_t GetVertexCount() const override
+        std::size_t GetControlPointCount() const override
         {
-          return vertices_.size();
+          return points_.size();
         }
 
         /**
@@ -167,23 +167,42 @@ namespace App
         }
 
         /**
+         *  @brief  頂点テクスチャ座標リストを取得する
+         *  @return 頂点テクスチャ座標のリスト
+         */
+        const std::vector<DirectX::XMFLOAT2>& GetTextureCoords() const override
+        {
+          return texture_coords_;
+        }
+
+        /**
+         *  @brief  テクスチャ座標数を取得する
+         *  @return テクスチャ座標数
+         */
+        std::size_t GetTextureCoordCount() const override
+        {
+          return texture_coords_.size();
+        }
+
+        /**
          *  @brief  データを開放する
          */
         void Release() override
         {
-          vertices_.clear();
+          points_.clear();
           polygon_count_ = 0;
           indices_.clear();
           normals_.clear();
+          texture_coords_.clear();
         }
 
         /**
-         *  @brief  頂点座標を追加する
-         *  @param  vertex:追加する頂点座標
+         *  @brief  座標を追加する
+         *  @param  point:追加する座標
          */
-        void AddVertex(const DirectX::XMFLOAT4A& vertex)
+        void AddControlPoint(const DirectX::XMFLOAT3& point)
         {
-          vertices_.emplace_back(vertex);
+          points_.emplace_back(point);
         }
 
         /**
@@ -215,11 +234,21 @@ namespace App
           normals_.emplace_back(normal);
         }
 
+        /**
+         *  @brief  テクスチャ座標を追加する
+         *  @param  texture_coord:追加するテクスチャ座標
+         */
+        void AddTextureCoord(const DirectX::XMFLOAT2& texture_coord)
+        {
+          texture_coords_.emplace_back(texture_coord);
+        }
+
       private:
-        std::vector<DirectX::XMFLOAT4A> vertices_;  ///< 頂点座標リスト
-        std::size_t polygon_count_;                 ///< ポリゴン数
-        std::vector<uint32_t> indices_;             ///< 頂点インデックスリスト
-        std::vector<DirectX::XMFLOAT3> normals_;    ///< 法線ベクトルリスト
+        std::vector<DirectX::XMFLOAT3> points_;         ///< 座標リスト
+        std::size_t polygon_count_;                     ///< ポリゴン数
+        std::vector<uint32_t> indices_;                 ///< 頂点インデックスリスト
+        std::vector<DirectX::XMFLOAT3> normals_;        ///< 法線ベクトルリスト
+        std::vector<DirectX::XMFLOAT2> texture_coords_; ///< テクスチャ座標リスト
       };
 
       /**
@@ -350,12 +379,14 @@ namespace App
             case ObjKeywords::kUseMaterial:
               break;
               // 頂点座標
-            case ObjKeywords::kVertex:
+            case ObjKeywords::kControlPoint:
               // TODO:要素数が4でない場合は違法データとして戻す
-              model->AddVertex(DirectX::XMFLOAT4A(std::stof(parts[1]), std::stof(parts[2]), std::stof(parts[3]), 0.0f));
+              model->AddControlPoint(DirectX::XMFLOAT3(std::stof(parts[1]), std::stof(parts[2]), std::stof(parts[3])));
               break;
               // テクスチャ座標
             case ObjKeywords::kVertexTexture:
+              // TODO:要素数が3でない場合は違法データとして戻す
+              model->AddTextureCoord(DirectX::XMFLOAT2(std::stof(parts[1]), std::stof(parts[2])));
               break;
               // 頂点法線ベクトル
             case ObjKeywords::kVertexNormal:
