@@ -11,7 +11,8 @@
 #include <fstream>
 #include <sstream>
 #include <map>
-#include <boost/1_66_0/boost/algorithm/string.hpp>
+#include <boost/algorithm/string.hpp>
+#include <boost/range/adaptor/indexed.hpp>
 
 namespace App
 {
@@ -64,7 +65,8 @@ namespace App
         /**
          *  @brief  コンストラクタ
          */
-        Model() : points_(0), polygon_count_(0), indices_(0), normals_(0), texture_coords_(0)
+        Model() : points_(0), normals_(0), texture_coords_(0),
+          polygon_count_(0), point_indices_(0), normal_indices_(0), texture_coord_indices_(0)
         {
 
         }
@@ -116,36 +118,9 @@ namespace App
          *  @brief  頂点座標数を取得する
          *  @return 頂点座標数
          */
-        std::size_t GetControlPointCount() const override
+        uint32_t GetControlPointCount() const override
         {
-          return points_.size();
-        }
-
-        /**
-         *  @brief  ポリゴン数を取得する
-         *  @return ポリゴン数
-         */
-        std::size_t GetPolygonCount() const override
-        {
-          return polygon_count_;
-        }
-
-        /**
-         *  @brief  頂点インデックスデータを取得する
-         *  @return 頂点インデックスデータのリスト
-         */
-        const std::vector<uint32_t>& GetIndices() const override
-        {
-          return indices_;
-        }
-
-        /**
-         *  @brief  頂点インデックス数を取得する
-         *  @return 頂点インデックス数
-         */
-        std::size_t GetIndexCount() const override
-        {
-          return indices_.size();
+          return static_cast<uint32_t>(points_.size());
         }
 
         /**
@@ -161,9 +136,9 @@ namespace App
          *  @brief  頂点法線ベクトル数を取得する
          *  @return 頂点法線ベクトル数
          */
-        std::size_t GetNormalCount() const override
+        uint32_t GetNormalCount() const override
         {
-          return normals_.size();
+          return static_cast<uint32_t>(normals_.size());
         }
 
         /**
@@ -179,9 +154,72 @@ namespace App
          *  @brief  テクスチャ座標数を取得する
          *  @return テクスチャ座標数
          */
-        std::size_t GetTextureCoordCount() const override
+        uint32_t GetTextureCoordCount() const override
         {
-          return texture_coords_.size();
+          return static_cast<uint32_t>(texture_coords_.size());
+        }
+
+        /**
+         *  @brief  ポリゴン数を取得する
+         *  @return ポリゴン数
+         */
+        uint32_t GetPolygonCount() const override
+        {
+          return polygon_count_;
+        }
+
+        /**
+         *  @brief  頂点インデックスデータを取得する
+         *  @return 頂点インデックスデータのリスト
+         */
+        const std::vector<uint32_t>& GetIndices() const override
+        {
+          return point_indices_;
+        }
+
+        /**
+         *  @brief  頂点インデックス数を取得する
+         *  @return 頂点インデックス数
+         */
+        uint32_t GetIndexCount() const override
+        {
+          return static_cast<uint32_t>(point_indices_.size());
+        }
+
+        /**
+         *  @brief  頂点法線ベクトルインデックスリストを取得する
+         *  @return 頂点法線ベクトルインデックスのリスト
+         */
+        const std::vector<uint32_t>& GetNormalIndices() const override
+        {
+          return normal_indices_;
+        }
+
+        /**
+         *  @brief  頂点法線ベクトルインデックス数を取得する
+         *  @return 頂点法線ベクトルインデックス数
+         */
+        uint32_t GetNormalIndexCount() const override
+        {
+          return static_cast<uint32_t>(normal_indices_.size());
+        }
+
+        /**
+         *  @brief  頂点テクスチャ座標インデックスリストを取得する
+         *  @return 頂点テクスチャ座標インデックスのリスト
+         */
+        const std::vector<uint32_t>& GetTextureCoordIndices() const override
+        {
+          return texture_coord_indices_;
+        }
+
+        /**
+         *  @brief  頂点テクスチャ座標インデックス数を取得する
+         *  @return 頂点テクスチャ座標インデックス数
+         */
+        uint32_t GetTextureCoordIndexCount() const override
+        {
+          return static_cast<uint32_t>(texture_coord_indices_.size());
         }
 
         /**
@@ -190,10 +228,13 @@ namespace App
         void Release() override
         {
           points_.clear();
-          polygon_count_ = 0;
-          indices_.clear();
           normals_.clear();
           texture_coords_.clear();
+
+          polygon_count_ = 0;
+          point_indices_.clear();
+          normal_indices_.clear();
+          texture_coord_indices_.clear();
         }
 
         /**
@@ -214,18 +255,6 @@ namespace App
         }
 
         /**
-         *  @brief  頂点インデックスを追加する
-         *  @param  polygon_indices:追加する頂点インデックスのポリゴン単位でのリスト
-         */
-        void AddIndex(const std::vector<uint32_t>& polygon_indices)
-        {
-          for (auto index : polygon_indices)
-          {
-            indices_.emplace_back(index);
-          }
-        }
-
-        /**
          *  @brief  法線ベクトルを追加する
          *  @param  normal:追加する法線ベクトル
          */
@@ -243,12 +272,51 @@ namespace App
           texture_coords_.emplace_back(texture_coord);
         }
 
+        /**
+         *  @brief  頂点座標インデックスを追加する
+         *  @param  polygon_indices:追加する頂点座標インデックスのポリゴン単位でのリスト
+         */
+        void AddPointIndex(const std::vector<uint32_t>& polygon_indices)
+        {
+          for (auto index : polygon_indices)
+          {
+            point_indices_.emplace_back(index);
+          }
+        }
+
+        /**
+         *  @brief  頂点法線ベクトルインデックスを追加する
+         *  @param  polygon_indices:頂点法線ベクトルインデックスのポリゴン単位でのリスト
+         */
+        void AddNormalIndex(const std::vector<uint32_t>& polygon_indices)
+        {
+          for (auto index : polygon_indices)
+          {
+            normal_indices_.emplace_back(index);
+          }
+        }
+
+        /**
+         *  @brief  頂点テクスチャ座標インデックスを追加する
+         *  @param  polygon_indices:追加する頂点テクスチャ座標インデックスのポリゴン単位でのリスト
+         */
+        void AddTextureCoordIndex(const std::vector<uint32_t>& polygon_indices)
+        {
+          for (auto index : polygon_indices)
+          {
+            texture_coord_indices_.emplace_back(index);
+          }
+        }
+
       private:
         std::vector<DirectX::XMFLOAT3> points_;         ///< 座標リスト
-        std::size_t polygon_count_;                     ///< ポリゴン数
-        std::vector<uint32_t> indices_;                 ///< 頂点インデックスリスト
         std::vector<DirectX::XMFLOAT3> normals_;        ///< 法線ベクトルリスト
         std::vector<DirectX::XMFLOAT2> texture_coords_; ///< テクスチャ座標リスト
+
+        uint32_t polygon_count_;                        ///< ポリゴン数
+        std::vector<uint32_t> point_indices_;           ///< 頂点インデックスリスト
+        std::vector<uint32_t> normal_indices_;          ///< 頂点法線ベクトルインデックスリスト
+        std::vector<uint32_t> texture_coord_indices_;   ///< 頂点テクスチャ座標インデックスリスト
       };
 
       /**
@@ -396,13 +464,38 @@ namespace App
               // ポリゴンデータ
             case ObjKeywords::kPolygon:
               {
-                std::vector<uint32_t> indices;
+                std::vector<uint32_t> point_indices;
+                std::vector<uint32_t> normal_indices;
+                std::vector<uint32_t> texture_coord_indices;
                 for (decltype(parts.size()) i = 1; i < parts.size(); ++i)
                 {
-                  // 頂点は0番目からなので、(頂点インデックス - 1)を行う
-                  indices.emplace_back(std::stoi(parts[i].substr(0, parts[i].find('/'))) - 1);
+                  std::vector<std::string> indices;
+                  boost::split(indices, parts[i], boost::is_any_of("/"));
+                  for (auto index : indices | boost::adaptors::indexed())
+                  {
+                    if (false == index.value().empty())
+                    {
+                      // 座標・テクスチャ座標・法線ベクトルは0番目からなので、-1を行う
+                      const auto value = std::stoi(index.value()) - 1;
+                      switch (index.index())
+                      {
+                      case 0:
+                        
+                        point_indices.emplace_back(value);
+                        break;
+                      case 1:
+                        texture_coord_indices.emplace_back(value);
+                        break;
+                      case 2:
+                        normal_indices.emplace_back(value);
+                        break;
+                      }
+                    }
+                  }
                 }
-                model->AddIndex(indices);
+                model->AddPointIndex(point_indices);
+                model->AddTextureCoordIndex(texture_coord_indices);
+                model->AddNormalIndex(normal_indices);
                 model->AddPolygon();
               }
               break;
