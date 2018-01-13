@@ -1,3 +1,4 @@
+// TODO:includeの順序をコーディングルールに合わせる
 #include <qevent.h>
 #include <qtimer.h>
 #include <qdatetime.h>
@@ -12,6 +13,8 @@
 #include <qmimedata.h>
 #include <qprogressdialog.h>
 #include "./Loader/obj_loader.h"
+#include <unordered_map>
+#include <boost/range/adaptor/indexed.hpp>
 
 QtDirect3D12::QtDirect3D12(QWidget *parent)
   : QWidget(parent),
@@ -189,39 +192,66 @@ void QtDirect3D12::dropEvent(QDropEvent* event)
   };
 #pragma pack(pop)
 
-  // 座標・法線ベクトル・テクスチャ座標・ポリゴンデータから頂点を生成する
+  std::vector<Vertex> vertices;
+  std::unordered_map<std::string, uint32_t> map;
+  std::vector<uint32_t> indices;
 
-  // ポリゴンデータの下記3項目の数は同じ筈(0でなければ)
-  // 頂点座標インデックス数
-  // 頂点法線ベクトルインデックス数
-  // 頂点テクスチャ座標インデックス数
-
-  auto vertex_size = sizeof(Vertex);
-  std::vector<Vertex> vertices(model_->GetControlPointCount());
-  const auto base_vertices = model_->GetControlPoints();
+  const auto points = model_->GetControlPoints();
   const auto normals = model_->GetNormals();
-  const auto texture_coords = model_->GetTextureCoords();
+  const auto tex_coords = model_->GetTextureCoords();
+  const auto point_indices = model_->GetIndices();
+  const auto normal_indices = model_->GetNormalIndices();
+  const auto tex_coords_indices = model_->GetTextureCoordIndices();
 
-  auto begin_iterator = vertices.begin();
-  // TODO:range-based forにする(ID抽出はboost::adaptors:indexedを使用する)
-  for (auto iterator = vertices.begin(); iterator != vertices.end(); ++iterator)
+  // 頂点データリストと、頂点データインデックスとハッシュを持つリストを作成する
+  for (const auto point : point_indices | boost::adaptors::indexed())
   {
-    auto index = std::distance(begin_iterator, iterator);
-    iterator->position.x = base_vertices[index].x;
-    iterator->position.y = base_vertices[index].y;
-    iterator->position.z = base_vertices[index].z;
-    //iterator->normal.x = normals[index].x;
-    //iterator->normal.y = normals[index].y;
-    //iterator->normal.z = normals[index].z;
-    //iterator->texcoord.x = texture_coords[index].x;
-    //iterator->texcoord.y = texture_coords[index].y;
+    const auto index = point.index();
+
+    // ハッシュを作成
+    std::string hash = std::to_string(point.value());
+
+    if (tex_coords_indices.empty() == false)
+    {
+      hash += '-' + std::to_string(tex_coords_indices[index]);
+    }
+
+    if (normal_indices.empty() == false)
+    {
+      hash += '-' + std::to_string(normal_indices[index]);
+    }
+
+    // ハッシュが存在しない場合は頂点データを追加する
+    if (map.count(hash) == 0)
+    {
+      // 頂点データ
+      Vertex vertex = {};
+      vertex.position = points.at(point.value());
+
+      if (normal_indices.empty() == false)
+      {
+        vertex.normal = normals.at(normal_indices.at(index));
+      }
+
+      if (tex_coords_indices.empty() == false)
+      {
+        vertex.texcoord = tex_coords.at(tex_coords_indices.at(index));
+      }
+
+      vertices.emplace_back(vertex);
+
+      // ハッシュリストを更新
+      map.insert({ hash, static_cast<uint32_t>(vertices.size() - 1) });
+    }
+
+    // インデックスリストにインデックスを追加する
+    indices.emplace_back(map.at(hash));
   }
 
-  const auto indices = model_->GetIndices();
-
   // 頂点データ、インデックスバッファの更新
-  vertexBuffer->Create(&(device->GetDevice()), vertex_size * model_->GetControlPointCount(), vertex_size, &(vertices[0]));
-  indexBuffer->Create(&(device->GetDevice()), sizeof(uint32_t) * model_->GetIndexCount(), &(indices[0]), DXGI_FORMAT_R32_UINT);
+  auto vertex_size = sizeof(Vertex);
+  vertexBuffer->Create(&(device->GetDevice()), vertex_size * vertices.size(), vertex_size, &(vertices[0]));
+  indexBuffer->Create(&(device->GetDevice()), sizeof(uint32_t) * indices.size(), &(indices[0]), DXGI_FORMAT_R32_UINT);
 }
 
 void QtDirect3D12::wheelEvent(QWheelEvent* event)
