@@ -254,6 +254,9 @@ void QtDirect3D12::dropEvent(QDropEvent* event)
   indexBuffer->Create(&(device->GetDevice()), sizeof(uint32_t) * indices.size(), &(indices[0]), DXGI_FORMAT_R32_UINT);
 }
 
+// 線形補間テスト用変数
+// start * (1.0f - t) + end * t; 補間値計算式(tは任意の補間関数)
+
 void QtDirect3D12::wheelEvent(QWheelEvent* event)
 {
   constexpr auto value = 1.0f;
@@ -288,7 +291,7 @@ void QtDirect3D12::wheelEvent(QWheelEvent* event)
   // 現在の視点と移動先の視点を線形補間で指定時間で移動を行うようにする
   // 移動中に移動先の視点が更新される可能性を考慮する
   // メインループのジョブ実行順序は
-  // 1.ファイル読み込み
+  // 1.ファイル読み込み(非同期ジョブ)
   // 2.座標更新
   // 3.描画にする
   DirectX::XMStoreFloat3(&eye_, eye);
