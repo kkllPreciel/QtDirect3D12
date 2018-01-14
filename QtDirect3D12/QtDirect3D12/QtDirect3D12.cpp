@@ -256,6 +256,8 @@ void QtDirect3D12::dropEvent(QDropEvent* event)
 
 void QtDirect3D12::wheelEvent(QWheelEvent* event)
 {
+  constexpr auto value = 1.0f;
+
   QPoint degrees = event->angleDelta() / 8;
 
   // 視点から注視点へのベクトルを作成
@@ -267,13 +269,21 @@ void QtDirect3D12::wheelEvent(QWheelEvent* event)
   float distance = 0.0f;
   DirectX::XMStoreFloat(&distance, DirectX::XMVector3Length(dir));
 
+  // 距離が離れている場合は移動量に補正を行う
+  const auto move = value * (std::fabsf(distance) * 0.5);
+
+  const auto force = degrees.y() / std::abs(degrees.y());
+  eye = DirectX::XMVectorAdd(eye, DirectX::XMVectorScale(DirectX::XMVector3Normalize(dir), force * move));
+
   // 注視点との距離が一定以下なら近づけないようにする
+  dir = DirectX::XMVectorSubtract(at, eye);
+  distance = 0.0f;
+  DirectX::XMStoreFloat(&distance, DirectX::XMVector3Length(dir));
   if (distance < 1.0f)
   {
     return;
   }
 
-  // TODO:一定距離以上は近づけないようにする
-  // TODO:注視点との距離で移動量に補正をつける
-  DirectX::XMStoreFloat3(&eye_, DirectX::XMVectorAdd(eye, DirectX::XMVectorScale(DirectX::XMVector3Normalize(dir), degrees.y() / std::abs(degrees.y()) * distance)));
+  // TODO:滑らかに移動するようにする(ジョブに登録して移動させる?)
+  DirectX::XMStoreFloat3(&eye_, eye);
 }
