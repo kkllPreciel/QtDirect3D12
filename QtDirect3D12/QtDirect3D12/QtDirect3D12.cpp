@@ -88,6 +88,12 @@ QtDirect3D12::~QtDirect3D12()
   }
 }
 
+// 線形補間テスト用変数
+bool is_moving_ = false;
+DirectX::XMFLOAT3 target_ = {};
+DirectX::XMFLOAT3 start_ = {};
+float time_ = {};
+
 void QtDirect3D12::mainLoop()
 {
   // デバッグ用FPS表示
@@ -118,6 +124,20 @@ void QtDirect3D12::mainLoop()
 
     // ワールド行列を更新
     DirectX::XMStoreFloat4x4(&(constantBuffer.world), DirectX::XMMatrixRotationY(now));
+
+    if (is_moving_)
+    {
+      time_ += 0.1f;
+      if (1.0f <= time_)
+      {
+        time_ = 1.0f;
+        is_moving_ = false;
+      }
+
+      DirectX::XMVECTOR target = DirectX::XMLoadFloat3(&target_);
+      DirectX::XMVECTOR start = DirectX::XMLoadFloat3(&start_);
+      DirectX::XMStoreFloat3(&eye_, DirectX::XMVectorAdd(DirectX::XMVectorScale(start, (1.0f - time_)), DirectX::XMVectorScale(target, time_)));
+    }
 
     // ビュー行列を作成
     DirectX::XMVECTOR eye = DirectX::XMLoadFloat3(&eye_);
@@ -254,9 +274,6 @@ void QtDirect3D12::dropEvent(QDropEvent* event)
   indexBuffer->Create(&(device->GetDevice()), sizeof(uint32_t) * indices.size(), &(indices[0]), DXGI_FORMAT_R32_UINT);
 }
 
-// 線形補間テスト用変数
-// start * (1.0f - t) + end * t; 補間値計算式(tは任意の補間関数)
-
 void QtDirect3D12::wheelEvent(QWheelEvent* event)
 {
   constexpr auto value = 1.0f;
@@ -276,16 +293,21 @@ void QtDirect3D12::wheelEvent(QWheelEvent* event)
   const auto move = value * (std::fabsf(distance) * 0.5);
 
   const auto force = degrees.y() / std::abs(degrees.y());
-  eye = DirectX::XMVectorAdd(eye, DirectX::XMVectorScale(DirectX::XMVector3Normalize(dir), force * move));
+  DirectX::XMVECTOR target = DirectX::XMVectorAdd(eye, DirectX::XMVectorScale(DirectX::XMVector3Normalize(dir), force * move));
 
   // 注視点との距離が一定以下なら近づけないようにする
-  dir = DirectX::XMVectorSubtract(at, eye);
+  dir = DirectX::XMVectorSubtract(at, target);
   distance = 0.0f;
   DirectX::XMStoreFloat(&distance, DirectX::XMVector3Length(dir));
   if (distance < 1.0f)
   {
     return;
   }
+
+  DirectX::XMStoreFloat3(&target_, target);
+  DirectX::XMStoreFloat3(&start_, eye);
+  time_ = 0;
+  is_moving_ = true;
 
   // TODO:滑らかに移動するようにする(ジョブに登録して移動させる?)
   // 現在の視点と移動先の視点を線形補間で指定時間で移動を行うようにする
@@ -294,5 +316,5 @@ void QtDirect3D12::wheelEvent(QWheelEvent* event)
   // 1.ファイル読み込み(非同期ジョブ)
   // 2.座標更新
   // 3.描画にする
-  DirectX::XMStoreFloat3(&eye_, eye);
+  // DirectX::XMStoreFloat3(&eye_, eye);
 }
