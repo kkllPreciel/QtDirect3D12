@@ -86,6 +86,7 @@
     <ClCompile Include="GeneratedFiles\Release\moc_QtDirect3D12.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="job_system\job.cc" />
     <ClCompile Include="Loader\obj_loader.cc" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="QtDirect3D12.cpp" />
@@ -116,6 +117,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GeneratedFiles\ui_QtDirect3D12.h" />
+    <ClInclude Include="job_system\job.h" />
     <ClInclude Include="Loader\loader.h" />
     <ClInclude Include="Loader\loader_factory.h" />
     <ClInclude Include="Loader\model.h" />
