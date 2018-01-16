@@ -53,6 +53,12 @@ namespace App
       void Execute(std::uint64_t delta_time);
 
       /**
+       *  @brief  ジョブコンテナを設定する
+       *  @param  job_container:ジョブコンテナへのポインタ
+       */
+      void SetContainer(JobContainer* job_container);
+
+      /**
        *  @brief  ジョブとして実行する関数を設定する
        *  @param  pointer:オブジェクトのポインタ
        *  @param  func:関数へのポインタ
@@ -62,7 +68,7 @@ namespace App
 
     private:
       std::function<void(std::uint64_t)> function_; ///< 関数へのポインタ
-      JobContainer* container = nullptr;            ///< 登録したコンテナへのポインタ
+      JobContainer* container_ = nullptr;           ///< 登録したコンテナへのポインタ
     };
 
     // templateの実体

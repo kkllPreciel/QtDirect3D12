@@ -37,5 +37,14 @@ namespace App
     {
       function_(delta_time);
     }
+
+    /**
+     *  @brief  ジョブコンテナを設定する
+     *  @param  job_container:ジョブコンテナへのポインタ
+     */
+    void Job::SetContainer(JobContainer* job_container)
+    {
+      container_ = job_container;
+    }
   };
 };
