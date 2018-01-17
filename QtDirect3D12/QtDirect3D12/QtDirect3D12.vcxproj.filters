@@ -64,6 +64,9 @@
     <ClCompile Include="job_system\job_container.cc">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="job_system\job_scheduler.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="QtDirect3D12.h">
@@ -96,6 +99,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="job_system\job_container.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="job_system\job_scheduler.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

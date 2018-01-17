@@ -63,7 +63,7 @@ namespace App
        *  @param  pointer:オブジェクトのポインタ
        *  @param  func:関数へのポインタ
        */
-      template<typename _Class> void SetFunction(_Class* pointer, void(_Class::* func)(std::uint64_t));
+      template<typename _Class> void SetFunction(_Class* pointer, void(_Class::* func)(std::uint64_t));   ///< メンバ関数のみ許容する
       // template<typename _Class> void SetFunction(_Class* pointer, std::function<void(std::uint64_t)>);
 
     private:
