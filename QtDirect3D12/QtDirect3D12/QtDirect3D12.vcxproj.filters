@@ -67,6 +67,12 @@
     <ClCompile Include="job_system\job_scheduler.cc">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="job_system\async_job.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="job_system\async_job_manager.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="QtDirect3D12.h">
@@ -102,6 +108,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="job_system\job_scheduler.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="job_system\async_job.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="job_system\async_job_manager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

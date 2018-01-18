@@ -86,6 +86,8 @@
     <ClCompile Include="GeneratedFiles\Release\moc_QtDirect3D12.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="job_system\async_job.cc" />
+    <ClCompile Include="job_system\async_job_manager.cc" />
     <ClCompile Include="job_system\job.cc" />
     <ClCompile Include="job_system\job_container.cc" />
     <ClCompile Include="job_system\job_scheduler.cc" />
@@ -119,6 +121,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GeneratedFiles\ui_QtDirect3D12.h" />
+    <ClInclude Include="job_system\async_job.h" />
+    <ClInclude Include="job_system\async_job_manager.h" />
     <ClInclude Include="job_system\job.h" />
     <ClInclude Include="job_system\job_container.h" />
     <ClInclude Include="job_system\job_scheduler.h" />
