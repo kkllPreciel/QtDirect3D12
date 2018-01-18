@@ -60,21 +60,27 @@ namespace App
 
       /**
        *  @brief  ジョブとして実行する関数を設定する
+       *  @param  func:関数へのポインタ
+       */
+      void SetFunction(std::function<void(std::uint64_t)>);
+
+      /**
+       *  @brief  ジョブとして実行する関数を設定する
        *  @param  pointer:オブジェクトのポインタ
        *  @param  func:関数へのポインタ
        */
-      template<typename _Class> void SetFunction(_Class* pointer, void(_Class::* func)(std::uint64_t));   ///< メンバ関数のみ許容する
-      // template<typename _Class> void SetFunction(_Class* pointer, std::function<void(std::uint64_t)>);
+      // template<typename _Class> void SetFunction(_Class* pointer, std::function<void(_Class*, std::uint64_t)>); ///< メンバ関数のみ許容する(std::function)
+      // template<typename _Class> void SetFunction(_Class* pointer, void(_Class::* func)(std::uint64_t));         ///< メンバ関数のみ許容する(関数ポインタ)
 
     private:
       std::function<void(std::uint64_t)> function_; ///< 関数へのポインタ
       JobContainer* container_ = nullptr;           ///< 登録したコンテナへのポインタ
     };
 
-    // templateの実体
-    template<typename _Class> void Job::SetFunction(_Class* pointer, void(_Class::* func)(std::uint64_t))
+    // templateの実態(メンバ関数のみ許容する関数ポインタ)
+    /*template<typename _Class> void Job::SetFunction(_Class* pointer, void(_Class::* func)(std::uint64_t))
     {
       function_ = std::bind(std::mem_fn(func), pointer, std::placeholders::_1);
-    }
+    }*/
   };
 };

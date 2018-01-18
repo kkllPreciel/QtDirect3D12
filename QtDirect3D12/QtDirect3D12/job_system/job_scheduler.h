@@ -10,6 +10,7 @@
 
  // include
 #include <array>
+#include <memory>
 #include "job_system/job_container.h"
 
 namespace App
@@ -38,7 +39,7 @@ namespace App
        *  @brief  インスタンスを取得する
        *  @return ジョブスケジューラのポインタ
        */
-      static JobScheduler* GetInstance()
+      static std::unique_ptr<JobScheduler>& GetInstance()
       {
         return instance_;
       }
@@ -94,8 +95,8 @@ namespace App
       JobScheduler& operator = (const JobScheduler& other) = delete;
 
     private:
-      static JobScheduler* instance_;           ///< ジョブスケジューラのインスタンス
-      std::array<JobContainer, 10> containers_; ///< スケジュールするジョブコンテナリスト
+      static std::unique_ptr<JobScheduler> instance_; ///< ジョブスケジューラのインスタンス
+      std::array<JobContainer, 10> containers_;       ///< スケジュールするジョブコンテナリスト
     };
   };
 };

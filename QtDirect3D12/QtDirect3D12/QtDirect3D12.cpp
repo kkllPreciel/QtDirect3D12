@@ -89,6 +89,9 @@ QtDirect3D12::~QtDirect3D12()
 }
 
 // 線形補間テスト用変数
+#include "job_system/job.h"
+#include "job_system/job_scheduler.h"
+App::job_system::Job job;
 bool is_moving_ = false;
 DirectX::XMFLOAT3 target_ = {};
 DirectX::XMFLOAT3 start_ = {};
@@ -125,7 +128,9 @@ void QtDirect3D12::mainLoop()
     // ワールド行列を更新
     DirectX::XMStoreFloat4x4(&(constantBuffer.world), DirectX::XMMatrixRotationY(now));
 
-    if (is_moving_)
+    App::job_system::JobScheduler::GetInstance()->Execute(0.01f);
+
+    /*if (is_moving_)
     {
       time_ += 0.1f;
       if (1.0f <= time_)
@@ -137,7 +142,7 @@ void QtDirect3D12::mainLoop()
       DirectX::XMVECTOR target = DirectX::XMLoadFloat3(&target_);
       DirectX::XMVECTOR start = DirectX::XMLoadFloat3(&start_);
       DirectX::XMStoreFloat3(&eye_, DirectX::XMVectorAdd(DirectX::XMVectorScale(start, (1.0f - time_)), DirectX::XMVectorScale(target, time_)));
-    }
+    }*/
 
     // ビュー行列を作成
     DirectX::XMVECTOR eye = DirectX::XMLoadFloat3(&eye_);
@@ -308,6 +313,29 @@ void QtDirect3D12::wheelEvent(QWheelEvent* event)
   DirectX::XMStoreFloat3(&start_, eye);
   time_ = 0;
   is_moving_ = true;
+
+  App::job_system::JobScheduler::GetInstance()->Unregister(&job);
+  job.SetFunction([&](std::uint64_t delta_time) {
+    if (is_moving_)
+    {
+      time_ += 0.1f;
+      if (1.0f <= time_)
+      {
+        time_ = 1.0f;
+        is_moving_ = false;
+      }
+      DirectX::XMVECTOR target = DirectX::XMLoadFloat3(&target_);
+      DirectX::XMVECTOR start = DirectX::XMLoadFloat3(&start_);
+      DirectX::XMStoreFloat3(&eye_, DirectX::XMVectorAdd(DirectX::XMVectorScale(start, (1.0f - time_)), DirectX::XMVectorScale(target, time_)));
+    }
+
+    // ジョブが終了したので登録を解除する
+    if (false == is_moving_)
+    {
+      App::job_system::JobScheduler::GetInstance()->Unregister(&job);
+    }
+  });
+  App::job_system::JobScheduler::GetInstance()->Register(&job, App::job_system::JobScheduler::Containers::kCameraUpdate);
 
   // TODO:滑らかに移動するようにする(ジョブに登録して移動させる?)
   // 現在の視点と移動先の視点を線形補間で指定時間で移動を行うようにする

@@ -16,7 +16,7 @@ namespace App
   namespace job_system
   {
     // 静的メンバ変数の定義
-    JobScheduler* JobScheduler::instance_ = nullptr;
+    std::unique_ptr<JobScheduler> JobScheduler::instance_ = std::make_unique<JobScheduler>();
 
     /**
      *  @brief  コンストラクタ
@@ -24,7 +24,6 @@ namespace App
     JobScheduler::JobScheduler()
     {
       assert(instance_ == nullptr);
-      instance_ = this;
     }
     
     /**
@@ -33,7 +32,6 @@ namespace App
     JobScheduler::~JobScheduler()
     {
       Destroy();
-      instance_ = nullptr;
     }
     
     /**

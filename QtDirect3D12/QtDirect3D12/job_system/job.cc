@@ -46,5 +46,14 @@ namespace App
     {
       container_ = job_container;
     }
+
+    /**
+     *  @brief  ジョブとして実行する関数を設定する
+     *  @param  func:関数へのポインタ
+     */
+    void Job::SetFunction(std::function<void(std::uint64_t)> func)
+    {
+      function_ = func;
+    }
   };
 };
