@@ -74,6 +74,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="actor\actor.cc" />
     <ClCompile Include="GeneratedFiles\Debug\moc_QtDirect3D12.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
@@ -120,6 +121,7 @@
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="actor\actor.h" />
     <ClInclude Include="GeneratedFiles\ui_QtDirect3D12.h" />
     <ClInclude Include="job_system\async_job.h" />
     <ClInclude Include="job_system\async_job_manager.h" />
