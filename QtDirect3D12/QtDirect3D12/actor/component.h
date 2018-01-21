@@ -54,7 +54,15 @@ namespace App
        */
       Component& operator = (const Component& other) = delete;
 
+      /**
+       *  @brief  初期化を行う
+       *  @return 初期化成功フラグ
+       */
       virtual bool Create() = 0;
+
+      /**
+       *  @brief  終了処理を行う
+       */
       virtual void Destroy() = 0;
 
     protected:
