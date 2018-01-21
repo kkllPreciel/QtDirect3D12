@@ -10,6 +10,7 @@
 
  // include
 #include <cstdint>
+#include <map>
 #include <DirectXMath.h>
 
 namespace App
@@ -100,8 +101,19 @@ namespace App
        */
       DirectX::XMVECTOR GetRotation() const;
 
+      /**
+       *  @brief  コンポーネントを作成する
+       */
+      template<typename _Type> _Type* AddComponent();
+
+      /**
+       *  @brief  コンポーネントを取得する
+       */
+      template<typename _Type> _Type* GetComponent();
+
     private:
       std::uint64_t unique_id_;                                       ///< アクター間でのユニークなID
+      std::map<std::uint16_t, Component*> components_;                ///< コンポーネント用コンテナ
       DirectX::XMVECTOR position_ = DirectX::XMVectorZero();          ///< 座標(ベクトル)
       DirectX::XMVECTOR rotation_ = DirectX::XMQuaternionIdentity();  ///< 回転(クォータニオン)
     };

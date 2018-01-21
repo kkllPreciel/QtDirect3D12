@@ -72,7 +72,6 @@ namespace App
        */
       Component(Actor* owner);
 
-    private:
       Actor* owner_;  ///< オーナーアクター
     };
   };

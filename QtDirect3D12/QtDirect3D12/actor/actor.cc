@@ -9,7 +9,6 @@
  // include
 #include "actor/actor.h"
 #include <cassert>
-#include <map>
 #include "job_system/job.h"
 
 namespace App
@@ -110,6 +109,37 @@ namespace App
     DirectX::XMVECTOR Actor::GetRotation() const
     {
       return rotation_;
+    }
+
+    /**
+     *  @brief  コンポーネントを作成する
+     */
+    template<typename _Type> _Type* Actor::AddComponent()
+    {
+      // デバッグ時専用のチェック処理
+      // コンポーネントの二重登録は不許可
+      assert(GetComponent<_Type>() == nullptr);
+
+      _Type* component = new _Type();
+      component->Create();
+      components_.insert(std::pair<std::uint16_t, Component*>(_Type::GetId(), component));
+
+      return component;
+    }
+    
+    /**
+     *  @brief  コンポーネントを取得する
+     */
+    template<typename _Type> _Type* Actor::GetComponent()
+    {
+      std::map<std::uint16_t, Component*>::iterator it = components_.find(_Type::GetId());
+      if (it != components_.end())
+      {
+        it->second->Destroy();
+        return static_cast<_Type*>(it->second);
+      }
+
+      return nullptr;
     }
   };
 };

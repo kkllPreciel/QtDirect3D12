@@ -30,7 +30,7 @@ namespace App
       {
         kIllegal = 0,
         kLoading,
-        kCameraUpdate,
+        kMoveUpdate,
         kRenderUpdate,
         kEnd,
       };

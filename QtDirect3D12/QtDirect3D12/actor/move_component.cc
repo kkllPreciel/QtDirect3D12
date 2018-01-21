@@ -48,7 +48,14 @@ namespace App
      */
     bool MoveComponent::Create()
     {
-      // TODO:初期化処理
+      Destroy();
+
+      job_ = std::make_unique<job_system::Job>();
+
+      job_->SetFunction([&](std::uint64_t delta_time) {
+        this->Update(delta_time);
+      });
+      job_system::JobScheduler::GetInstance()->Register(job_.get(), job_system::JobScheduler::kMoveUpdate);
 
       return true;
     }
@@ -58,7 +65,13 @@ namespace App
      */
     void MoveComponent::Destroy()
     {
+      // ジョブスケジューラへの登録を解除する
+      if (job_)
+      {
+        job_system::JobScheduler::GetInstance()->Unregister(job_.get());
+      }
 
+      job_.reset();
     }
 
     /**
@@ -67,7 +80,8 @@ namespace App
      */
     void MoveComponent::Update(std::uint64_t delta_time)
     {
-      // TODO:更新処理
+      DirectX::XMVECTOR vector = DirectX::XMVectorScale(velocity_, speed_);
+      owner_->SetPosition(DirectX::XMVectorAdd(owner_->GetPosition(), vector));
     }
     
     /**

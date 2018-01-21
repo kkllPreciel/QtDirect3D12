@@ -9,6 +9,7 @@
 #pragma once
 
  // include
+#include <memory>
 #include <DirectXMath.h>
 #include "actor/component.h"
 #include "job_system/job.h"
@@ -102,6 +103,7 @@ namespace App
     private:
       DirectX::XMVECTOR velocity_ = DirectX::XMVectorZero();  ///< ˆÚ“®•ûŒü
       float speed_ = 0.0f;                                    ///< ‘¬“x
+      std::unique_ptr<job_system::Job> job_;                  ///< ƒWƒ‡ƒu
     };
   };
 };
