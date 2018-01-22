@@ -82,6 +82,9 @@
     <ClCompile Include="actor\move_component.cc">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="actor\camera_move_component.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="QtDirect3D12.h">
@@ -132,6 +135,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="actor\move_component.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="actor\camera_move_component.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
