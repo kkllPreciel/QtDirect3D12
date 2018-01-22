@@ -113,9 +113,40 @@ namespace App
 
     private:
       std::uint64_t unique_id_;                                       ///< アクター間でのユニークなID
-      std::map<std::uint16_t, Component*> components_;                ///< コンポーネント用コンテナ
+      std::map<std::uint32_t, Component*> components_;                ///< コンポーネント用コンテナ
       DirectX::XMVECTOR position_ = DirectX::XMVectorZero();          ///< 座標(ベクトル)
       DirectX::XMVECTOR rotation_ = DirectX::XMQuaternionIdentity();  ///< 回転(クォータニオン)
     };
+
+    /**
+     *  @brief  コンポーネントを作成する
+     */
+    template<typename _Type> _Type* Actor::AddComponent()
+    {
+      // デバッグ時専用のチェック処理
+      // コンポーネントの二重登録は不許可
+      assert(GetComponent<_Type>() == nullptr);
+
+      _Type* component = new _Type(this);
+      component->Create();
+      components_.insert(std::pair<std::uint32_t, Component*>(_Type::GetId(), component));
+
+      return component;
+    }
+    
+    /**
+     *  @brief  コンポーネントを取得する
+     */
+    template<typename _Type> _Type* Actor::GetComponent()
+    {
+      std::map<std::uint32_t, Component*>::iterator it = components_.find(_Type::GetId());
+      if (it != components_.end())
+      {
+        it->second->Destroy();
+        return static_cast<_Type*>(it->second);
+      }
+
+      return nullptr;
+    }
   };
 };

@@ -5,6 +5,7 @@
 #include <DirectXMath.h>
 #include "ui_QtDirect3D12.h"
 #include "./Loader/model.h"
+#include "actor/actor.h"
 
 namespace Sein {
   namespace Direct3D12 {
@@ -39,9 +40,9 @@ private:
   std::unique_ptr<Sein::Direct3D12::Device> device;
   std::unique_ptr<Sein::Direct3D12::VertexBuffer> vertexBuffer;
   std::unique_ptr<Sein::Direct3D12::IndexBuffer> indexBuffer;
-  std::unique_ptr<App::IModel> model_;  ///< モデルインターフェイス
-  DirectX::XMFLOAT3 eye_;               ///< 視点座標
-  DirectX::XMFLOAT3 at_;                ///< 注視点座標
+  std::unique_ptr<App::IModel> model_;        ///< モデルインターフェイス
+  std::unique_ptr<App::actor::Actor> camera_; ///< カメラアクター
+  DirectX::XMFLOAT3 at_;                      ///< 注視点座標
 
   /**
    *  @brief  定数バッファ用構造体

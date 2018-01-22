@@ -31,16 +31,6 @@ namespace App
     {
 
     }
-    
-    /**
-     *  @brief  コンポーネントの種別IDを取得する
-     *  @return コンポーネントの種別ID
-     */
-    constexpr Component::ID MoveComponent::GetId()
-    {
-      return Component::ID::kMove;
-    }
-    
 
     /**
      *  @brief  初期化を行う

@@ -57,7 +57,10 @@ namespace App
        *  @brief  コンポーネントの種別IDを取得する
        *  @return コンポーネントの種別ID
        */
-      static constexpr Component::ID GetId();
+      static constexpr std::uint32_t GetId()
+      {
+        return Component::ID::kMove;
+      }
 
       /**
        *  @brief  初期化を行う

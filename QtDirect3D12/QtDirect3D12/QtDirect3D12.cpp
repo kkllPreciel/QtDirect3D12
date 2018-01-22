@@ -15,6 +15,8 @@
 #include "./Loader/obj_loader.h"
 #include <unordered_map>
 #include <boost/range/adaptor/indexed.hpp>
+#include "actor/camera_move_component.h"
+#include "job_system/job_scheduler.h"
 
 QtDirect3D12::QtDirect3D12(QWidget *parent)
   : QWidget(parent),
@@ -72,7 +74,8 @@ QtDirect3D12::QtDirect3D12(QWidget *parent)
   }
 
   // 視点・注視点を初期化
-  eye_ = { 0.0f, 10.f, -30.5f };
+  camera_ = std::make_unique<App::actor::Actor>();
+  camera_->SetPosition({ 0.0f, 10.f, -30.5f });
   at_ = { 0.0f, 10.0f, 0.0f };
 
   // メインループ呼び出し設定
@@ -87,15 +90,6 @@ QtDirect3D12::~QtDirect3D12()
     timer->stop();
   }
 }
-
-// 線形補間テスト用変数
-#include "job_system/job.h"
-#include "job_system/job_scheduler.h"
-App::job_system::Job job;
-bool is_moving_ = false;
-DirectX::XMFLOAT3 target_ = {};
-DirectX::XMFLOAT3 start_ = {};
-float time_ = {};
 
 void QtDirect3D12::mainLoop()
 {
@@ -128,24 +122,11 @@ void QtDirect3D12::mainLoop()
     // ワールド行列を更新
     DirectX::XMStoreFloat4x4(&(constantBuffer.world), DirectX::XMMatrixRotationY(now));
 
-    App::job_system::JobScheduler::GetInstance()->Execute(0.01f);
-
-    /*if (is_moving_)
-    {
-      time_ += 0.1f;
-      if (1.0f <= time_)
-      {
-        time_ = 1.0f;
-        is_moving_ = false;
-      }
-
-      DirectX::XMVECTOR target = DirectX::XMLoadFloat3(&target_);
-      DirectX::XMVECTOR start = DirectX::XMLoadFloat3(&start_);
-      DirectX::XMStoreFloat3(&eye_, DirectX::XMVectorAdd(DirectX::XMVectorScale(start, (1.0f - time_)), DirectX::XMVectorScale(target, time_)));
-    }*/
+    // ジョブ実行
+    App::job_system::JobScheduler::GetInstance()->Execute(6);
 
     // ビュー行列を作成
-    DirectX::XMVECTOR eye = DirectX::XMLoadFloat3(&eye_);
+    DirectX::XMVECTOR eye = camera_->GetPosition();
     DirectX::XMVECTOR at = DirectX::XMLoadFloat3(&at_);
     DirectX::XMVECTORF32 up = { 0.0f, 1.0f, 0.0f, 0.0f };
     DirectX::XMStoreFloat4x4(&(constantBuffer.view), DirectX::XMMatrixLookAtLH(eye, at, up));
@@ -286,7 +267,7 @@ void QtDirect3D12::wheelEvent(QWheelEvent* event)
   QPoint degrees = event->angleDelta() / 8;
 
   // 視点から注視点へのベクトルを作成
-  DirectX::XMVECTOR eye = DirectX::XMLoadFloat3(&eye_);
+  DirectX::XMVECTOR eye = camera_->GetPosition();
   DirectX::XMVECTOR at = DirectX::XMLoadFloat3(&at_);
   DirectX::XMVECTOR dir = DirectX::XMVectorSubtract(at, eye);
   
@@ -309,33 +290,16 @@ void QtDirect3D12::wheelEvent(QWheelEvent* event)
     return;
   }
 
-  DirectX::XMStoreFloat3(&target_, target);
-  DirectX::XMStoreFloat3(&start_, eye);
-  time_ = 0;
-  is_moving_ = true;
-
-  //App::job_system::JobScheduler::GetInstance()->Unregister(&job);
-  //job.SetFunction([&](std::uint64_t delta_time) {
-  //  if (is_moving_)
-  //  {
-  //    time_ += 0.1f;
-  //    if (1.0f <= time_)
-  //    {
-  //      time_ = 1.0f;
-  //      is_moving_ = false;
-  //    }
-  //    DirectX::XMVECTOR target = DirectX::XMLoadFloat3(&target_);
-  //    DirectX::XMVECTOR start = DirectX::XMLoadFloat3(&start_);
-  //    DirectX::XMStoreFloat3(&eye_, DirectX::XMVectorAdd(DirectX::XMVectorScale(start, (1.0f - time_)), DirectX::XMVectorScale(target, time_)));
-  //  }
-
-  //  // ジョブが終了したので登録を解除する
-  //  if (false == is_moving_)
-  //  {
-  //    App::job_system::JobScheduler::GetInstance()->Unregister(&job);
-  //  }
-  //});
-  //App::job_system::JobScheduler::GetInstance()->Register(&job, App::job_system::JobScheduler::Containers::kCameraUpdate);
+  decltype(auto) component = camera_->GetComponent<App::actor::CameraMoveComponent>();
+  if (component == nullptr)
+  {
+    component = camera_->AddComponent<App::actor::CameraMoveComponent>();
+  }
+  
+  component->SetBeginPosition(eye);
+  component->SetEndPosition(target);
+  component->SetTime(1);
+  component->Create();
 
   // TODO:滑らかに移動するようにする(ジョブに登録して移動させる?)
   // 現在の視点と移動先の視点を線形補間で指定時間で移動を行うようにする
