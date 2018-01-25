@@ -95,6 +95,7 @@ void QtDirect3D12::mainLoop()
 {
   // デバッグ用FPS表示
   {
+#if false
     static QTime time;
     static auto frameCount = 0;
     wchar_t buf[256] = { 0 };
@@ -109,6 +110,7 @@ void QtDirect3D12::mainLoop()
     }
 
     frameCount++;
+#endif
   }
 
   // 定数バッファを更新

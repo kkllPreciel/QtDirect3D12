@@ -28,7 +28,10 @@ namespace App
      */
     Actor::~Actor()
     {
-
+      for (decltype(auto) component : components_)
+      {
+        delete component.second;
+      }
     }
     
     /**

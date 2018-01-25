@@ -28,7 +28,7 @@ namespace App
      */
     CameraMoveComponent::~CameraMoveComponent()
     {
-
+      Destroy();
     }
 
     /**
