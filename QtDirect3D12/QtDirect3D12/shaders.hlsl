@@ -1,9 +1,9 @@
 /**
- *	@file		shaders.hlsl
- *	@brief		シェーダー
- *	@author		kkllPreciel
- *	@date		2017/05/18
- *	@version	1.0
+ *  @file     shaders.hlsl
+ *  @brief    物理ベースレンダリング用シェーダー
+ *  @author   kkllPreciel
+ *  @date     2017/05/18
+ *  @version  1.0
  */
 
 /**
@@ -11,10 +11,10 @@
  */
 struct VSInput
 {
-    float3		position : POSITION;        ///< 座標
-    float3		normal   : NORMAL;          ///< 法線ベクトル
-    float2		uv       : TEXCOORD;        ///< UV座標
-    uint        id       : SV_InstanceID;   ///< インスタンスID
+    float3  position : POSITION;        ///< 座標
+    float3  normal   : NORMAL;          ///< 法線ベクトル
+    float2  uv       : TEXCOORD;        ///< UV座標
+    uint    id       : SV_InstanceID;   ///< インスタンスID
 };
 
 /**

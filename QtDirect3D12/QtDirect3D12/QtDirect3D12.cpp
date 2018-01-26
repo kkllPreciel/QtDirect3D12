@@ -143,6 +143,7 @@ void QtDirect3D12::mainLoop()
   auto index_count = 321567;
   if (model_ != nullptr)
   {
+    // TODO:正しいインデックス数に修正する
     index_count = model_->GetIndexCount();
   }
 
