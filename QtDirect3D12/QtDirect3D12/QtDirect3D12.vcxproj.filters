@@ -88,6 +88,9 @@
     <ClCompile Include="actor\level.cc">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="actor\camera_component.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="QtDirect3D12.h">
@@ -144,6 +147,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="actor\level.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="actor\camera_component.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
