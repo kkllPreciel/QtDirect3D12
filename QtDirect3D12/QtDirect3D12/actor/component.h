@@ -28,6 +28,7 @@ namespace App
       enum ID : std::uint32_t
       {
         kIllegal = 0,
+        kObject,      ///< オブジェクト
         kMove,        ///< 移動処理
       };
 

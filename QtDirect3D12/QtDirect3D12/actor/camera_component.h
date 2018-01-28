@@ -57,8 +57,7 @@ namespace App
        */
       static constexpr std::uint32_t GetId()
       {
-        // TODO:ê≥ÇµÇ¢ílÇ…èCê≥
-        return Component::ID::kMove;
+        return Component::ID::kObject;
       }
 
       /**

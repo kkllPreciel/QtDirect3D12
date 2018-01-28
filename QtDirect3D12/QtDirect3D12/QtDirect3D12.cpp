@@ -16,6 +16,7 @@
 #include <unordered_map>
 #include <boost/range/adaptor/indexed.hpp>
 #include "actor/camera_move_component.h"
+#include "actor/camera_component.h"
 #include "job_system/job_scheduler.h"
 
 QtDirect3D12::QtDirect3D12(QWidget *parent)
@@ -75,8 +76,8 @@ QtDirect3D12::QtDirect3D12(QWidget *parent)
 
   // 視点・注視点を初期化
   camera_ = std::make_unique<App::actor::Actor>();
+  camera_->AddComponent<App::actor::CameraComponent>()->SetLookAt({ 0.0f, 10.0f, 0.0f });
   camera_->SetPosition({ 0.0f, 10.f, -30.5f });
-  at_ = { 0.0f, 10.0f, 0.0f };
 
   // メインループ呼び出し設定
   connect(timer.get(), SIGNAL(timeout()), this, SLOT(mainLoop()));
@@ -129,7 +130,7 @@ void QtDirect3D12::mainLoop()
 
     // ビュー行列を作成
     DirectX::XMVECTOR eye = camera_->GetPosition();
-    DirectX::XMVECTOR at = DirectX::XMLoadFloat3(&at_);
+    DirectX::XMVECTOR at = camera_->GetComponent<App::actor::CameraComponent>()->GetLookAt();
     DirectX::XMVECTORF32 up = { 0.0f, 1.0f, 0.0f, 0.0f };
     DirectX::XMStoreFloat4x4(&(constantBuffer.view), DirectX::XMMatrixLookAtLH(eye, at, up));
 
@@ -271,7 +272,7 @@ void QtDirect3D12::wheelEvent(QWheelEvent* event)
 
   // 視点から注視点へのベクトルを作成
   DirectX::XMVECTOR eye = camera_->GetPosition();
-  DirectX::XMVECTOR at = DirectX::XMLoadFloat3(&at_);
+  DirectX::XMVECTOR at = camera_->GetComponent<App::actor::CameraComponent>()->GetLookAt();
   DirectX::XMVECTOR dir = DirectX::XMVectorSubtract(at, eye);
   
   // 視点から注視点への距離を取得

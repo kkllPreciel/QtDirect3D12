@@ -42,7 +42,6 @@ private:
   std::unique_ptr<Sein::Direct3D12::IndexBuffer> indexBuffer;
   std::unique_ptr<App::IModel> model_;        ///< モデルインターフェイス
   std::unique_ptr<App::actor::Actor> camera_; ///< カメラアクター
-  DirectX::XMFLOAT3 at_;                      ///< 注視点座標
 
   /**
    *  @brief  定数バッファ用構造体
