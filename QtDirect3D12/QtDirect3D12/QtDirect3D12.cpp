@@ -59,7 +59,9 @@ QtDirect3D12::QtDirect3D12(QWidget *parent)
   }
 
   QImage image;
-  if (image.load("../Resources/Texture/A.png"))
+
+  // ベースカラー(アルベド)
+  if (image.load("../Resources/Texture/Copper-scuffed_basecolor.png"))
   {
     auto format = image.format();
     auto bytesPerLine = image.bytesPerLine();
@@ -73,6 +75,40 @@ QtDirect3D12::QtDirect3D12(QWidget *parent)
 
     buffer.reset(nullptr);
   }
+
+#if false
+  // メタリック(金属性)
+  if (image.load("../Resources/Texture/Copper-scuffed_metallic.png"))
+  {
+    auto format = image.format();
+    auto bytesPerLine = image.bytesPerLine();
+    auto width = image.width();
+    auto height = image.height();
+    auto buffer = std::make_unique<uchar[]>(bytesPerLine * height);
+    std::memcpy(buffer.get(), image.convertToFormat(QImage::Format::Format_RGBA8888).constBits(), bytesPerLine * height);
+
+    // テクスチャバッファを作成
+    device->CreateTextureBuffer(buffer.get(), width, height, 4);
+
+    buffer.reset(nullptr);
+  }
+
+  // ラフネス(粗さ)
+  if (image.load("../Resources/Texture/Copper-scuffed_roughness.png"))
+  {
+    auto format = image.format();
+    auto bytesPerLine = image.bytesPerLine();
+    auto width = image.width();
+    auto height = image.height();
+    auto buffer = std::make_unique<uchar[]>(bytesPerLine * height);
+    std::memcpy(buffer.get(), image.convertToFormat(QImage::Format::Format_RGBA8888).constBits(), bytesPerLine * height);
+
+    // テクスチャバッファを作成
+    device->CreateTextureBuffer(buffer.get(), width, height, 4);
+
+    buffer.reset(nullptr);
+  }
+#endif
 
   // 視点・注視点を初期化
   camera_ = std::make_unique<App::actor::Actor>();
