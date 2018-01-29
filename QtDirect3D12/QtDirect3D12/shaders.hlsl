@@ -58,9 +58,19 @@ cbuffer ConstantBuffer : register(b0)
 };
 
 /**
- *  @brief  テクスチャ
+ *  @brief  アルベドマップ
  */
-Texture2D g_texture : register(t0);
+Texture2D g_albedo_map : register(t0);
+
+/**
+ *  @brief  メタリックマップ
+ */
+Texture2D g_metallic_map : register(t1);
+
+/**
+ *  @brief  ラフネスマップ
+ */
+Texture2D g_roughness_map : register(t2);
 
 /**
  *  @brief  サンプラー
@@ -314,7 +324,7 @@ PSOutput PSMain(VSOutput input)
     // 物体の表面情報(金属度・粗さ・アルベド)
     float metallic = 0.2;
     float roughness = 0.1;
-    float3 albedo = (float3)g_texture.Sample(g_sampler, input.uv);
+    float3 albedo = (float3) g_albedo_map.Sample(g_sampler, input.uv);
 
     // 物体の材質
     Material material;

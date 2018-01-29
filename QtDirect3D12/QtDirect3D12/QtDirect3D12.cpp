@@ -76,7 +76,6 @@ QtDirect3D12::QtDirect3D12(QWidget *parent)
     buffer.reset(nullptr);
   }
 
-#if false
   // メタリック(金属性)
   if (image.load("../Resources/Texture/Copper-scuffed_metallic.png"))
   {
@@ -108,7 +107,6 @@ QtDirect3D12::QtDirect3D12(QWidget *parent)
 
     buffer.reset(nullptr);
   }
-#endif
 
   // 視点・注視点を初期化
   camera_ = std::make_unique<App::actor::Actor>();
