@@ -61,7 +61,7 @@ QtDirect3D12::QtDirect3D12(QWidget *parent)
   QImage image;
 
   // ベースカラー(アルベド)
-  if (image.load("../Resources/Texture/Copper-scuffed_basecolor.png"))
+  if (image.load("../Resources/Texture/marble-speckled-albedo.png"))
   {
     auto format = image.format();
     auto bytesPerLine = image.bytesPerLine();
@@ -77,7 +77,7 @@ QtDirect3D12::QtDirect3D12(QWidget *parent)
   }
 
   // メタリック(金属性)
-  if (image.load("../Resources/Texture/Copper-scuffed_metallic.png"))
+  if (image.load("../Resources/Texture/marble-speckled-metalness"))
   {
     auto format = image.format();
     auto bytesPerLine = image.bytesPerLine();
@@ -93,7 +93,7 @@ QtDirect3D12::QtDirect3D12(QWidget *parent)
   }
 
   // ラフネス(粗さ)
-  if (image.load("../Resources/Texture/Copper-scuffed_roughness.png"))
+  if (image.load("../Resources/Texture/marble-speckled-roughness.png"))
   {
     auto format = image.format();
     auto bytesPerLine = image.bytesPerLine();
@@ -111,7 +111,7 @@ QtDirect3D12::QtDirect3D12(QWidget *parent)
   // 視点・注視点を初期化
   camera_ = std::make_unique<App::actor::Actor>();
   camera_->AddComponent<App::actor::CameraComponent>()->SetLookAt({ 0.0f, 10.0f, 0.0f });
-  camera_->SetPosition({ 0.0f, 10.f, -30.5f });
+  camera_->SetPosition({ 0.0f, 10.0f, -30.5f });
 
   // メインループ呼び出し設定
   connect(timer.get(), SIGNAL(timeout()), this, SLOT(mainLoop()));

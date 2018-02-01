@@ -92,7 +92,7 @@ VSOutput VSMain(VSInput input)
     pos = mul(projection, pos);
 
     result.position = pos;
-    result.color = float4(input.uv.x, input.uv.y, 1.0, 1.0);
+    result.color = float4(1.0, 1.0, 1.0, 1.0);
     result.uv = input.uv;
     
     // ワールド空間での法線ベクトル(近似値)
@@ -322,13 +322,13 @@ PSOutput PSMain(VSOutput input)
     geometry.viewDir = (float3)normalize(float4(0, 10, -30.5, 1) - input.wPos); // 視点への向きベクトル
     
     // 物体の表面情報(金属度・粗さ・アルベド)
-    float metallic = 0.2;
-    float roughness = 0.1;
+    float metallic = g_metallic_map.Sample(g_sampler, input.uv).r;
+    float roughness = g_roughness_map.Sample(g_sampler, input.uv).r;
     float3 albedo = (float3) g_albedo_map.Sample(g_sampler, input.uv);
 
     // 物体の材質
     Material material;
-    material.diffuseColor = lerp(albedo, (float3) 0, metallic);     // 拡散反射光の割合
+    material.diffuseColor = lerp(albedo, (float3)0, metallic);     // 拡散反射光の割合
     material.specularColor = lerp((float3)0.04, albedo, metallic);  // 鏡面反射光の割合
     material.specularRoughness = roughness;                         // 表面の粗さ
 
