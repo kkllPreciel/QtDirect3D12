@@ -340,7 +340,7 @@ PSOutput PSMain(VSOutput input)
     DirectionalLight directionalLight;
 
     // ï¿çsåıåπ
-    directionalLight.direction = float3(-0.5, -0.5, 0);
+    directionalLight.direction = float3(0, 1, 0);
     directionalLight.color = float3(1, 1, 1);
     getDirectionalDirectLightIrradiance(directionalLight, geometry, directLight);
     RE_Direct(directLight, geometry, material, reflectedLight);
