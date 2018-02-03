@@ -77,7 +77,7 @@ QtDirect3D12::QtDirect3D12(QWidget *parent)
   }
 
   // ƒƒ^ƒŠƒbƒN(‹à‘®«)
-  if (image.load("../Resources/Texture/marble-speckled-metalness"))
+  if (image.load("../Resources/Texture/marble-speckled-metalness.png"))
   {
     auto format = image.format();
     auto bytesPerLine = image.bytesPerLine();
