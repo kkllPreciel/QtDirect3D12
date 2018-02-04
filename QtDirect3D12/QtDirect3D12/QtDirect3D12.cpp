@@ -113,6 +113,9 @@ QtDirect3D12::QtDirect3D12(QWidget *parent)
   camera_->AddComponent<App::actor::CameraComponent>()->SetLookAt({ 0.0f, 10.0f, 0.0f });
   camera_->SetPosition({ 0.0f, 10.0f, -30.5f });
 
+  // プリミティブタイプの設定
+  topology_ = D3D12_PRIMITIVE_TOPOLOGY::D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
+
   // メインループ呼び出し設定
   connect(timer.get(), SIGNAL(timeout()), this, SLOT(mainLoop()));
   timer->start(1000 / 60);
@@ -183,7 +186,7 @@ void QtDirect3D12::mainLoop()
   }
 
   device->BeginScene();
-  device->SetPrimitiveTopology(D3D12_PRIMITIVE_TOPOLOGY::D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+  device->SetPrimitiveTopology(topology_);
   device->SetVertexBuffers(0, 1, &(vertexBuffer->GetView()));
   device->SetIndexBuffer(&(indexBuffer->GetView()));
   device->Render(index_count, 1);
@@ -349,4 +352,19 @@ void QtDirect3D12::wheelEvent(QWheelEvent* event)
   // 2.座標更新
   // 3.描画にする
   // DirectX::XMStoreFloat3(&eye_, eye);
+}
+
+void QtDirect3D12::keyPressEvent(QKeyEvent* event)
+{
+  if (event->key() == Qt::Key::Key_Shift)
+  {
+    if (topology_ == D3D12_PRIMITIVE_TOPOLOGY::D3D10_PRIMITIVE_TOPOLOGY_POINTLIST)
+    {
+      topology_ = D3D12_PRIMITIVE_TOPOLOGY::D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
+    }
+    else
+    {
+      topology_ = D3D12_PRIMITIVE_TOPOLOGY::D3D10_PRIMITIVE_TOPOLOGY_POINTLIST;
+    }
+  }
 }

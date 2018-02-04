@@ -2,6 +2,7 @@
 
 #include <memory>
 #include <QtWidgets/QWidget>
+#include <d3d12.h>
 #include <DirectXMath.h>
 #include "ui_QtDirect3D12.h"
 #include "./Loader/model.h"
@@ -30,6 +31,7 @@ protected:
   void dragEnterEvent(QDragEnterEvent *event) Q_DECL_FINAL;
   void dropEvent(QDropEvent *event) Q_DECL_FINAL;
   void wheelEvent(QWheelEvent *event) Q_DECL_FINAL;
+  void keyPressEvent(QKeyEvent *event) Q_DECL_FINAL;
 
 private Q_SLOTS:
   void mainLoop();
@@ -42,6 +44,7 @@ private:
   std::unique_ptr<Sein::Direct3D12::IndexBuffer> indexBuffer;
   std::unique_ptr<App::IModel> model_;        ///< モデルインターフェイス
   std::unique_ptr<App::actor::Actor> camera_; ///< カメラアクター
+  D3D12_PRIMITIVE_TOPOLOGY topology_;         ///< プリミティブのタイプ
 
   /**
    *  @brief  定数バッファ用構造体
