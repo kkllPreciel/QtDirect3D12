@@ -183,8 +183,10 @@ void QtDirect3D12::mainLoop()
   }
 
   device->BeginScene();
-  //device->Render(*vertexBuffer, *indexBuffer, instanceBufferData.size());
-  device->Render(*vertexBuffer, *indexBuffer, index_count, 1);
+  device->SetPrimitiveTopology(D3D12_PRIMITIVE_TOPOLOGY::D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+  device->SetVertexBuffers(0, 1, &(vertexBuffer->GetView()));
+  device->SetIndexBuffer(&(indexBuffer->GetView()));
+  device->Render(index_count, 1);
   device->EndScene();
   device->Present();
 }
