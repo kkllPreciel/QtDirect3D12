@@ -113,6 +113,14 @@ QtDirect3D12::QtDirect3D12(QWidget *parent)
   camera_->AddComponent<App::actor::CameraComponent>()->SetLookAt({ 0.0f, 10.0f, 0.0f });
   camera_->SetPosition({ 0.0f, 10.0f, -30.5f });
 
+  // 移動用コンポーネントを作成
+  auto component = camera_->AddComponent<App::actor::CameraMoveComponent>();
+  component->Create();
+  component->SetTime(1);
+  component->SetVelocity(1.0f);
+  component->SetCoefficient(0.5f);
+  component->SetDistance(1.0f);
+
   // プリミティブタイプの設定
   topology_ = D3D12_PRIMITIVE_TOPOLOGY::D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
 
@@ -305,44 +313,14 @@ void QtDirect3D12::dropEvent(QDropEvent* event)
 
 void QtDirect3D12::wheelEvent(QWheelEvent* event)
 {
-  constexpr auto value = 1.0f;
+  // 注視点との距離
 
   QPoint degrees = event->angleDelta() / 8;
-
-  // 視点から注視点へのベクトルを作成
-  DirectX::XMVECTOR eye = camera_->GetPosition();
-  DirectX::XMVECTOR at = camera_->GetComponent<App::actor::CameraComponent>()->GetLookAt();
-  DirectX::XMVECTOR dir = DirectX::XMVectorSubtract(at, eye);
-  
-  // 視点から注視点への距離を取得
-  float distance = 0.0f;
-  DirectX::XMStoreFloat(&distance, DirectX::XMVector3Length(dir));
-
-  // 距離が離れている場合は移動量に補正を行う
-  const auto move = value * (std::fabsf(distance) * 0.5);
-
   const auto force = degrees.y() / std::abs(degrees.y());
-  DirectX::XMVECTOR target = DirectX::XMVectorAdd(eye, DirectX::XMVectorScale(DirectX::XMVector3Normalize(dir), force * move));
 
-  // 注視点との距離が一定以下なら近づけないようにする
-  dir = DirectX::XMVectorSubtract(at, target);
-  distance = 0.0f;
-  DirectX::XMStoreFloat(&distance, DirectX::XMVector3Length(dir));
-  if (distance < 1.0f)
-  {
-    return;
-  }
-
-  decltype(auto) component = camera_->GetComponent<App::actor::CameraMoveComponent>();
-  if (component == nullptr)
-  {
-    component = camera_->AddComponent<App::actor::CameraMoveComponent>();
-  }
-  
-  component->SetBeginPosition(eye);
-  component->SetEndPosition(target);
-  component->SetTime(1);
-  component->Create();
+  // カメラ移動イベントを発火する
+  auto component = camera_->GetComponent<App::actor::CameraMoveComponent>();
+  component->Ignition(force);
 
   // TODO:滑らかに移動するようにする(ジョブに登録して移動させる?)
   // 現在の視点と移動先の視点を線形補間で指定時間で移動を行うようにする
@@ -351,7 +329,6 @@ void QtDirect3D12::wheelEvent(QWheelEvent* event)
   // 1.ファイル読み込み(非同期ジョブ)
   // 2.座標更新
   // 3.描画にする
-  // DirectX::XMStoreFloat3(&eye_, eye);
 }
 
 void QtDirect3D12::keyPressEvent(QKeyEvent* event)

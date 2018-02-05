@@ -74,22 +74,34 @@ namespace App
       virtual void Destroy() override;
 
       /**
+       *  @brief  発火する
+       *  @param  direction:方向
+       */
+      void Ignition(const float direction);
+
+      /**
        *  @brief  更新処理を行う
        *  @param  delta_time:1フレームの経過時間
        */
       void Update(std::uint64_t delta_time);
 
       /**
-       *  @brief  初期座標を設定する
-       *  @param  begin_position:初期座標
+       *  @brief  移動速度を設定する
+       *  @param  velocity:移動速度
        */
-      void SetBeginPosition(DirectX::XMVECTOR begin_position);
+      void SetVelocity(const float velocity);
 
       /**
-       *  @brief  目標座標を設定する
-       *  @param  end_position:目標座標
+       *  @brief  移動係数を設定する
+       *  @param  coefficient:移動係数
        */
-      void SetEndPosition(DirectX::XMVECTOR end_position);
+      void SetCoefficient(const float coefficient);
+
+      /**
+       *  @brief  注視点との最低距離を設定する
+       *  @param  distance:注視点との最低距離
+       */
+      void SetDistance(const float distance);
 
       /**
        *  @brief  移動に必要な時間を設定する
@@ -98,6 +110,9 @@ namespace App
       void SetTime(std::uint64_t time);
 
     private:
+      float velocity_;                        ///< 移動速度
+      float coefficient_;                     ///< 移動係数
+      float distance_;                        ///< 注視点との最低距離
       DirectX::XMVECTOR begin_position_;      ///< 初期座標
       DirectX::XMVECTOR end_position_;        ///< 目標座標
       std::uint64_t time_;                    ///< 移動に必要な時間
