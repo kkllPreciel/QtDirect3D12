@@ -80,6 +80,7 @@
     <ClCompile Include="actor\component.cc" />
     <ClCompile Include="actor\level.cc" />
     <ClCompile Include="actor\move_component.cc" />
+    <ClCompile Include="actor\viewer_level.cc" />
     <ClCompile Include="GeneratedFiles\Debug\moc_QtDirect3D12.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
@@ -132,6 +133,7 @@
     <ClInclude Include="actor\component.h" />
     <ClInclude Include="actor\level.h" />
     <ClInclude Include="actor\move_component.h" />
+    <ClInclude Include="actor\viewer_level.h" />
     <ClInclude Include="GeneratedFiles\ui_QtDirect3D12.h" />
     <ClInclude Include="job_system\async_job.h" />
     <ClInclude Include="job_system\async_job_manager.h" />
