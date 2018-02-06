@@ -10,12 +10,9 @@
 
  // include
 #include <cstdint>
-#include <d3d12.h>
-#include <Sein\Direct3D12\vertex_buffer.h>
-#include <Sein\Direct3D12\index_buffer.h>
 #include "job_system/job.h"
 #include "job_system/async_job.h"
-#include "actor/actor.h"
+#include "Loader/model.h"
 
 namespace App
 {
@@ -77,7 +74,7 @@ namespace App
        *  @brief  読み込み終了イベントを登録する
        *  @param  callback:読み込み終了時に実行する関数
        */
-      void RegisterLoadedEvent(std::function<void()> callback);
+      void RegisterLoadedEvent(std::function<void(App::IModel*)> callback);
 
     private:
       /**
@@ -90,7 +87,7 @@ namespace App
       job_system::AsyncJob async_job_;                ///< 非同期処理用ジョブ
       bool initialized_ = false;                      ///< 初期化終了フラグ
       std::string file_path_;                         ///< モデルファイルパス
-      std::function<void()> function_;                ///< 関数へのポインタ
+      std::function<void(App::IModel*)> function_;    ///< 関数へのポインタ
     };
   };
 };

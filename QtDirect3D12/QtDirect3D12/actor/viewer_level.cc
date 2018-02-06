@@ -10,6 +10,7 @@
 #include "actor/viewer_level.h"
 #include "job_system/job_scheduler.h"
 #include "job_system/async_job_manager.h"
+#include "Loader/obj_loader.h"
 
 namespace App
 {
@@ -68,8 +69,10 @@ namespace App
     {
       Destroy();
 
-      job_.SetFunction([&](std::uint64_t delta_time) { this->Execute(delta_time); });
-      job_system::JobScheduler::GetInstance()->Register(&job_, job_system::JobScheduler::kMoveUpdate);
+      file_path_ = file_path;
+
+      // job_.SetFunction([&](std::uint64_t delta_time) { this->Execute(delta_time); });
+      // job_system::JobScheduler::GetInstance()->Register(&job_, job_system::JobScheduler::kMoveUpdate);
 
       // 非同期関数のジョブ登録
       async_job_.SetFunction([&]() { this->AsyncExecute(); });
@@ -80,7 +83,7 @@ namespace App
      *  @brief  読み込み終了イベントを登録する
      *  @param  callback:読み込み終了時に実行する関数
      */
-    void ViewerLevel::RegisterLoadedEvent(std::function<void()> callback)
+    void ViewerLevel::RegisterLoadedEvent(std::function<void(App::IModel*)> callback)
     {
       function_ = callback;
     }
@@ -91,6 +94,10 @@ namespace App
     void ViewerLevel::AsyncExecute()
     {
       // 非同期読み込み処理
+
+      auto loader = App::Loader::Obj::CreateLoader();
+      auto model = loader->Load(file_path_, nullptr);
+      function_(model.get());
     }
   };
 };

@@ -5,8 +5,8 @@
 #include <d3d12.h>
 #include <DirectXMath.h>
 #include "ui_QtDirect3D12.h"
-#include "./Loader/model.h"
 #include "actor/actor.h"
+#include "actor/viewer_level.h"
 
 namespace Sein {
   namespace Direct3D12 {
@@ -42,9 +42,11 @@ private:
   std::unique_ptr<Sein::Direct3D12::Device> device;
   std::unique_ptr<Sein::Direct3D12::VertexBuffer> vertexBuffer;
   std::unique_ptr<Sein::Direct3D12::IndexBuffer> indexBuffer;
-  std::unique_ptr<App::IModel> model_;        ///< モデルインターフェイス
-  std::unique_ptr<App::actor::Actor> camera_; ///< カメラアクター
-  D3D12_PRIMITIVE_TOPOLOGY topology_;         ///< プリミティブのタイプ
+  std::uint64_t index_count_;
+  std::unique_ptr<App::actor::Actor> camera_;       ///< カメラアクター
+  D3D12_PRIMITIVE_TOPOLOGY topology_;               ///< プリミティブのタイプ
+  std::unique_ptr<App::actor::ViewerLevel> level_;  ///< ビューア用レベル
+  bool is_loading = false;                          ///< 読み込み中フラグ
 
   /**
    *  @brief  定数バッファ用構造体
