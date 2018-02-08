@@ -10,6 +10,8 @@
 #include "actor/viewer_level.h"
 #include "job_system/job_scheduler.h"
 #include "job_system/async_job_manager.h"
+#include "actor/camera_component.h"
+#include "actor/camera_move_component.h"
 #include "Loader/obj_loader.h"
 
 namespace App
@@ -38,6 +40,18 @@ namespace App
      */
     bool ViewerLevel::Create()
     {
+      // アクターを生成する(TODO:設定ファイルから読み込む)
+      actors_[0].AddComponent<actor::CameraComponent>()->SetLookAt({ 0.0f, 10.0f, 0.0f });
+      actors_[0].SetPosition({ 0.0f, 10.0f, -30.5f });
+
+      // 移動用コンポーネントを作成
+      auto component = actors_[0].AddComponent<actor::CameraMoveComponent>();
+      component->Create();
+      component->SetTime(1);
+      component->SetVelocity(1.0f);
+      component->SetCoefficient(0.5f);
+      component->SetDistance(1.0f);
+
       return true;
     }
 
@@ -58,7 +72,10 @@ namespace App
      */
     void ViewerLevel::Destroy()
     {
-
+      for (auto& actor : actors_)
+      {
+        actor.Destroy();
+      }
     }
 
     /**
@@ -83,9 +100,37 @@ namespace App
      *  @brief  読み込み終了イベントを登録する
      *  @param  callback:読み込み終了時に実行する関数
      */
-    void ViewerLevel::RegisterLoadedEvent(std::function<void(App::IModel*)> callback)
+    void ViewerLevel::RegisterLoadedEvent(std::function<void(IModel*)> callback)
     {
       function_ = callback;
+    }
+
+    /**
+     *  @brief  ホイールイベントを発行する
+     *  @param  force:ホイールの回転方向
+     */
+    void ViewerLevel::DispatchWheelEvent(const std::float_t force)
+    {
+      // TODO:オブサーバーパターンを使用して実装する
+      actors_[0].GetComponent<actor::CameraMoveComponent>()->Ignition(force);
+    }
+
+    /**
+     *  @brief  カメラの座標を取得する
+     *  @return カメラの座標ベクトル
+     */
+    DirectX::XMVECTOR ViewerLevel::GetCameraPosition()
+    {
+      return actors_[0].GetPosition();
+    }
+    
+    /**
+     *  @brief  注視点の座標を取得する
+     *  @return 注視点の座標ベクトル
+     */
+    DirectX::XMVECTOR ViewerLevel::GetLookAt()
+    {
+      return actors_[0].GetComponent<actor::CameraComponent>()->GetLookAt();
     }
 
     /**

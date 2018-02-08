@@ -43,7 +43,6 @@ private:
   std::unique_ptr<Sein::Direct3D12::VertexBuffer> vertexBuffer;
   std::unique_ptr<Sein::Direct3D12::IndexBuffer> indexBuffer;
   std::uint64_t index_count_;
-  std::unique_ptr<App::actor::Actor> camera_;       ///< カメラアクター
   D3D12_PRIMITIVE_TOPOLOGY topology_;               ///< プリミティブのタイプ
   std::unique_ptr<App::actor::ViewerLevel> level_;  ///< ビューア用レベル
   bool is_loading = false;                          ///< 読み込み中フラグ

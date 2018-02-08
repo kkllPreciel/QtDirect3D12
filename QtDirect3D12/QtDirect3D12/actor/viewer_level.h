@@ -10,8 +10,10 @@
 
  // include
 #include <cstdint>
+#include <array>
 #include "job_system/job.h"
 #include "job_system/async_job.h"
+#include "actor/actor.h"
 #include "Loader/model.h"
 
 namespace App
@@ -74,7 +76,25 @@ namespace App
        *  @brief  読み込み終了イベントを登録する
        *  @param  callback:読み込み終了時に実行する関数
        */
-      void RegisterLoadedEvent(std::function<void(App::IModel*)> callback);
+      void RegisterLoadedEvent(std::function<void(IModel*)> callback);
+
+      /**
+       *  @brief  ホイールイベントを発行する
+       *  @param  force:ホイールの回転方向
+       */
+      void DispatchWheelEvent(const std::float_t force);
+
+      /**
+       *  @brief  カメラの座標を取得する
+       *  @return カメラの座標ベクトル
+       */
+      DirectX::XMVECTOR GetCameraPosition();
+
+      /**
+       *  @brief  注視点の座標を取得する
+       *  @return 注視点の座標ベクトル
+       */
+      DirectX::XMVECTOR GetLookAt();
 
     private:
       /**
@@ -83,11 +103,12 @@ namespace App
       void AsyncExecute();
 
     private:
+      std::array<actor::Actor, 10> actors_;           ///< アクターリスト
       job_system::Job job_;                           ///< 更新処理用ジョブ
       job_system::AsyncJob async_job_;                ///< 非同期処理用ジョブ
       bool initialized_ = false;                      ///< 初期化終了フラグ
       std::string file_path_;                         ///< モデルファイルパス
-      std::function<void(App::IModel*)> function_;    ///< 関数へのポインタ
+      std::function<void(IModel*)> function_;         ///< 関数へのポインタ
     };
   };
 };

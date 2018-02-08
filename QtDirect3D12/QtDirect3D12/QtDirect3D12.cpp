@@ -110,19 +110,6 @@ QtDirect3D12::QtDirect3D12(QWidget *parent)
     buffer.reset(nullptr);
   }
 
-  // 視点・注視点を初期化
-  camera_ = std::make_unique<App::actor::Actor>();
-  camera_->AddComponent<App::actor::CameraComponent>()->SetLookAt({ 0.0f, 10.0f, 0.0f });
-  camera_->SetPosition({ 0.0f, 10.0f, -30.5f });
-
-  // 移動用コンポーネントを作成
-  auto component = camera_->AddComponent<App::actor::CameraMoveComponent>();
-  component->Create();
-  component->SetTime(1);
-  component->SetVelocity(1.0f);
-  component->SetCoefficient(0.5f);
-  component->SetDistance(1.0f);
-
   // プリミティブタイプの設定
   topology_ = D3D12_PRIMITIVE_TOPOLOGY::D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
 
@@ -190,8 +177,8 @@ void QtDirect3D12::mainLoop()
     App::job_system::JobScheduler::GetInstance()->Execute(6);
 
     // ビュー行列を作成
-    DirectX::XMVECTOR eye = camera_->GetPosition();
-    DirectX::XMVECTOR at = camera_->GetComponent<App::actor::CameraComponent>()->GetLookAt();
+    DirectX::XMVECTOR eye = level_->GetCameraPosition();
+    DirectX::XMVECTOR at = level_->GetLookAt();
     DirectX::XMVECTORF32 up = { 0.0f, 1.0f, 0.0f, 0.0f };
     DirectX::XMStoreFloat4x4(&(constantBuffer.view), DirectX::XMMatrixLookAtLH(eye, at, up));
 
@@ -213,6 +200,7 @@ void QtDirect3D12::mainLoop()
 
 void QtDirect3D12::resizeEvent(QResizeEvent *event)
 {
+  // TODO:ウィンドウのリサイズに対応する
   QSize size = event->size();
 }
 
@@ -334,9 +322,8 @@ void QtDirect3D12::wheelEvent(QWheelEvent* event)
   QPoint degrees = event->angleDelta() / 8;
   const auto force = degrees.y() / std::abs(degrees.y());
 
-  // カメラ移動イベントを発火する
-  auto component = camera_->GetComponent<App::actor::CameraMoveComponent>();
-  component->Ignition(force);
+  // レベルにホイール回転イベントを通知する
+  level_->DispatchWheelEvent(force);
 
   // TODO:滑らかに移動するようにする(ジョブに登録して移動させる?)
   // 現在の視点と移動先の視点を線形補間で指定時間で移動を行うようにする
