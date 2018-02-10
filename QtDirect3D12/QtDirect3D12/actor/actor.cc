@@ -9,6 +9,7 @@
  // include
 #include "actor/actor.h"
 #include <cassert>
+#include "actor/component.h"
 #include "job_system/job.h"
 
 namespace App
@@ -28,10 +29,7 @@ namespace App
      */
     Actor::~Actor()
     {
-      for (decltype(auto) component : components_)
-      {
-        delete component.second;
-      }
+      Destroy();
     }
     
     /**
@@ -48,7 +46,13 @@ namespace App
      */
     void Actor::Destroy()
     {
+      for (decltype(auto) component : components_)
+      {
+        component.second->Destroy();
+        delete component.second;
+      }
 
+      components_.clear();
     }
     
     /**
