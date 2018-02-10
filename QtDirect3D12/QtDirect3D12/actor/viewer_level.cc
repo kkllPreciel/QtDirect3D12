@@ -10,6 +10,7 @@
 #include "actor/viewer_level.h"
 #include "job_system/job_scheduler.h"
 #include "job_system/async_job_manager.h"
+#include "actor/model_move_component.h"
 #include "actor/camera_component.h"
 #include "actor/camera_move_component.h"
 #include "Loader/obj_loader.h"
@@ -51,6 +52,14 @@ namespace App
       component->SetVelocity(1.0f);
       component->SetCoefficient(0.5f);
       component->SetDistance(1.0f);
+
+      // モデル用アクターを生成する
+      actors_[1].SetPosition({ 0.0f, 10.0f, 0.0f });
+
+      // モデル用アクター移動用コンポーネントを作成
+      decltype(auto) model_component = actors_[1].AddComponent<actor::ModelMoveComponent>();
+      model_component->SetRotationAngle(DirectX::XM_PI / 180.0f);
+      model_component->Create();
 
       return true;
     }
@@ -131,6 +140,15 @@ namespace App
     DirectX::XMVECTOR ViewerLevel::GetLookAt()
     {
       return actors_[0].GetComponent<actor::CameraComponent>()->GetLookAt();
+    }
+
+    /**
+     *  @brief  モデルのクォータニオンを取得する
+     *  @return モデルのクォータニオン
+     */
+    DirectX::XMVECTOR ViewerLevel::GetModelQuaternion()
+    {
+      return actors_[1].GetRotation();
     }
 
     /**

@@ -96,6 +96,12 @@ namespace App
        */
       DirectX::XMVECTOR GetLookAt();
 
+      /**
+       *  @brief  モデルのクォータニオンを取得する
+       *  @return モデルのクォータニオン
+       */
+      DirectX::XMVECTOR GetModelQuaternion();
+
     private:
       /**
        *  @brief  非同期実行処理関数

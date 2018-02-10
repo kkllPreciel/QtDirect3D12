@@ -39,6 +39,14 @@ namespace App
     {
       Destroy();
 
+      // ƒWƒ‡ƒu‚É“o˜^‚·‚é
+      job_ = std::make_unique<job_system::Job>();
+
+      job_->SetFunction([&](std::uint64_t delta_time) {
+        this->Update(delta_time);
+      });
+      job_system::JobScheduler::GetInstance()->Register(job_.get(), job_system::JobScheduler::kMoveUpdate);
+
       return true;
     }
 

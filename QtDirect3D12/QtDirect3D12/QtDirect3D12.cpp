@@ -164,14 +164,8 @@ void QtDirect3D12::mainLoop()
 
   // 定数バッファを更新
   {
-    static float now = 0.0f;
-    static float angle = DirectX::XM_PI / 180.0f;
-
-    // 回転
-    now += angle;
-
     // ワールド行列を更新
-    DirectX::XMStoreFloat4x4(&(constantBuffer.world), DirectX::XMMatrixRotationY(now));
+    DirectX::XMStoreFloat4x4(&(constantBuffer.world), DirectX::XMMatrixRotationQuaternion(level_->GetModelQuaternion()));
 
     // ジョブ実行
     App::job_system::JobScheduler::GetInstance()->Execute(6);
