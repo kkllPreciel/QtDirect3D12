@@ -88,13 +88,11 @@ namespace App
       // 各コンテナのジョブを実行
       for (decltype(auto) container : containers_)
       {
-        auto job = container.Pop();
-        if (job == nullptr)
+        Job* job = nullptr;
+        while ((job = container.Pop()) != nullptr)
         {
-          continue;
+          job->Execute(delta_time);
         }
-
-        job->Execute(delta_time);
       }
     }
   };
