@@ -99,7 +99,7 @@
     <ClCompile Include="job_system\job.cc" />
     <ClCompile Include="job_system\job_container.cc" />
     <ClCompile Include="job_system\job_scheduler.cc" />
-    <ClCompile Include="Loader\obj_loader.cc" />
+    <ClCompile Include="loader\obj_model_loader.cc" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="QtDirect3D12.cpp" />
   </ItemGroup>
@@ -142,10 +142,7 @@
     <ClInclude Include="job_system\job.h" />
     <ClInclude Include="job_system\job_container.h" />
     <ClInclude Include="job_system\job_scheduler.h" />
-    <ClInclude Include="Loader\loader.h" />
-    <ClInclude Include="Loader\loader_factory.h" />
-    <ClInclude Include="Loader\model.h" />
-    <ClInclude Include="Loader\obj_loader.h" />
+    <ClInclude Include="loader\model.h" />
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="QtDirect3D12.qrc">

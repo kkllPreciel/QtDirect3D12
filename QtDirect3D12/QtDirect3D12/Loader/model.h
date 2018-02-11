@@ -11,6 +11,7 @@
  // include
 #include <cstdint>
 #include <vector>
+#include <memory>
 #include <DirectXMath.h>
 
 namespace App
@@ -108,5 +109,12 @@ namespace App
      *  @brief  データを開放する
      */
     virtual void Release() = 0;
+
+    /**
+     *  @brief  OBJフォーマットファイルからモデルデータを作成する
+     *  @param  file_path:読み込みを行うファイルのパス
+     *  @return モデルインターフェイスへのポインタ
+     */
+    static std::unique_ptr<IModel> CreateFromObj(const std::string& file_path);
   };
 };

@@ -13,7 +13,6 @@
 #include "actor/model_move_component.h"
 #include "actor/camera_component.h"
 #include "actor/camera_move_component.h"
-#include "Loader/obj_loader.h"
 
 namespace App
 {
@@ -93,8 +92,6 @@ namespace App
      */
     void ViewerLevel::LoadModel(std::string file_path)
     {
-      Destroy();
-
       file_path_ = file_path;
 
       // job_.SetFunction([&](std::uint64_t delta_time) { this->Execute(delta_time); });
@@ -158,8 +155,7 @@ namespace App
     {
       // ”ñ“¯Šú“Ç‚Ýž‚Ýˆ—
 
-      auto loader = App::Loader::Obj::CreateLoader();
-      auto model = loader->Load(file_path_, nullptr);
+      auto model = App::IModel::CreateFromObj(file_path_);
       function_(model.get());
     }
   };

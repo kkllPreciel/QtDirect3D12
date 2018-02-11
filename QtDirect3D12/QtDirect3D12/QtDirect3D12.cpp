@@ -12,7 +12,6 @@
 #include <qimage.h>
 #include <qmimedata.h>
 #include <qprogressdialog.h>
-#include "./Loader/obj_loader.h"
 #include <unordered_map>
 #include <boost/range/adaptor/indexed.hpp>
 #include "actor/camera_move_component.h"

@@ -55,9 +55,6 @@
     <ClCompile Include="GeneratedFiles\qrc_QtDirect3D12.cpp">
       <Filter>Generated Files</Filter>
     </ClCompile>
-    <ClCompile Include="Loader\obj_loader.cc">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="job_system\job.cc">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -97,6 +94,9 @@
     <ClCompile Include="actor\model_move_component.cc">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="loader\obj_model_loader.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="QtDirect3D12.h">
@@ -112,18 +112,6 @@
   <ItemGroup>
     <ClInclude Include="GeneratedFiles\ui_QtDirect3D12.h">
       <Filter>Generated Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Loader\loader.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Loader\loader_factory.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Loader\model.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Loader\obj_loader.h">
-      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="job_system\job.h">
       <Filter>Header Files</Filter>
@@ -162,6 +150,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="actor\model_move_component.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="loader\model.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
