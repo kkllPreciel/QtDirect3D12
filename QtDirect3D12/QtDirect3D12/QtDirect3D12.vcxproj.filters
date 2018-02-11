@@ -94,7 +94,7 @@
     <ClCompile Include="actor\model_move_component.cc">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="loader\obj_model_loader.cc">
+    <ClCompile Include="model\obj_model_loader.cc">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -152,7 +152,7 @@
     <ClInclude Include="actor\model_move_component.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="loader\model.h">
+    <ClInclude Include="model\model.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

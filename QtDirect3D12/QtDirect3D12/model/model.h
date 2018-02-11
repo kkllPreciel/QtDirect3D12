@@ -22,6 +22,17 @@ namespace App
   class IModel
   {
   public:
+    // アラインメントを1バイトに設定
+#pragma pack(push, 1)
+    struct Vertex
+    {
+      DirectX::XMFLOAT3 position; ///< 座標
+      DirectX::XMFLOAT3 normal;   ///< 法線ベクトル
+      DirectX::XMFLOAT2 texcoord; ///< テクスチャUV座標
+    };
+#pragma pack(pop)
+
+  public:
     /**
      *  @brief  デストラクタ
      */
@@ -70,16 +81,16 @@ namespace App
     virtual uint32_t GetPolygonCount() const = 0;
 
     /**
-     *  @brief  頂点インデックスデータを取得する
-     *  @return 頂点インデックスデータのリスト
+     *  @brief  頂点座標インデックスデータを取得する
+     *  @return 頂点座標インデックスデータのリスト
      */
-    virtual const std::vector<uint32_t>& GetIndices() const = 0;
+    virtual const std::vector<uint32_t>& GetControlPointIndices() const = 0;
 
     /**
-     *  @brief  頂点インデックス数を取得する
-     *  @return 頂点インデックス数
+     *  @brief  頂点座標インデックス数を取得する
+     *  @return 頂点座標インデックス数
      */
-    virtual uint32_t GetIndexCount() const = 0;
+    virtual uint32_t GetControlPointIndexCount() const = 0;
 
     /**
      *  @brief  頂点法線ベクトルインデックスリストを取得する

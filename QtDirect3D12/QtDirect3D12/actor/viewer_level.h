@@ -14,7 +14,7 @@
 #include "job_system/job.h"
 #include "job_system/async_job.h"
 #include "actor/actor.h"
-#include "loader/model.h"
+#include "model/model.h"
 
 namespace App
 {

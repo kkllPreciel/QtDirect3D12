@@ -7,7 +7,7 @@
  */
 
  // include
-#include "loader/model.h"
+#include "model/model.h"
 #include <fstream>
 #include <sstream>
 #include <map>
@@ -163,21 +163,21 @@ namespace App
       {
         return polygon_count_;
       }
-    
+
       /**
-       *  @brief  頂点インデックスデータを取得する
-       *  @return 頂点インデックスデータのリスト
+       *  @brief  頂点座標インデックスデータを取得する
+       *  @return 頂点座標インデックスデータのリスト
        */
-      const std::vector<uint32_t>& GetIndices() const override
+      const std::vector<uint32_t>& GetControlPointIndices() const override
       {
         return point_indices_;
       }
-    
+      
       /**
-       *  @brief  頂点インデックス数を取得する
-       *  @return 頂点インデックス数
+       *  @brief  頂点座標インデックス数を取得する
+       *  @return 頂点座標インデックス数
        */
-      uint32_t GetIndexCount() const override
+      uint32_t GetControlPointIndexCount() const override
       {
         return static_cast<uint32_t>(point_indices_.size());
       }

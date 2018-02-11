@@ -243,7 +243,7 @@ void QtDirect3D12::dropEvent(QDropEvent* event)
     const auto points = model->GetControlPoints();
     const auto normals = model->GetNormals();
     const auto tex_coords = model->GetTextureCoords();
-    const auto point_indices = model->GetIndices();
+    const auto point_indices = model->GetControlPointIndices();
     const auto normal_indices = model->GetNormalIndices();
     const auto tex_coords_indices = model->GetTextureCoordIndices();
 
