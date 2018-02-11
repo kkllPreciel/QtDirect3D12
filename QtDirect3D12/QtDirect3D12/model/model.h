@@ -39,6 +39,24 @@ namespace App
     virtual ~IModel() {};
 
     /**
+     *  @brief  頂点リストを取得する
+     *  @return 頂点のリスト
+     */
+    virtual const std::vector<Vertex>& GetVertices() const = 0;
+
+    /**
+     *  @brief  頂点インデックスリストを取得する
+     *  @return 頂点インデックスのリスト
+     */
+    virtual const std::vector<uint32_t>& GetIndices() const = 0;
+
+    /**
+     *  @brief  ポリゴン数を取得する
+     *  @return ポリゴン数
+     */
+    virtual uint32_t GetPolygonCount() const = 0;
+
+    /**
      *  @brief  頂点座標リストを取得する
      *  @return 頂点座標のリスト
      */
@@ -73,12 +91,6 @@ namespace App
      *  @return テクスチャ座標数
      */
     virtual uint32_t GetTextureCoordCount() const = 0;
-
-    /**
-     *  @brief  ポリゴン数を取得する
-     *  @return ポリゴン数
-     */
-    virtual uint32_t GetPolygonCount() const = 0;
 
     /**
      *  @brief  頂点座標インデックスデータを取得する

@@ -61,8 +61,9 @@ namespace App
       /**
        *  @brief  コンストラクタ
        */
-      Model() : points_(0), normals_(0), texture_coords_(0),
-        polygon_count_(0), point_indices_(0), normal_indices_(0), texture_coord_indices_(0)
+      Model() : vertices_(0), indices_(0), polygon_count_(0),
+        points_(0), normals_(0), texture_coords_(0),
+        point_indices_(0), normal_indices_(0), texture_coord_indices_(0)
       {
     
       }
@@ -100,6 +101,33 @@ namespace App
        *  @return ムーブ代入後のインスタンス
        */
       Model& operator = (Model&& other) = delete;
+
+      /**
+       *  @brief  頂点リストを取得する
+       *  @return 頂点のリスト
+       */
+      const std::vector<Vertex>& GetVertices() const override
+      {
+        return vertices_;
+      }
+      
+      /**
+       *  @brief  頂点インデックスリストを取得する
+       *  @return 頂点インデックスのリスト
+       */
+      const std::vector<uint32_t>& GetIndices() const override
+      {
+        return indices_;
+      }
+      
+      /**
+       *  @brief  ポリゴン数を取得する
+       *  @return ポリゴン数
+       */
+      uint32_t GetPolygonCount() const override
+      {
+        return polygon_count_;
+      }
     
       /**
        *  @brief  頂点座標リストを取得する
@@ -153,15 +181,6 @@ namespace App
       uint32_t GetTextureCoordCount() const override
       {
         return static_cast<uint32_t>(texture_coords_.size());
-      }
-    
-      /**
-       *  @brief  ポリゴン数を取得する
-       *  @return ポリゴン数
-       */
-      uint32_t GetPolygonCount() const override
-      {
-        return polygon_count_;
       }
 
       /**
@@ -223,14 +242,45 @@ namespace App
        */
       void Release() override
       {
+        vertices_.clear();
+        indices_.clear();
+        polygon_count_ = 0;
+        
         points_.clear();
         normals_.clear();
         texture_coords_.clear();
-    
-        polygon_count_ = 0;
         point_indices_.clear();
         normal_indices_.clear();
         texture_coord_indices_.clear();
+      }
+
+      /**
+       *  @brief  頂点を追加する
+       *  @param  vertex:追加する頂点
+       */
+      void AddVertex(const Vertex& vertex)
+      {
+        vertices_.emplace_back(vertex);
+      }
+
+      /**
+       *  @brief  頂点インデックスを追加する
+       *  @param  indices:追加する頂点インデックスのポリゴン単位でのリスト
+       */
+      void AddIndex(const std::vector<uint32_t>& polygon_indices)
+      {
+        for (auto index : polygon_indices)
+        {
+          indices_.emplace_back(index);
+        }
+      }
+
+      /**
+       *  @brief  ポリゴンを追加する
+       */
+      void AddPolygon()
+      {
+        ++polygon_count_;
       }
     
       /**
@@ -240,14 +290,6 @@ namespace App
       void AddControlPoint(const DirectX::XMFLOAT3& point)
       {
         points_.emplace_back(point);
-      }
-    
-      /**
-       *  @brief  ポリゴンを追加する
-       */
-      void AddPolygon()
-      {
-        ++polygon_count_;
       }
     
       /**
@@ -305,12 +347,14 @@ namespace App
       }
     
     private:
+      std::vector<Vertex> vertices_;                  ///< 頂点リスト
+      std::vector<uint32_t> indices_;                 ///< インデックスリスト
+      uint32_t polygon_count_;                        ///< ポリゴン数
+
       std::vector<DirectX::XMFLOAT3> points_;         ///< 座標リスト
       std::vector<DirectX::XMFLOAT3> normals_;        ///< 法線ベクトルリスト
       std::vector<DirectX::XMFLOAT2> texture_coords_; ///< テクスチャ座標リスト
-    
-      uint32_t polygon_count_;                        ///< ポリゴン数
-      std::vector<uint32_t> point_indices_;           ///< 頂点インデックスリスト
+      std::vector<uint32_t> point_indices_;           ///< 頂点座標インデックスリスト
       std::vector<uint32_t> normal_indices_;          ///< 頂点法線ベクトルインデックスリスト
       std::vector<uint32_t> texture_coord_indices_;   ///< 頂点テクスチャ座標インデックスリスト
     };
@@ -443,6 +487,8 @@ namespace App
         break;
       }
     }
+
+    // TODO:頂点を生成する
 
     return model;
   }
