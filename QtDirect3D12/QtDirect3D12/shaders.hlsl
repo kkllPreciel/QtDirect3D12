@@ -324,7 +324,7 @@ PSOutput PSMain(VSOutput input)
     // 物体の表面情報(金属度・粗さ・アルベド)
     float metallic = g_metallic_map.Sample(g_sampler, input.uv).r;
     float roughness = g_roughness_map.Sample(g_sampler, input.uv).r;
-    float3 albedo = (float3) g_albedo_map.Sample(g_sampler, input.uv);
+    float3 albedo = (float3) g_albedo_map.Sample(g_sampler, input.uv);  // TODO:ガンマ補正を行う
 
     // 物体の材質
     Material material;
