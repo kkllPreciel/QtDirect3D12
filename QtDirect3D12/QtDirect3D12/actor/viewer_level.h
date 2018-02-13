@@ -11,6 +11,7 @@
  // include
 #include <cstdint>
 #include <array>
+#include <Sein/Direct3D12/direct3d12_device.h>
 #include "job_system/job.h"
 #include "job_system/async_job.h"
 #include "actor/actor.h"
@@ -102,6 +103,18 @@ namespace App
        */
       DirectX::XMVECTOR GetModelQuaternion();
 
+      /**
+       *  @brief  デバイスを設定する
+       *  @param  device:デバイス
+       */
+      void SetDevice(std::unique_ptr<Sein::Direct3D12::Device> device);
+
+      /**
+       *  @brief  デバイスを取得する
+       *  @return デバイス
+       */
+      Sein::Direct3D12::Device& GetDevice();
+
     private:
       /**
        *  @brief  非同期実行処理関数
@@ -109,12 +122,13 @@ namespace App
       void AsyncExecute();
 
     private:
-      std::array<actor::Actor, 10> actors_;           ///< アクターリスト
-      job_system::Job job_;                           ///< 更新処理用ジョブ
-      job_system::AsyncJob async_job_;                ///< 非同期処理用ジョブ
-      bool initialized_ = false;                      ///< 初期化終了フラグ
-      std::string file_path_;                         ///< モデルファイルパス
-      std::function<void(IModel*)> function_;         ///< 関数へのポインタ
+      std::unique_ptr<Sein::Direct3D12::Device> device_;  ///< デバイス
+      std::array<actor::Actor, 10> actors_;               ///< アクターリスト
+      job_system::Job job_;                               ///< 更新処理用ジョブ
+      job_system::AsyncJob async_job_;                    ///< 非同期処理用ジョブ
+      bool initialized_ = false;                          ///< 初期化終了フラグ
+      std::string file_path_;                             ///< モデルファイルパス
+      std::function<void(IModel*)> function_;             ///< 関数へのポインタ
     };
   };
 };

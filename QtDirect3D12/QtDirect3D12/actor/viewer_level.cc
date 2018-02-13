@@ -149,6 +149,25 @@ namespace App
     }
 
     /**
+     *  @brief  デバイスを設定する
+     *  @param  device:デバイス
+     */
+    void ViewerLevel::SetDevice(std::unique_ptr<Sein::Direct3D12::Device> device)
+    {
+      device_.reset(nullptr);
+      device_ = std::move(device);
+    }
+
+    /**
+     *  @brief  デバイスを取得する
+     *  @return デバイス
+     */
+    Sein::Direct3D12::Device& ViewerLevel::GetDevice()
+    {
+      return *device_;
+    }
+
+    /**
      *  @brief  非同期実行処理関数
      */
     void ViewerLevel::AsyncExecute()

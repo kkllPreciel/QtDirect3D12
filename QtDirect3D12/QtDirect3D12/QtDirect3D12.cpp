@@ -2,7 +2,6 @@
 #include <qevent.h>
 #include <qtimer.h>
 #include <qdatetime.h>
-#include <Sein\Direct3D12\direct3d12_device.h>
 #include <Sein\Direct3D12\vertex_buffer.h>
 #include <Sein\Direct3D12\index_buffer.h>
 #include <Sein\Direct3D12\constant_buffer.h>
@@ -20,7 +19,6 @@
 QtDirect3D12::QtDirect3D12(QWidget *parent)
   : QWidget(parent),
   timer(std::make_unique<QTimer>()),
-  device(std::make_unique<Sein::Direct3D12::Device>()),
   vertexBuffer(std::make_unique<Sein::Direct3D12::VertexBuffer>()),
   indexBuffer(std::make_unique<Sein::Direct3D12::IndexBuffer>()),
   constantBufferView(nullptr),
@@ -31,9 +29,12 @@ QtDirect3D12::QtDirect3D12(QWidget *parent)
   // ドロップを許可する
   setAcceptDrops(true);
 
+  // デバイスの作成
   // DirectX12のラッパーを作成
   // TODO:reinterpret_castを削除する
-  device->Create(reinterpret_cast<HWND>(this->winId()), this->width(), this->height());
+  auto device = std::make_unique<Sein::Direct3D12::Device>();
+  device->Create(reinterpret_cast<HWND>(this->winId()), this->width(), this->height());  
+
   Sein::Pmx::Loader loader;
   loader.Load("../Resources/Pmx/YYB式桜ミクv1.00.pmx");
   vertexBuffer->Create(&(device->GetDevice()), loader.GetVertexSize() * loader.GetVertexCount(), loader.GetVertexSize(), loader.GetVertices());
@@ -115,6 +116,7 @@ QtDirect3D12::QtDirect3D12(QWidget *parent)
 
   // レベルの作成
   level_ = std::make_unique<App::actor::ViewerLevel>();
+  level_->SetDevice(std::move(device));
   level_->Create();
 
   is_loading = false;
@@ -180,13 +182,14 @@ void QtDirect3D12::mainLoop()
     constantBufferView->Map(&constantBuffer, sizeof(ConstantBufferType));
   }
 
-  device->BeginScene();
-  device->SetPrimitiveTopology(topology_);
-  device->SetVertexBuffers(0, 1, &(vertexBuffer->GetView()));
-  device->SetIndexBuffer(&(indexBuffer->GetView()));
-  device->Render(index_count_, 1);
-  device->EndScene();
-  device->Present();
+  decltype(auto) device = level_->GetDevice();
+  device.BeginScene();
+  device.SetPrimitiveTopology(topology_);
+  device.SetVertexBuffers(0, 1, &(vertexBuffer->GetView()));
+  device.SetIndexBuffer(&(indexBuffer->GetView()));
+  device.Render(index_count_, 1);
+  device.EndScene();
+  device.Present();
 }
 
 void QtDirect3D12::resizeEvent(QResizeEvent *event)
@@ -224,13 +227,14 @@ void QtDirect3D12::dropEvent(QDropEvent* event)
 
   level_->RegisterLoadedEvent([&](App::IModel* model) {
 
+    decltype(auto) device = level_->GetDevice();
     decltype(auto) vertices = model->GetVertices();
     decltype(auto) indices = model->GetIndices();
 
     // 頂点データ、インデックスバッファの更新
     auto vertex_size = sizeof(App::IModel::Vertex);
-    vertexBuffer->Create(&(device->GetDevice()), vertex_size * vertices.size(), vertex_size, &(vertices[0]));
-    indexBuffer->Create(&(device->GetDevice()), sizeof(uint32_t) * indices.size(), &(indices[0]), DXGI_FORMAT_R32_UINT);
+    vertexBuffer->Create(&(device.GetDevice()), vertex_size * vertices.size(), vertex_size, &(vertices[0]));
+    indexBuffer->Create(&(device.GetDevice()), sizeof(uint32_t) * indices.size(), &(indices[0]), DXGI_FORMAT_R32_UINT);
     index_count_ = indices.size();
 
     is_loading = false;

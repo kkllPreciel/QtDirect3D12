@@ -10,7 +10,6 @@
 
 namespace Sein {
   namespace Direct3D12 {
-    class Device;
     class VertexBuffer;
     class IndexBuffer;
     class ConstantBuffer;
@@ -39,7 +38,6 @@ private Q_SLOTS:
 private:
   Ui::QtDirect3D12Class ui;
   std::unique_ptr<QTimer> timer;
-  std::unique_ptr<Sein::Direct3D12::Device> device;
   std::unique_ptr<Sein::Direct3D12::VertexBuffer> vertexBuffer;
   std::unique_ptr<Sein::Direct3D12::IndexBuffer> indexBuffer;
   std::uint64_t index_count_;
