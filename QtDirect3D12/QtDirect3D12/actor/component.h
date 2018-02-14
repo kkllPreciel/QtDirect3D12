@@ -30,6 +30,7 @@ namespace App
         kIllegal = 0,
         kObject,      ///< オブジェクト
         kMove,        ///< 移動処理
+        kRender,      ///< 描画処理
       };
 
       /**

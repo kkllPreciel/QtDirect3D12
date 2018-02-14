@@ -80,6 +80,7 @@
     <ClCompile Include="actor\component.cc" />
     <ClCompile Include="actor\level.cc" />
     <ClCompile Include="actor\model_move_component.cc" />
+    <ClCompile Include="actor\model_render_component.cc" />
     <ClCompile Include="actor\move_component.cc" />
     <ClCompile Include="actor\viewer_level.cc" />
     <ClCompile Include="GeneratedFiles\Debug\moc_QtDirect3D12.cpp">
@@ -134,6 +135,7 @@
     <ClInclude Include="actor\component.h" />
     <ClInclude Include="actor\level.h" />
     <ClInclude Include="actor\model_move_component.h" />
+    <ClInclude Include="actor\model_render_component.h" />
     <ClInclude Include="actor\move_component.h" />
     <ClInclude Include="actor\viewer_level.h" />
     <ClInclude Include="GeneratedFiles\ui_QtDirect3D12.h" />
