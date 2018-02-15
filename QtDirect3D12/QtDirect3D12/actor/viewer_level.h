@@ -15,7 +15,7 @@
 #include "job_system/job.h"
 #include "job_system/async_job.h"
 #include "actor/actor.h"
-#include "model/model.h"
+#include "model/app_model.h"
 
 namespace App
 {
@@ -77,7 +77,7 @@ namespace App
        *  @brief  読み込み終了イベントを登録する
        *  @param  callback:読み込み終了時に実行する関数
        */
-      void RegisterLoadedEvent(std::function<void(IModel*)> callback);
+      void RegisterLoadedEvent(std::function<void(App::IAppModel*)> callback);
 
       /**
        *  @brief  ホイールイベントを発行する
@@ -128,7 +128,7 @@ namespace App
       job_system::AsyncJob async_job_;                    ///< 非同期処理用ジョブ
       bool initialized_ = false;                          ///< 初期化終了フラグ
       std::string file_path_;                             ///< モデルファイルパス
-      std::function<void(IModel*)> function_;             ///< 関数へのポインタ
+      std::function<void(App::IAppModel*)> function_;     ///< 関数へのポインタ
     };
   };
 };

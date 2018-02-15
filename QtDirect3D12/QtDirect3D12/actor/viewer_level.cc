@@ -106,7 +106,7 @@ namespace App
      *  @brief  読み込み終了イベントを登録する
      *  @param  callback:読み込み終了時に実行する関数
      */
-    void ViewerLevel::RegisterLoadedEvent(std::function<void(IModel*)> callback)
+    void ViewerLevel::RegisterLoadedEvent(std::function<void(App::IAppModel*)> callback)
     {
       function_ = callback;
     }
@@ -174,7 +174,7 @@ namespace App
     {
       // 非同期読み込み処理
 
-      auto model = App::IModel::CreateFromObj(file_path_);
+      auto model = App::IAppModel::LoadFromObj(file_path_);
       function_(model.get());
     }
   };

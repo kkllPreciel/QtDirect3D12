@@ -11,7 +11,6 @@
 #include <fstream>
 #include <sstream>
 #include <map>
-#include <unordered_map>
 #include <boost/algorithm/string.hpp>
 #include <boost/range/adaptor/indexed.hpp>
 
@@ -62,8 +61,7 @@ namespace App
       /**
        *  @brief  コンストラクタ
        */
-      Model() : vertices_(0), indices_(0), polygon_count_(0),
-        points_(0), normals_(0), texture_coords_(0),
+      Model() : polygon_count_(0), points_(0), normals_(0), texture_coords_(0),
         point_indices_(0), normal_indices_(0), texture_coord_indices_(0)
       {
     
@@ -102,24 +100,6 @@ namespace App
        *  @return ムーブ代入後のインスタンス
        */
       Model& operator = (Model&& other) = delete;
-
-      /**
-       *  @brief  頂点リストを取得する
-       *  @return 頂点のリスト
-       */
-      const std::vector<Vertex>& GetVertices() const override
-      {
-        return vertices_;
-      }
-      
-      /**
-       *  @brief  頂点インデックスリストを取得する
-       *  @return 頂点インデックスのリスト
-       */
-      const std::vector<uint32_t>& GetIndices() const override
-      {
-        return indices_;
-      }
       
       /**
        *  @brief  ポリゴン数を取得する
@@ -243,37 +223,13 @@ namespace App
        */
       void Release() override
       {
-        vertices_.clear();
-        indices_.clear();
-        polygon_count_ = 0;
-        
+        polygon_count_ = 0;        
         points_.clear();
         normals_.clear();
         texture_coords_.clear();
         point_indices_.clear();
         normal_indices_.clear();
         texture_coord_indices_.clear();
-      }
-
-      /**
-       *  @brief  頂点を追加する
-       *  @param  vertex:追加する頂点
-       */
-      void AddVertex(const Vertex& vertex)
-      {
-        vertices_.emplace_back(vertex);
-      }
-
-      /**
-       *  @brief  頂点インデックスを追加する
-       *  @param  indices:追加する頂点インデックスのポリゴン単位でのリスト
-       */
-      void AddIndex(const std::vector<uint32_t>& polygon_indices)
-      {
-        for (auto index : polygon_indices)
-        {
-          indices_.emplace_back(index);
-        }
       }
 
       /**
@@ -348,10 +304,7 @@ namespace App
       }
     
     private:
-      std::vector<Vertex> vertices_;                  ///< 頂点リスト
-      std::vector<uint32_t> indices_;                 ///< インデックスリスト
       uint32_t polygon_count_;                        ///< ポリゴン数
-
       std::vector<DirectX::XMFLOAT3> points_;         ///< 座標リスト
       std::vector<DirectX::XMFLOAT3> normals_;        ///< 法線ベクトルリスト
       std::vector<DirectX::XMFLOAT2> texture_coords_; ///< テクスチャ座標リスト
@@ -488,70 +441,6 @@ namespace App
         break;
       }
     }
-
-    // TODO:頂点を生成する
-    std::vector<Vertex> vertices;
-    std::unordered_map<std::string, uint32_t> map;
-    std::vector<uint32_t> indices;
-
-    const auto points = model->GetControlPoints();
-    const auto normals = model->GetNormals();
-    const auto tex_coords = model->GetTextureCoords();
-    const auto point_indices = model->GetControlPointIndices();
-    const auto normal_indices = model->GetNormalIndices();
-    const auto tex_coords_indices = model->GetTextureCoordIndices();
-
-    // 頂点データリストと、頂点データインデックスとハッシュを持つリストを作成する
-    for (const auto point : point_indices | boost::adaptors::indexed())
-    {
-      const auto index = point.index();
-
-      // ハッシュを作成
-      std::string hash = std::to_string(point.value());
-
-      if (tex_coords_indices.empty() == false)
-      {
-        hash += '-' + std::to_string(tex_coords_indices[index]);
-      }
-
-      if (normal_indices.empty() == false)
-      {
-        hash += '-' + std::to_string(normal_indices[index]);
-      }
-
-      // ハッシュが存在しない場合は頂点データを追加する
-      if (map.count(hash) == 0)
-      {
-        // 頂点データ
-        Vertex vertex = {};
-        vertex.position = points.at(point.value());
-
-        if (normal_indices.empty() == false)
-        {
-          vertex.normal = normals.at(normal_indices.at(index));
-        }
-
-        if (tex_coords_indices.empty() == false)
-        {
-          vertex.texcoord = tex_coords.at(tex_coords_indices.at(index));
-        }
-
-        vertices.emplace_back(vertex);
-
-        // ハッシュリストを更新
-        map.insert({ hash, static_cast<uint32_t>(vertices.size() - 1) });
-      }
-
-      // インデックスリストにインデックスを追加する
-      indices.emplace_back(map.at(hash));
-    }
-
-    for (decltype(auto) vertex : vertices)
-    {
-      model->AddVertex(vertex);
-    }
-
-    model->AddIndex(indices);
 
     return model;
   }

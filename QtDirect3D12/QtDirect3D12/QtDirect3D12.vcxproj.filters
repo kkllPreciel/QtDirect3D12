@@ -100,6 +100,9 @@
     <ClCompile Include="actor\model_render_component.cc">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="model\app_model.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="QtDirect3D12.h">
@@ -159,6 +162,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="actor\model_render_component.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="model\app_model.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
