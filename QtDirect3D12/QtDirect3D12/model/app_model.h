@@ -9,6 +9,9 @@
 #pragma once
 
  // include
+#include <Sein/Direct3D12/vertex_buffer.h>
+#include <Sein/Direct3D12/index_buffer.h>
+#include <Sein/Direct3D12/direct3d12_device.h>
 #include "model/model.h"
 
 namespace App
@@ -48,10 +51,23 @@ namespace App
     virtual const std::vector<uint32_t>& GetIndices() const = 0;
 
     /**
+     *  @brief  頂点バッファを取得する
+     *  @return 頂点バッファ
+     */
+    virtual const Sein::Direct3D12::VertexBuffer& GetVertexBuffer() const = 0;
+
+    /**
+     *  @brief  インデックスバッファを取得する
+     *  @return インデックスバッファ
+     */
+    virtual const Sein::Direct3D12::IndexBuffer& GetIndexBuffer() const = 0;
+
+    /**
      *  @brief  OBJフォーマットファイルからモデルデータを作成する
+     *  @param  device:デバイス
      *  @param  file_path:読み込みを行うファイルのパス
      *  @return モデルインターフェイスへのポインタ
      */
-    static std::unique_ptr<IAppModel> LoadFromObj(const std::string& file_path);
+    static std::unique_ptr<IAppModel> LoadFromObj(const Sein::Direct3D12::Device& device, const std::string& file_path);
   };
 };

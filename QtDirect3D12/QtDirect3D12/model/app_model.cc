@@ -25,7 +25,7 @@ namespace App
       /**
        *  @brief  コンストラクタ
        */
-      AppModel() : vertices_(0), indices_(0), model_(nullptr)
+      AppModel() : vertices_(0), indices_(0), model_(nullptr), vertex_buffer_(nullptr), index_buffer_(nullptr)
       {
     
       }
@@ -80,6 +80,24 @@ namespace App
       const std::vector<uint32_t>& GetIndices() const override
       {
         return indices_;
+      }
+
+      /**
+       *  @brief  頂点バッファを取得する
+       *  @return 頂点バッファ
+       */
+      const Sein::Direct3D12::VertexBuffer& GetVertexBuffer() const override
+      {
+        return *vertex_buffer_;
+      }
+  
+      /**
+       *  @brief  インデックスバッファを取得する
+       *  @return インデックスバッファ
+       */
+      const Sein::Direct3D12::IndexBuffer& GetIndexBuffer() const override
+      {
+        return *index_buffer_;
       }
       
       /**
@@ -207,6 +225,9 @@ namespace App
         vertices_.clear();
         indices_.clear();
 
+        vertex_buffer_.reset();
+        index_buffer_.reset();
+
         model_->Release();
         model_.reset();
       }
@@ -240,20 +261,41 @@ namespace App
       {
         model_.reset(model);
       }
+
+      /**
+       *  @brief  頂点バッファを設定する
+       *  @param  vertex_buffer:頂点バッファ
+       */
+      void SetVertexBuffer(Sein::Direct3D12::VertexBuffer* vertex_buffer)
+      {
+        vertex_buffer_.reset(vertex_buffer);
+      }
+
+      /**
+       *  @brief  インデックスバッファを設定する
+       *  @param  index_buffer:インデックスバッファ
+       */
+      void SetIndexBuffer(Sein::Direct3D12::IndexBuffer* index_buffer)
+      {
+        index_buffer_.reset(index_buffer);
+      }
     
     private:
-      std::vector<Vertex> vertices_;        ///< 頂点リスト
-      std::vector<uint32_t> indices_;       ///< インデックスリスト
-      std::unique_ptr<App::IModel> model_;  ///< モデル
+      std::vector<Vertex> vertices_;                                  ///< 頂点リスト
+      std::vector<uint32_t> indices_;                                 ///< インデックスリスト
+      std::unique_ptr<App::IModel> model_;                            ///< モデル
+      std::unique_ptr<Sein::Direct3D12::VertexBuffer> vertex_buffer_; ///< 頂点バッファ
+      std::unique_ptr<Sein::Direct3D12::IndexBuffer> index_buffer_;   ///< インデックスバッファ
     };
   };
 
   /**
    *  @brief  OBJフォーマットファイルからモデルデータを作成する
+   *  @param  device:デバイス
    *  @param  file_path:読み込みを行うファイルのパス
    *  @return モデルインターフェイスへのポインタ
    */
-  std::unique_ptr<IAppModel> IAppModel::LoadFromObj(const std::string& file_path)
+  std::unique_ptr<IAppModel> IAppModel::LoadFromObj(const Sein::Direct3D12::Device& device, const std::string& file_path)
   {
     std::unique_ptr<AppModel> app_model = nullptr;
 
@@ -323,12 +365,21 @@ namespace App
       indices.emplace_back(map.at(hash));
     }
 
+    auto vertex_size = sizeof(App::IAppModel::Vertex);
+    auto vertex_buffer = std::make_unique<Sein::Direct3D12::VertexBuffer>();
+    auto index_buffer = std::make_unique<Sein::Direct3D12::IndexBuffer>();
+    vertex_buffer->Create(&(device.GetDevice()), vertex_size * vertices.size(), vertex_size, &(vertices[0]));
+    index_buffer->Create(&(device.GetDevice()), sizeof(uint32_t) * indices.size(), &(indices[0]), DXGI_FORMAT_R32_UINT);
+
     for (decltype(auto) vertex : vertices)
     {
       app_model->AddVertex(vertex);
     }
 
     app_model->AddIndex(indices);
+
+    app_model->SetVertexBuffer(vertex_buffer.release());
+    app_model->SetIndexBuffer(index_buffer.release());
 
     return app_model;
   }

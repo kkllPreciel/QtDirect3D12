@@ -227,6 +227,8 @@ void QtDirect3D12::dropEvent(QDropEvent* event)
 
   level_->RegisterLoadedEvent([&](App::IAppModel* model) {
 
+    index_count_ = model->GetIndices().size();
+
     decltype(auto) device = level_->GetDevice();
     decltype(auto) vertices = model->GetVertices();
     decltype(auto) indices = model->GetIndices();
@@ -235,7 +237,6 @@ void QtDirect3D12::dropEvent(QDropEvent* event)
     auto vertex_size = sizeof(App::IAppModel::Vertex);
     vertexBuffer->Create(&(device.GetDevice()), vertex_size * vertices.size(), vertex_size, &(vertices[0]));
     indexBuffer->Create(&(device.GetDevice()), sizeof(uint32_t) * indices.size(), &(indices[0]), DXGI_FORMAT_R32_UINT);
-    index_count_ = indices.size();
 
     is_loading = false;
   });

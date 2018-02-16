@@ -174,7 +174,7 @@ namespace App
     {
       // ”ñ“¯Šú“Ç‚İ‚İˆ—
 
-      auto model = App::IAppModel::LoadFromObj(file_path_);
+      auto model = App::IAppModel::LoadFromObj(*device_, file_path_);
       function_(model.get());
     }
   };
