@@ -2,11 +2,8 @@
 #include <qevent.h>
 #include <qtimer.h>
 #include <qdatetime.h>
-#include <Sein\Direct3D12\vertex_buffer.h>
-#include <Sein\Direct3D12\index_buffer.h>
 #include <Sein\Direct3D12\constant_buffer.h>
 #include <Sein\Direct3D12\shader_resource_buffer.h>
-#include <Sein\PMX\loader.h>
 #include "QtDirect3D12.h"
 #include <qimage.h>
 #include <qmimedata.h>
@@ -19,8 +16,7 @@
 QtDirect3D12::QtDirect3D12(QWidget *parent)
   : QWidget(parent),
   timer(std::make_unique<QTimer>()),
-  vertexBuffer(std::make_unique<Sein::Direct3D12::VertexBuffer>()),
-  indexBuffer(std::make_unique<Sein::Direct3D12::IndexBuffer>()),
+  model_(nullptr),
   constantBufferView(nullptr),
   shaderResourceBuffer(nullptr)
 {
@@ -35,11 +31,7 @@ QtDirect3D12::QtDirect3D12(QWidget *parent)
   auto device = std::make_unique<Sein::Direct3D12::Device>();
   device->Create(reinterpret_cast<HWND>(this->winId()), this->width(), this->height());  
 
-  Sein::Pmx::Loader loader;
-  loader.Load("../Resources/Pmx/YYB式桜ミクv1.00.pmx");
-  vertexBuffer->Create(&(device->GetDevice()), loader.GetVertexSize() * loader.GetVertexCount(), loader.GetVertexSize(), loader.GetVertices());
-  indexBuffer->Create(&(device->GetDevice()), loader.GetIndexSize() * loader.GetIndexCount(), loader.GetIndices(), DXGI_FORMAT_R32_UINT);
-  index_count_ = 321567;
+  model_ = std::move(App::IAppModel::LoadFromPmx(*(device.get()), "../Resources/Pmx/YYB式桜ミクv1.00.pmx"));
 
   // 定数バッファを作成
   constantBufferView = device->CreateConstantBuffer(sizeof(ConstantBufferType));
@@ -185,9 +177,9 @@ void QtDirect3D12::mainLoop()
   decltype(auto) device = level_->GetDevice();
   device.BeginScene();
   device.SetPrimitiveTopology(topology_);
-  device.SetVertexBuffers(0, 1, &(vertexBuffer->GetView()));
-  device.SetIndexBuffer(&(indexBuffer->GetView()));
-  device.Render(index_count_, 1);
+  device.SetVertexBuffers(0, 1, &(model_->GetVertexBuffer().GetView()));
+  device.SetIndexBuffer(&(model_->GetIndexBuffer().GetView()));
+  device.Render(model_->GetIndices().size(), 1);
   device.EndScene();
   device.Present();
 }
@@ -226,18 +218,6 @@ void QtDirect3D12::dropEvent(QDropEvent* event)
   progress.setValue(100);
 
   level_->RegisterLoadedEvent([&](App::IAppModel* model) {
-
-    index_count_ = model->GetIndices().size();
-
-    decltype(auto) device = level_->GetDevice();
-    decltype(auto) vertices = model->GetVertices();
-    decltype(auto) indices = model->GetIndices();
-
-    // 頂点データ、インデックスバッファの更新
-    auto vertex_size = sizeof(App::IAppModel::Vertex);
-    vertexBuffer->Create(&(device.GetDevice()), vertex_size * vertices.size(), vertex_size, &(vertices[0]));
-    indexBuffer->Create(&(device.GetDevice()), sizeof(uint32_t) * indices.size(), &(indices[0]), DXGI_FORMAT_R32_UINT);
-
     is_loading = false;
   });
 

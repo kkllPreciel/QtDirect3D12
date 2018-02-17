@@ -7,11 +7,10 @@
 #include "ui_QtDirect3D12.h"
 #include "actor/actor.h"
 #include "actor/viewer_level.h"
+#include "model/app_model.h"
 
 namespace Sein {
   namespace Direct3D12 {
-    class VertexBuffer;
-    class IndexBuffer;
     class ConstantBuffer;
     class ShaderResourceBuffer;
   };
@@ -38,9 +37,7 @@ private Q_SLOTS:
 private:
   Ui::QtDirect3D12Class ui;
   std::unique_ptr<QTimer> timer;
-  std::unique_ptr<Sein::Direct3D12::VertexBuffer> vertexBuffer;
-  std::unique_ptr<Sein::Direct3D12::IndexBuffer> indexBuffer;
-  std::uint64_t index_count_;
+  std::unique_ptr<App::IAppModel> model_;           ///< モデル
   D3D12_PRIMITIVE_TOPOLOGY topology_;               ///< プリミティブのタイプ
   std::unique_ptr<App::actor::ViewerLevel> level_;  ///< ビューア用レベル
   bool is_loading = false;                          ///< 読み込み中フラグ
