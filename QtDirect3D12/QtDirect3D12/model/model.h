@@ -116,5 +116,12 @@ namespace App
      *  @return モデルインターフェイスへのポインタ
      */
     static std::unique_ptr<IModel> CreateFromObj(const std::string& file_path);
+
+    /**
+     *  @brief  PMXフォーマットファイルからモデルデータを作成する
+     *  @param  file_path:読み込みを行うファイルのパス
+     *  @return モデルインターフェイスへのポインタ
+     */
+    static std::unique_ptr<IModel> CreateFromPmx(const std::string& file_path);
   };
 };

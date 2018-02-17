@@ -103,6 +103,7 @@
     <ClCompile Include="model\app_model.cc" />
     <ClCompile Include="model\obj_model_loader.cc" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="model\pmx_model_loader.cc" />
     <ClCompile Include="QtDirect3D12.cpp" />
   </ItemGroup>
   <ItemGroup>

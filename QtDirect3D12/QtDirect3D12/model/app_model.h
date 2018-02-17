@@ -69,5 +69,13 @@ namespace App
      *  @return モデルインターフェイスへのポインタ
      */
     static std::unique_ptr<IAppModel> LoadFromObj(const Sein::Direct3D12::Device& device, const std::string& file_path);
+
+    /**
+     *  @brief  PMXフォーマットファイルからモデルデータを作成する
+     *  @param  device:デバイス
+     *  @param  file_path:読み込みを行うファイルのパス
+     *  @return モデルインターフェイスへのポインタ
+     */
+    static std::unique_ptr<IAppModel> LoadFromPmx(const Sein::Direct3D12::Device& device, const std::string& file_path);
   };
 };

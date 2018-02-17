@@ -383,4 +383,66 @@ namespace App
 
     return app_model;
   }
+
+  /**
+   *  @brief  PMXフォーマットファイルからモデルデータを作成する
+   *  @param  device:デバイス
+   *  @param  file_path:読み込みを行うファイルのパス
+   *  @return モデルインターフェイスへのポインタ
+   */
+  std::unique_ptr<IAppModel> IAppModel::LoadFromPmx(const Sein::Direct3D12::Device& device, const std::string& file_path)
+  {
+    std::unique_ptr<AppModel> app_model = nullptr;
+
+    auto model = IModel::CreateFromPmx(file_path);
+    if (!model)
+    {
+      return app_model;
+    }
+
+    app_model = std::make_unique<AppModel>();
+    app_model->SetModel(model.release());
+
+    // アプリケーション用の頂点データを生成する
+    std::vector<Vertex> vertices(app_model->GetControlPointCount());
+    std::vector<uint32_t> indices(app_model->GetControlPointIndexCount());
+
+    // 頂点生成
+    const auto points = app_model->GetControlPoints();
+    const auto normals = app_model->GetNormals();
+    const auto tex_coords = app_model->GetTextureCoords();
+    for (auto& vertex : vertices | boost::adaptors::indexed())
+    {
+      const auto index = vertex.index();
+
+      vertex.value().position = points[index];
+      vertex.value().normal = normals[index];
+      vertex.value().texcoord = tex_coords[index];
+    }
+
+    // インデックス生成
+    const auto point_indices = app_model->GetControlPointIndices();
+    for (auto& index : indices | boost::adaptors::indexed())
+    {
+      index.value() = point_indices[index.index()];
+    }
+
+    auto vertex_size = sizeof(App::IAppModel::Vertex);
+    auto vertex_buffer = std::make_unique<Sein::Direct3D12::VertexBuffer>();
+    auto index_buffer = std::make_unique<Sein::Direct3D12::IndexBuffer>();
+    vertex_buffer->Create(&(device.GetDevice()), vertex_size * vertices.size(), vertex_size, &(vertices[0]));
+    index_buffer->Create(&(device.GetDevice()), sizeof(uint32_t) * indices.size(), &(indices[0]), DXGI_FORMAT_R32_UINT);
+
+    for (decltype(auto) vertex : vertices)
+    {
+      app_model->AddVertex(vertex);
+    }
+
+    app_model->AddIndex(indices);
+
+    app_model->SetVertexBuffer(vertex_buffer.release());
+    app_model->SetIndexBuffer(index_buffer.release());
+
+    return app_model;
+  }
 };

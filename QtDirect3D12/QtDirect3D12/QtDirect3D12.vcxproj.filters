@@ -103,6 +103,9 @@
     <ClCompile Include="model\app_model.cc">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="model\pmx_model_loader.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="QtDirect3D12.h">
