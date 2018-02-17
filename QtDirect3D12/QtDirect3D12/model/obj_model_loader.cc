@@ -1,5 +1,5 @@
 /**
- *  @file     obj_loader.cc
+ *  @file     obj_model_loader.cc
  *  @brief    OBJファイル読み込みに関する処理を行うプログラムソース
  *  @author   kkllPreciel
  *  @date     2018/01/01
