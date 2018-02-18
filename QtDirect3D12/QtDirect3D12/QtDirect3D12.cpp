@@ -111,6 +111,11 @@ QtDirect3D12::QtDirect3D12(QWidget *parent)
   level_->SetDevice(std::move(device));
   level_->Create();
 
+  // 読み込み終了シグナルにスロット(関数)を登録する
+  level_->RegisterLoadedSignalEvent([&](App::IAppModel* model) {
+    is_loading = false;
+  });
+
   is_loading = false;
 
   // メインループ呼び出し設定
@@ -216,10 +221,6 @@ void QtDirect3D12::dropEvent(QDropEvent* event)
   progress.setWindowTitle(u8"処理中");
   progress.show();
   progress.setValue(100);
-
-  level_->RegisterLoadedEvent([&](App::IAppModel* model) {
-    is_loading = false;
-  });
 
   is_loading = true;
 

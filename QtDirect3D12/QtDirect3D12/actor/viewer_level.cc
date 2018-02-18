@@ -84,6 +84,8 @@ namespace App
       {
         actor.Destroy();
       }
+
+      loaded_.disconnect_all_slots();
     }
 
     /**
@@ -103,12 +105,12 @@ namespace App
     }
 
     /**
-     *  @brief  読み込み終了イベントを登録する
-     *  @param  callback:読み込み終了時に実行する関数
+     *  @brief  読み込み終了シグナルイベントにスロット(関数)を登録する
+     *  @param  callback:読み込み終了時に実行するスロット(関数)
      */
-    void ViewerLevel::RegisterLoadedEvent(std::function<void(App::IAppModel*)> callback)
+    void ViewerLevel::RegisterLoadedSignalEvent(std::function<void(App::IAppModel*)> callback)
     {
-      function_ = callback;
+      loaded_.connect(callback);
     }
 
     /**
@@ -175,7 +177,7 @@ namespace App
       // 非同期読み込み処理
 
       auto model = App::IAppModel::LoadFromObj(*device_, file_path_);
-      function_(model.get());
+      loaded_(model.get());
     }
   };
 };

@@ -11,6 +11,7 @@
  // include
 #include <cstdint>
 #include <array>
+#include <boost/signals2/signal.hpp>
 #include <Sein/Direct3D12/direct3d12_device.h>
 #include "job_system/job.h"
 #include "job_system/async_job.h"
@@ -74,10 +75,10 @@ namespace App
       void LoadModel(std::string file_path);
 
       /**
-       *  @brief  読み込み終了イベントを登録する
-       *  @param  callback:読み込み終了時に実行する関数
+       *  @brief  読み込み終了シグナルイベントにスロット(関数)を登録する
+       *  @param  callback:読み込み終了時に実行するスロット(関数)
        */
-      void RegisterLoadedEvent(std::function<void(App::IAppModel*)> callback);
+      void RegisterLoadedSignalEvent(std::function<void(App::IAppModel*)> callback);
 
       /**
        *  @brief  ホイールイベントを発行する
@@ -122,13 +123,13 @@ namespace App
       void AsyncExecute();
 
     private:
-      std::unique_ptr<Sein::Direct3D12::Device> device_;  ///< デバイス
-      std::array<actor::Actor, 10> actors_;               ///< アクターリスト
-      job_system::Job job_;                               ///< 更新処理用ジョブ
-      job_system::AsyncJob async_job_;                    ///< 非同期処理用ジョブ
-      bool initialized_ = false;                          ///< 初期化終了フラグ
-      std::string file_path_;                             ///< モデルファイルパス
-      std::function<void(App::IAppModel*)> function_;     ///< 関数へのポインタ
+      std::unique_ptr<Sein::Direct3D12::Device> device_;      ///< デバイス
+      std::array<actor::Actor, 10> actors_;                   ///< アクターリスト
+      job_system::Job job_;                                   ///< 更新処理用ジョブ
+      job_system::AsyncJob async_job_;                        ///< 非同期処理用ジョブ
+      bool initialized_ = false;                              ///< 初期化終了フラグ
+      std::string file_path_;                                 ///< モデルファイルパス
+      boost::signals2::signal<void(App::IAppModel*)> loaded_; ///< 読み込み終了シグナル
     };
   };
 };
