@@ -74,14 +74,23 @@ namespace App
       // オーナーの座標、向き、スケーリングから行列を生成する
       // モデルと必要な情報をレンダリングキューに登録する
     }
-    
+
     /**
      *  @brief  モデルを設定する
      *  @param  model:モデル
      */
-    void ModelRenderComponent::SetModel(std::shared_ptr<App::IModel> model)
+    void ModelRenderComponent::SetModel(std::shared_ptr<App::IAppModel> model)
     {
       model_ = model;
+    }
+
+    /**
+     *  @brief  プリミティブのトポロジーを設定する
+     *  @param  topology:トポロジー
+     */
+    void ModelRenderComponent::SetTopology(D3D12_PRIMITIVE_TOPOLOGY topology)
+    {
+      topology_ = topology;
     }
   };
 };

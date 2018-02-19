@@ -2,7 +2,7 @@
  *  @file     model_render_component.h
  *  @brief    モデル描画処理用コンポーネントに関するヘッダファイル
  *  @author   kkllPreciel
- *  @date     2018/02/014
+ *  @date     2018/02/14
  *  @version  1.0
  */
 
@@ -11,12 +11,9 @@
  // include
 #include <memory>
 #include <DirectXMath.h>
-#include <Sein/Direct3D12/direct3d12_device.h>
-#include <Sein/Direct3D12/vertex_buffer.h>
-#include <Sein/Direct3D12/index_buffer.h>
 #include "actor/component.h"
 #include "job_system/job.h"
-#include "model/model.h"
+#include "model/app_model.h"
 
 namespace App
 {
@@ -87,14 +84,18 @@ namespace App
        *  @brief  モデルを設定する
        *  @param  model:モデル
        */
-      void SetModel(std::shared_ptr<App::IModel> model);
+      void SetModel(std::shared_ptr<App::IAppModel> model);
+
+      /**
+       *  @brief  プリミティブのトポロジーを設定する
+       *  @param  topology:トポロジー
+       */
+      void SetTopology(D3D12_PRIMITIVE_TOPOLOGY topology);
 
     private:
-      std::unique_ptr<job_system::Job> job_;                          ///< ジョブ
-      std::shared_ptr<App::IModel> model_;                            ///< モデル
-      std::unique_ptr<Sein::Direct3D12::VertexBuffer> vertex_buffer_; ///< 頂点バッファビュー
-      std::unique_ptr<Sein::Direct3D12::IndexBuffer> index_buffer_;   ///< インデックスバッファビュー
-      D3D12_PRIMITIVE_TOPOLOGY topology_;                             ///< プリミティブのタイプ
+      std::unique_ptr<job_system::Job> job_;  ///< ジョブ
+      std::shared_ptr<App::IAppModel> model_; ///< モデル
+      D3D12_PRIMITIVE_TOPOLOGY topology_;     ///< プリミティブのタイプ
     };
   };
 };
