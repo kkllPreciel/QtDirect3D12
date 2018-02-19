@@ -11,6 +11,7 @@
 #include "job_system/job_scheduler.h"
 #include "job_system/async_job_manager.h"
 #include "actor/model_move_component.h"
+#include "actor/model_render_component.h"
 #include "actor/camera_component.h"
 #include "actor/camera_move_component.h"
 
@@ -60,6 +61,10 @@ namespace App
       model_component->SetRotationAngle(DirectX::XM_PI / 180.0f);
       model_component->Create();
 
+      // モデル描画用コンポーネントを作成
+      decltype(auto) model_render_component = actors_[1].AddComponent<actor::ModelRenderComponent>();
+      model_render_component->SetTopology(D3D12_PRIMITIVE_TOPOLOGY::D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
       return true;
     }
 
@@ -72,6 +77,10 @@ namespace App
       if (initialized_ == false && async_job_.IsFinished())
       {
         initialized_ = true;
+      }
+      else if (async_job_.IsFinished())
+      {
+        // 更新処理を行う
       }
     }
 
