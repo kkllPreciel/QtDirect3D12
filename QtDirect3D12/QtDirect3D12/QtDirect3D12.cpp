@@ -50,8 +50,6 @@ QtDirect3D12::QtDirect3D12(QWidget *parent)
     shaderResourceBuffer->Map(&instanceBufferData[0], sizeof(InstanceBuffer) * instanceBufferData.size());
   }
 
-  QImage image;
-
   // ベースカラー(アルベド)のテクスチャバッファを作成
   device->CreateTextureBufferFromFile(L"../Resources/Texture/marble-speckled-albedo.png");
 
