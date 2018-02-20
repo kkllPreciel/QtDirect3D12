@@ -52,53 +52,14 @@ QtDirect3D12::QtDirect3D12(QWidget *parent)
 
   QImage image;
 
-  // ベースカラー(アルベド)
-  if (image.load("../Resources/Texture/marble-speckled-albedo.png"))
-  {
-    auto format = image.format();
-    auto bytesPerLine = image.bytesPerLine();
-    auto width = image.width();
-    auto height = image.height();
-    auto buffer = std::make_unique<uchar[]>(bytesPerLine * height);
-    std::memcpy(buffer.get(), image.convertToFormat(QImage::Format::Format_RGBA8888).constBits(), bytesPerLine * height);
+  // ベースカラー(アルベド)のテクスチャバッファを作成
+  device->CreateTextureBufferFromFile(L"../Resources/Texture/marble-speckled-albedo.png");
 
-    // テクスチャバッファを作成
-    device->CreateTextureBuffer(buffer.get(), width, height, 4);
+  // メタリック(金属性)のテクスチャバッファを作成
+  device->CreateTextureBufferFromFile(L"../Resources/Texture/marble-speckled-metalness.png");
 
-    buffer.reset(nullptr);
-  }
-
-  // メタリック(金属性)
-  if (image.load("../Resources/Texture/marble-speckled-metalness.png"))
-  {
-    auto format = image.format();
-    auto bytesPerLine = image.bytesPerLine();
-    auto width = image.width();
-    auto height = image.height();
-    auto buffer = std::make_unique<uchar[]>(bytesPerLine * height);
-    std::memcpy(buffer.get(), image.convertToFormat(QImage::Format::Format_RGBA8888).constBits(), bytesPerLine * height);
-
-    // テクスチャバッファを作成
-    device->CreateTextureBuffer(buffer.get(), width, height, 4);
-
-    buffer.reset(nullptr);
-  }
-
-  // ラフネス(粗さ)
-  if (image.load("../Resources/Texture/marble-speckled-roughness.png"))
-  {
-    auto format = image.format();
-    auto bytesPerLine = image.bytesPerLine();
-    auto width = image.width();
-    auto height = image.height();
-    auto buffer = std::make_unique<uchar[]>(bytesPerLine * height);
-    std::memcpy(buffer.get(), image.convertToFormat(QImage::Format::Format_RGBA8888).constBits(), bytesPerLine * height);
-
-    // テクスチャバッファを作成
-    device->CreateTextureBuffer(buffer.get(), width, height, 4);
-
-    buffer.reset(nullptr);
-  }
+  // ラフネス(粗さ)のテクスチャバッファを作成
+  device->CreateTextureBufferFromFile(L"../Resources/Texture/marble-speckled-roughness.png");
 
   // プリミティブタイプの設定
   topology_ = D3D12_PRIMITIVE_TOPOLOGY::D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
