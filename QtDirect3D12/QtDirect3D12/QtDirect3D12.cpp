@@ -119,9 +119,6 @@ void QtDirect3D12::mainLoop()
 
   // 定数バッファを更新
   {
-    // ワールド行列を更新
-    DirectX::XMStoreFloat4x4(&(constantBuffer.world), DirectX::XMMatrixRotationQuaternion(level_->GetModelQuaternion()));
-
     // ジョブ実行
     App::job_system::JobScheduler::GetInstance()->Execute(6);
 

@@ -99,12 +99,6 @@ namespace App
       DirectX::XMVECTOR GetLookAt();
 
       /**
-       *  @brief  モデルのクォータニオンを取得する
-       *  @return モデルのクォータニオン
-       */
-      DirectX::XMVECTOR GetModelQuaternion();
-
-      /**
        *  @brief  デバイスを設定する
        *  @param  device:デバイス
        */

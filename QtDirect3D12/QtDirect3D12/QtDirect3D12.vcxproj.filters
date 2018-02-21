@@ -91,9 +91,6 @@
     <ClCompile Include="actor\viewer_level.cc">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="actor\model_move_component.cc">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="model\obj_model_loader.cc">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -156,9 +153,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="actor\viewer_level.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="actor\model_move_component.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="model\model.h">

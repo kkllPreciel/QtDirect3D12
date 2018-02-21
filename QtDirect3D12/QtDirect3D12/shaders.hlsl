@@ -52,7 +52,6 @@ StructuredBuffer<InstanceBuffer> cbv : register(t0); ///< インスタンス毎のデータ
  */
 cbuffer ConstantBuffer : register(b0)
 {
-    float4x4 world;         ///< ワールド行列(列優先行列)
     float4x4 view;          ///< ビュー行列(列優先行列)
     float4x4 projection;    ///< プロジェクション行列(列優先行列)
 };
@@ -87,7 +86,6 @@ VSOutput VSMain(VSInput input)
     float4 pos = float4(input.position, 1.0);
 
     pos = mul(cbv[input.id].world, pos);
-    pos = mul(world, pos);
     pos = mul(view, pos);
     pos = mul(projection, pos);
 
@@ -96,10 +94,10 @@ VSOutput VSMain(VSInput input)
     result.uv = input.uv;
     
     // ワールド空間での法線ベクトル(近似値)
-    result.normal = mul(world, mul(cbv[input.id].world, float4(input.normal, 1.0)));
+    result.normal = mul(cbv[input.id].world, float4(input.normal, 1.0));
 
     // ワールド空間での座標
-    result.wPos = mul(world, mul(cbv[input.id].world, float4(input.position, 1.0)));
+    result.wPos = mul(cbv[input.id].world, float4(input.position, 1.0));
 
     return result;
 }
