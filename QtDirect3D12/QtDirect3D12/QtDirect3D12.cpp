@@ -218,3 +218,43 @@ void QtDirect3D12::keyPressEvent(QKeyEvent* event)
     }
   }
 }
+
+void QtDirect3D12::mousePressEvent(QMouseEvent *event)
+{
+  // 左クリックのみ処理する
+  if (event->button() != Qt::LeftButton)
+  {
+    return;
+  }
+
+  // 現在のマウス座標を保存する
+
+  // TODO:レベルにマウスプレスイベントを発行する
+}
+
+void QtDirect3D12::mouseReleaseEvent(QMouseEvent *event)
+{
+  // 左クリックのみ処理する
+  if (event->button() != Qt::LeftButton)
+  {
+    return;
+  }
+
+  // カメラの回転軸を確定する
+
+  // TODO:レベルにマウスリリースイベントを発行する
+}
+
+void QtDirect3D12::mouseMoveEvent(QMouseEvent *event)
+{
+  // 左クリックのみ処理する
+  if (event->button() != Qt::LeftButton)
+  {
+    return;
+  }
+
+  // マウスクリック時の座標と現在の座標の差分を算出する
+  // マウスクリック時のカメラの回転軸を座標の差分を使用して回転させる
+
+  // TODO:レベルにマウス移動イベントを発行する
+}
