@@ -12,7 +12,7 @@
 #include "job_system/async_job_manager.h"
 #include "actor/model_render_component.h"
 #include "actor/camera_component.h"
-#include "actor/camera_move_component.h"
+#include "actor/mouse_driven_camera_move_component.h"
 
 namespace App
 {
@@ -41,16 +41,20 @@ namespace App
     bool ViewerLevel::Create()
     {
       // アクターを生成する(TODO:設定ファイルから読み込む)
-      actors_[0].AddComponent<actor::CameraComponent>()->SetLookAt({ 0.0f, 10.0f, 0.0f });
-      actors_[0].SetPosition({ 0.0f, 10.0f, -30.5f });
+      {
+        auto camera_component = actors_[0].AddComponent<actor::CameraComponent>();
+        camera_component->SetLookAt({ 0.0f, 10.0f, 0.0f });
+        camera_component->SetUpDirection({ 0.0f, 1.0f, 0.0f });
+        actors_[0].SetPosition({ 0.0f, 10.0f, -30.5f });
 
-      // 移動用コンポーネントを作成
-      auto component = actors_[0].AddComponent<actor::CameraMoveComponent>();
-      component->Create();
-      component->SetTime(1);
-      component->SetVelocity(1.0f);
-      component->SetCoefficient(0.5f);
-      component->SetDistance(1.0f);
+        // マウスで操作用コンポーネントを作成
+        auto component = actors_[0].AddComponent<actor::MouseDrivenCameraMoveComponent>();
+        component->Create();
+        component->SetTime(1);
+        component->SetVelocity(1.0f);
+        component->SetCoefficient(0.5f);
+        component->SetDistance(1.0f);
+      }
 
       // モデル用アクターを生成する
       actors_[1].SetPosition({ 0.0f, 10.0f, 0.0f });
@@ -117,13 +121,43 @@ namespace App
     }
 
     /**
-     *  @brief  ホイールイベントを発行する
-     *  @param  force:ホイールの回転方向
+     *  @brief  マウスクリックイベントが発生した
+     *  @param  position:マウスの座標
      */
-    void ViewerLevel::DispatchWheelEvent(const std::float_t force)
+    void ViewerLevel::OnMousePressEvent(DirectX::XMVECTOR position)
     {
       // TODO:オブサーバーパターンを使用して実装する
-      actors_[0].GetComponent<actor::CameraMoveComponent>()->Ignition(force);
+      actors_[0].GetComponent<actor::MouseDrivenCameraMoveComponent>()->OnMousePressEvent(position);
+    }
+    
+    /**
+     *  @brief  マウスリリースイベントが発生した
+     *  @param  position:マウスの座標
+     */
+    void ViewerLevel::OnMouseReleaseEvent(DirectX::XMVECTOR position)
+    {
+      // TODO:オブサーバーパターンを使用して実装する
+      actors_[0].GetComponent<actor::MouseDrivenCameraMoveComponent>()->OnMouseReleaseEvent(position);
+    }
+    
+    /**
+     *  @brief  マウス移動イベントが発生した
+     *  @param  position:マウスの座標
+     */
+    void ViewerLevel::OnMouseMoveEvent(DirectX::XMVECTOR position)
+    {
+      // TODO:オブサーバーパターンを使用して実装する
+      actors_[0].GetComponent<actor::MouseDrivenCameraMoveComponent>()->OnMouseMoveEvent(position);
+    }
+    
+    /**
+     *  @brief  マウスホイールイベントが発生した
+     *  @param  direction:ホイールの回転方向
+     */
+    void ViewerLevel::OnMouseWheelEvent(std::int32_t direction)
+    {
+      // TODO:オブサーバーパターンを使用して実装する
+      actors_[0].GetComponent<actor::MouseDrivenCameraMoveComponent>()->OnMouseWheelEvent(direction);
     }
 
     /**

@@ -193,7 +193,7 @@ void QtDirect3D12::wheelEvent(QWheelEvent* event)
   const auto force = degrees.y() / std::abs(degrees.y());
 
   // レベルにホイール回転イベントを通知する
-  level_->DispatchWheelEvent(force);
+  level_->OnMouseWheelEvent(force);
 
   // TODO:滑らかに移動するようにする(ジョブに登録して移動させる?)
   // 現在の視点と移動先の視点を線形補間で指定時間で移動を行うようにする
@@ -227,9 +227,11 @@ void QtDirect3D12::mousePressEvent(QMouseEvent *event)
     return;
   }
 
-  // 現在のマウス座標を保存する
+  auto x = static_cast<float>(event->x());
+  auto y = static_cast<float>(event->y());
 
-  // TODO:レベルにマウスプレスイベントを発行する
+  // レベルにマウスプレスイベントを発行する
+  level_->OnMousePressEvent({ x, y, 0 });
 }
 
 void QtDirect3D12::mouseReleaseEvent(QMouseEvent *event)
@@ -240,9 +242,11 @@ void QtDirect3D12::mouseReleaseEvent(QMouseEvent *event)
     return;
   }
 
-  // カメラの回転軸を確定する
+  auto x = static_cast<float>(event->x());
+  auto y = static_cast<float>(event->y());
 
-  // TODO:レベルにマウスリリースイベントを発行する
+  // レベルにマウスリリースイベントを発行する
+  level_->OnMouseReleaseEvent({ x, y, 0 });
 }
 
 void QtDirect3D12::mouseMoveEvent(QMouseEvent *event)
@@ -253,8 +257,9 @@ void QtDirect3D12::mouseMoveEvent(QMouseEvent *event)
     return;
   }
 
-  // マウスクリック時の座標と現在の座標の差分を算出する
-  // マウスクリック時のカメラの回転軸を座標の差分を使用して回転させる
+  auto x = static_cast<float>(event->x());
+  auto y = static_cast<float>(event->y());
 
-  // TODO:レベルにマウス移動イベントを発行する
+  // レベルにマウス移動イベントを発行する
+  level_->OnMouseMoveEvent({ x, y, 0 });
 }

@@ -81,10 +81,29 @@ namespace App
       void RegisterLoadedSignalEvent(std::function<void(App::IAppModel*)> callback);
 
       /**
-       *  @brief  ホイールイベントを発行する
-       *  @param  force:ホイールの回転方向
+       *  @brief  マウスクリックイベントが発生した
+       *  @param  position:マウスの座標
        */
-      void DispatchWheelEvent(const std::float_t force);
+      void OnMousePressEvent(DirectX::XMVECTOR position);
+
+      /**
+       *  @brief  マウスリリースイベントが発生した
+       *  @param  position:マウスの座標
+       */
+      void OnMouseReleaseEvent(DirectX::XMVECTOR position);
+
+      /**
+       *  @brief  マウス移動イベントが発生した
+       *  @param  position:マウスの座標
+       */
+      void OnMouseMoveEvent(DirectX::XMVECTOR position);
+
+      /**
+       *  @brief  マウスホイールイベントが発生した
+       *  @param  direction:ホイールの回転方向
+       */
+      void OnMouseWheelEvent(std::int32_t direction);
+
 
       /**
        *  @brief  カメラの座標を取得する
