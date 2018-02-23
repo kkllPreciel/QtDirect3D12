@@ -251,12 +251,6 @@ void QtDirect3D12::mouseReleaseEvent(QMouseEvent *event)
 
 void QtDirect3D12::mouseMoveEvent(QMouseEvent *event)
 {
-  // ¶ƒNƒŠƒbƒN‚Ì‚Ýˆ—‚·‚é
-  if (event->button() != Qt::LeftButton)
-  {
-    return;
-  }
-
   auto x = static_cast<float>(event->x());
   auto y = static_cast<float>(event->y());
 
