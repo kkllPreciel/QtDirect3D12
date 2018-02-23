@@ -64,5 +64,23 @@ namespace App
     {
       return look_at_;
     }
+
+    /**
+     *  @brief  ã•ûŒü‚ğİ’è‚·‚é
+     *  @param  up:ã•ûŒü
+     */
+    void CameraComponent::SetUpDirection(DirectX::XMVECTOR up)
+    {
+      up_ = up;
+    }
+    
+    /**
+     *  @brief  ã•ûŒü‚ğæ“¾‚·‚é
+     *  @return ã•ûŒüƒxƒNƒgƒ‹
+     */
+    DirectX::XMVECTOR CameraComponent::GetUpDirection()
+    {
+      return up_;
+    }
   };
 };

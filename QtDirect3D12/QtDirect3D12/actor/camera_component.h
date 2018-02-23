@@ -83,8 +83,21 @@ namespace App
        */
       DirectX::XMVECTOR GetLookAt();
 
+      /**
+       *  @brief  上方向を設定する
+       *  @param  up:上方向
+       */
+      void SetUpDirection(DirectX::XMVECTOR up);
+
+      /**
+       *  @brief  上方向を取得する
+       *  @return 上方向ベクトル
+       */
+      DirectX::XMVECTOR GetUpDirection();
+
     private:
-      DirectX::XMVECTOR look_at_;  ///< 注視点座標
+      DirectX::XMVECTOR look_at_; ///< 注視点座標
+      DirectX::XMVECTOR up_;      ///< カメラの上方向
     };
   };
 };
