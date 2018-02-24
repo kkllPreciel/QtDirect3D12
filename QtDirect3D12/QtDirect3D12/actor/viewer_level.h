@@ -118,6 +118,12 @@ namespace App
       DirectX::XMVECTOR GetLookAt();
 
       /**
+       *  @brief  カメラの上方向ベクトルを取得する
+       *  @return カメラの上方向ベクトル
+       */
+      DirectX::XMVECTOR GetCameraUpDirection();
+
+      /**
        *  @brief  デバイスを設定する
        *  @param  device:デバイス
        */

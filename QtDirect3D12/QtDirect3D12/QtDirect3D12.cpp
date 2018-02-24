@@ -125,7 +125,7 @@ void QtDirect3D12::mainLoop()
     // ビュー行列を作成
     DirectX::XMVECTOR eye = level_->GetCameraPosition();
     DirectX::XMVECTOR at = level_->GetLookAt();
-    DirectX::XMVECTORF32 up = { 0.0f, 1.0f, 0.0f, 0.0f };
+    DirectX::XMVECTOR up = level_->GetCameraUpDirection();
     DirectX::XMStoreFloat4x4(&(constantBuffer.view), DirectX::XMMatrixLookAtLH(eye, at, up));
 
     // プロジェクション行列を作成

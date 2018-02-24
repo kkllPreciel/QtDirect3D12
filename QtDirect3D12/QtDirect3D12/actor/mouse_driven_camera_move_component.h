@@ -136,7 +136,7 @@ namespace App
       DirectX::XMVECTOR end_position_;        ///< 目標座標
       std::uint64_t time_;                    ///< 移動に必要な時間
       std::uint64_t delta_;                   ///< 現在の経過時間
-      DirectX::XMVECTOR clicked_position_;    ///< クリック時点での座標
+      DirectX::XMVECTOR prev_mouse_position_; ///< 1つ前のマウスの座標
       bool clicked_;                          ///< クリックフラグ
     };
   };

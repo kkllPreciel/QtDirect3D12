@@ -126,7 +126,7 @@ namespace App
     {
       Destroy();
 
-      clicked_position_ = position;
+      prev_mouse_position_ = position;
       clicked_ = true;
     }
     
@@ -155,12 +155,26 @@ namespace App
       // カメラの横方向ベクトルも計算可能
       // マウスの移動ベクトルに応じて上方向ベクトルと横方向ベクトルを合算する
 
-      auto component = owner_->GetComponent<CameraComponent>();
-      DirectX::XMVECTOR at = component->GetLookAt();
+      auto eye = owner_->GetPosition();
 
-      DirectX::XMVector2Normalize(DirectX::XMVectorSubtract(position, clicked_position_));
+      auto component = owner_->GetComponent<CameraComponent>();
+      auto at = component->GetLookAt();
+      auto up = component->GetUpDirection();
+      auto cross = DirectX::XMVector3Cross(up, DirectX::XMVector3Normalize(DirectX::XMVectorSubtract(at, eye)));
+
+      auto value = DirectX::XMVectorSubtract(position, prev_mouse_position_);
+
+      // 移動方向ベクトル(正規化済み)を作成
+      auto dir = DirectX::XMVector3Normalize(DirectX::XMVectorAdd(DirectX::XMVectorScale(up, -value.m128_f32[1]), DirectX::XMVectorScale(cross, value.m128_f32[0])));
+
+      // 回転軸を作成
+      auto rotation_axis = DirectX::XMQuaternionRotationAxis(DirectX::XMVector3Cross(DirectX::XMVector3Normalize(DirectX::XMVectorSubtract(at, eye)), dir), 0.1);
 
       // カメラの回転を行う
+      owner_->SetPosition(DirectX::XMVector3Rotate(eye, rotation_axis));
+      component->SetUpDirection(DirectX::XMVector3Rotate(up, rotation_axis));
+
+      prev_mouse_position_ = position;
     }
     
     /**

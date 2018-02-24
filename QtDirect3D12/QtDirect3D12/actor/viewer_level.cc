@@ -179,6 +179,15 @@ namespace App
     }
 
     /**
+     *  @brief  カメラの上方向ベクトルを取得する
+     *  @return カメラの上方向ベクトル
+     */
+    DirectX::XMVECTOR ViewerLevel::GetCameraUpDirection()
+    {
+      return actors_[0].GetComponent<actor::CameraComponent>()->GetUpDirection();
+    }
+
+    /**
      *  @brief  デバイスを設定する
      *  @param  device:デバイス
      */
