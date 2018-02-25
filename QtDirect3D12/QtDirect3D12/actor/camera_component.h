@@ -95,9 +95,23 @@ namespace App
        */
       DirectX::XMVECTOR GetUpDirection();
 
+      /**
+       *  @brief  ビュー行列を取得する
+       *  @return ビュー行列
+       */
+      const DirectX::XMMATRIX& GetViewMatrix();
+
+      /**
+       *  @brief  ダーティフラグを設定する
+       *  @param  dirty:ダーティフラグ
+       */
+      void SetDirty(bool dirty);
+
     private:
       DirectX::XMVECTOR look_at_; ///< 注視点座標
       DirectX::XMVECTOR up_;      ///< カメラの上方向
+      DirectX::XMMATRIX matrix_;  ///< ビュー(カメラ)行列
+      bool dirty_;                ///< ダーティ(更新)フラグ
     };
   };
 };

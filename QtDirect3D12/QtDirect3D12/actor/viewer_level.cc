@@ -164,16 +164,9 @@ namespace App
      *  @brief  ビュー行列を取得する
      *  @return ビュー行列
      */
-    DirectX::XMMATRIX& ViewerLevel::GetViewMatrix()
+    const DirectX::XMMATRIX& ViewerLevel::GetViewMatrix()
     {
-      auto camera = actors_[0].GetComponent<actor::CameraComponent>();
-
-      // ビュー行列を作成
-      // TODO:カメラコンポーネントに移動(ダーティフラグを使用する)
-      DirectX::XMVECTOR eye = actors_[0].GetPosition();
-      DirectX::XMVECTOR at = camera->GetLookAt();
-      DirectX::XMVECTOR up = camera->GetUpDirection();
-      return DirectX::XMMatrixLookAtLH(eye, at, up);
+      return actors_[0].GetComponent<actor::CameraComponent>()->GetViewMatrix();
     }
 
     /**

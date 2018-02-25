@@ -108,7 +108,7 @@ namespace App
        *  @brief  ビュー行列を取得する
        *  @return ビュー行列
        */
-      DirectX::XMMATRIX& GetViewMatrix();
+      const DirectX::XMMATRIX& GetViewMatrix();
 
       /**
        *  @brief  デバイスを設定する

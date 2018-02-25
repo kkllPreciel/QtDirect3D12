@@ -74,6 +74,9 @@ namespace App
       //now = DirectX::XMVectorAdd(DirectX::XMVectorScale(begin_position_, (1.0f - time_)), DirectX::XMVectorScale(end_position_, time_));
       owner_->SetPosition(now);
 
+      // カメラのダーティ(更新)フラグを立てる
+      owner_->GetComponent<CameraComponent>()->SetDirty(true);
+
       // 移動が終了したら自動的に削除する
       if (time_ * 60 <= delta_)
       {
@@ -175,6 +178,9 @@ namespace App
       component->SetUpDirection(DirectX::XMVector3Rotate(up, rotation_axis));
 
       prev_mouse_position_ = position;
+
+      // カメラのダーティ(更新)フラグを立てる
+      component->SetDirty(true);
     }
     
     /**

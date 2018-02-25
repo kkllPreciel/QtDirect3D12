@@ -36,6 +36,8 @@ namespace App
      */
     bool CameraComponent::Create()
     {
+      dirty_ = true;
+
       return true;
     }
 
@@ -81,6 +83,39 @@ namespace App
     DirectX::XMVECTOR CameraComponent::GetUpDirection()
     {
       return up_;
+    }
+
+    /**
+     *  @brief  ビュー行列を取得する
+     *  @return ビュー行列
+     */
+    const DirectX::XMMATRIX& CameraComponent::GetViewMatrix()
+    {
+      // ダーティ(更新)フラグが立っていない
+      // キャッシュした行列で問題ない
+      if (false == dirty_)
+      {
+        return matrix_;
+      }
+
+      dirty_ = false;
+
+      // ビュー行列を計算する
+      DirectX::XMVECTOR eye = owner_->GetPosition();
+      DirectX::XMVECTOR at = GetLookAt();;
+      DirectX::XMVECTOR up = GetUpDirection();
+      matrix_ = DirectX::XMMatrixLookAtLH(eye, at, up);
+
+      return matrix_;
+    }
+
+    /**
+     *  @brief  ダーティフラグを設定する
+     *  @param  dirty:ダーティフラグ
+     */
+    void CameraComponent::SetDirty(bool dirty)
+    {
+      dirty_ = dirty;
     }
   };
 };
