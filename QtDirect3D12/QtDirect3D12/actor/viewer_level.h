@@ -104,24 +104,11 @@ namespace App
        */
       void OnMouseWheelEvent(std::int32_t direction);
 
-
       /**
-       *  @brief  カメラの座標を取得する
-       *  @return カメラの座標ベクトル
+       *  @brief  ビュー行列を取得する
+       *  @return ビュー行列
        */
-      DirectX::XMVECTOR GetCameraPosition();
-
-      /**
-       *  @brief  注視点の座標を取得する
-       *  @return 注視点の座標ベクトル
-       */
-      DirectX::XMVECTOR GetLookAt();
-
-      /**
-       *  @brief  カメラの上方向ベクトルを取得する
-       *  @return カメラの上方向ベクトル
-       */
-      DirectX::XMVECTOR GetCameraUpDirection();
+      DirectX::XMMATRIX& GetViewMatrix();
 
       /**
        *  @brief  デバイスを設定する

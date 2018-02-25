@@ -161,30 +161,19 @@ namespace App
     }
 
     /**
-     *  @brief  カメラの座標を取得する
-     *  @return カメラの座標ベクトル
+     *  @brief  ビュー行列を取得する
+     *  @return ビュー行列
      */
-    DirectX::XMVECTOR ViewerLevel::GetCameraPosition()
+    DirectX::XMMATRIX& ViewerLevel::GetViewMatrix()
     {
-      return actors_[0].GetPosition();
-    }
-    
-    /**
-     *  @brief  注視点の座標を取得する
-     *  @return 注視点の座標ベクトル
-     */
-    DirectX::XMVECTOR ViewerLevel::GetLookAt()
-    {
-      return actors_[0].GetComponent<actor::CameraComponent>()->GetLookAt();
-    }
+      auto camera = actors_[0].GetComponent<actor::CameraComponent>();
 
-    /**
-     *  @brief  カメラの上方向ベクトルを取得する
-     *  @return カメラの上方向ベクトル
-     */
-    DirectX::XMVECTOR ViewerLevel::GetCameraUpDirection()
-    {
-      return actors_[0].GetComponent<actor::CameraComponent>()->GetUpDirection();
+      // ビュー行列を作成
+      // TODO:カメラコンポーネントに移動(ダーティフラグを使用する)
+      DirectX::XMVECTOR eye = actors_[0].GetPosition();
+      DirectX::XMVECTOR at = camera->GetLookAt();
+      DirectX::XMVECTOR up = camera->GetUpDirection();
+      return DirectX::XMMatrixLookAtLH(eye, at, up);
     }
 
     /**
