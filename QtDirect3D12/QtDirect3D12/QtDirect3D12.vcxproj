@@ -105,6 +105,7 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="model\pmx_model_loader.cc" />
     <ClCompile Include="QtDirect3D12.cpp" />
+    <ClCompile Include="shader\app_shader.cc" />
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="QtDirect3D12.h">
@@ -139,6 +140,7 @@
     <ClInclude Include="actor\model_render_component.h" />
     <ClInclude Include="actor\mouse_driven_camera_move_component.h" />
     <ClInclude Include="actor\move_component.h" />
+    <ClInclude Include="shader\app_shader.h" />
     <ClInclude Include="actor\viewer_level.h" />
     <ClInclude Include="GeneratedFiles\ui_QtDirect3D12.h" />
     <ClInclude Include="job_system\async_job.h" />
