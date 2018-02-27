@@ -109,9 +109,6 @@
     <ClCompile Include="shader\app_shader.cc">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="job_system\job_thread.cc">
-      <Filter>Source Files</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="QtDirect3D12.h">
@@ -177,9 +174,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="shader\app_shader.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="job_system\job_thread.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
