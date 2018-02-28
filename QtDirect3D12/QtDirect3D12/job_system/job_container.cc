@@ -38,6 +38,8 @@ namespace App
     void JobContainer::MakeReady()
     {
       current_index_ = 0;
+      finished_count_ = 0;
+      finished_ = job_list_.size() == 0;
     }
     
     /**
@@ -48,6 +50,7 @@ namespace App
     {
       job_list_.push_back(job);
       job->SetContainer(this);
+      job_size_ = static_cast<std::uint32_t>(job_list_.size());
     }
     
     /**
@@ -66,6 +69,8 @@ namespace App
           break;
         }
       }
+
+      job_size_ = static_cast<std::uint32_t>(job_list_.size());
     }
     
     /**
@@ -81,6 +86,57 @@ namespace App
       }
 
       return job_list_[index];
+    }
+
+    /**
+     *  @brief  終了待ちを行う
+     */
+    void JobContainer::Wait()
+    {
+      std::unique_lock<std::mutex> lock(mutex_);
+      if (false == finished_)
+      {
+        condition_.wait(lock);
+      }
+    }
+
+    /**
+     *  @brief  終了通知を行う
+     */
+    void JobContainer::NotifyFinished()
+    {
+      if (++finished_count_ == job_size_)
+      {
+        std::unique_lock<std::mutex> lock(mutex_);
+        finished_ = true;
+        condition_.notify_one();
+      }
+    }
+    
+    /**
+     *  @brief  処理が終了したか?
+     *  @return 処理終了フラグ
+     */
+    bool JobContainer::IsFinished() const
+    {
+      return finished_;
+    }
+    
+    /**
+     *  @brief  マルチスレッドで実行するようにする
+     */
+    void JobContainer::EnableMulti()
+    {
+      multi_ = true;
+    }
+    
+    /**
+     *  @brief  マルチスレッドで実行するか?
+     *  @return マルチスレッド実行フラグ
+     */
+    bool JobContainer::IsMulti() const
+    {
+      return multi_;
     }
   };
 };
