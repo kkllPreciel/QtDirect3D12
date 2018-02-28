@@ -9,8 +9,6 @@
  // include
 #include "job_thread.h"
 #include "job.h"
-#include "job_container.h"
-#include "job_queue.h"
 
 namespace App
 {
@@ -70,8 +68,6 @@ namespace App
     void JobThread::Execute(Job* job)
     {
       current_ = job;
-      job->Execute(queue_->delta_time());
-      job->GetContainer()->NotifyFinished();
       current_ = nullptr;
     }
     
@@ -94,10 +90,6 @@ namespace App
       SetThreadIndex(thread_index);
 
       Job* job = nullptr;
-      while ((job = queue_->Pop(thread_index)) != nullptr)
-      {
-        Execute(job);
-      }
     }
   };
 };

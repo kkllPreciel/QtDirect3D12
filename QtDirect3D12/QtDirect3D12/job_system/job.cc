@@ -48,15 +48,6 @@ namespace App
     }
 
     /**
-     *  @brief  ジョブコンテナを取得する
-     *  @return ジョブコンテナのポインタ
-     */
-    JobContainer* Job::GetContainer() const
-    {
-      return container_;
-    }
-
-    /**
      *  @brief  ジョブとして実行する関数を設定する
      *  @param  func:関数へのポインタ
      */
