@@ -59,6 +59,12 @@ namespace App
       void SetContainer(JobContainer* job_container);
 
       /**
+       *  @brief  ジョブコンテナを取得する
+       *  @return ジョブコンテナのポインタ
+       */
+      JobContainer* GetContainer() const;
+
+      /**
        *  @brief  ジョブとして実行する関数を設定する
        *  @param  func:関数へのポインタ
        */
