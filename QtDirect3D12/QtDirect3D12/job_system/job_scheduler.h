@@ -12,6 +12,8 @@
 #include <array>
 #include <memory>
 #include "job_system/job_container.h"
+#include "job_system/job_queue.h"
+#include "job_system/job_thread.h"
 
 namespace App
 {
@@ -56,9 +58,10 @@ namespace App
 
       /**
        *  @brief  作成する
+       *  @param  num_threads:スレッド数
        *  @return 生成成功フラグ
        */
-      bool Create();
+      bool Create(std::uint32_t num_threads);
 
       void Destroy();
 
@@ -97,6 +100,9 @@ namespace App
     private:
       static std::unique_ptr<JobScheduler> instance_; ///< ジョブスケジューラのインスタンス
       std::array<JobContainer, 10> containers_;       ///< スケジュールするジョブコンテナリスト
+      JobQueue queue_;                                ///< ジョブキュー
+      std::unique_ptr<JobThread[]> threads_;          ///< ジョブスレッドリスト
+      std::uint32_t num_task_threads_;                ///< タスクスレッド数
     };
   };
 };

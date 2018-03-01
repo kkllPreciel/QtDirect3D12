@@ -23,6 +23,7 @@ namespace App
      */
     class JobThread final
     {
+    public:
       /**
        *  @brief  コンストラクタ
        */

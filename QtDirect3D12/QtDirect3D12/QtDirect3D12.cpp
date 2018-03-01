@@ -65,6 +65,9 @@ QtDirect3D12::QtDirect3D12(QWidget *parent)
   // 非同期ジョブの準備
   App::job_system::AsyncJobManager::GetInstance()->Create();
 
+  // ジョブスケジューラの作成
+  App::job_system::JobScheduler::GetInstance()->Create(std::thread::hardware_concurrency() - 1);
+
   // レベルの作成
   level_ = std::make_unique<App::actor::ViewerLevel>();
   level_->SetDevice(std::move(device));

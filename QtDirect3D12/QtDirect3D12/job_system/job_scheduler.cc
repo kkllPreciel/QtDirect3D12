@@ -33,21 +33,48 @@ namespace App
     {
       Destroy();
     }
-    
+
     /**
      *  @brief  作成する
+     *  @param  num_threads:スレッド数
      *  @return 生成成功フラグ
      */
-    bool JobScheduler::Create()
+    bool JobScheduler::Create(std::uint32_t num_threads)
     {
       assert(JobScheduler::Containers::kEnd < containers_.size());
+
+      // 移動処理はマルチスレッドで処理する
+      containers_[Containers::kMoveUpdate].EnableMulti();
+
+      num_task_threads_ = num_threads;
+
+      // TODO:0番目の意味は?
+      threads_ = std::make_unique<JobThread[]>(num_task_threads_);
+      for (std::uint32_t i = 0; i < num_task_threads_; ++i)
+      {
+        threads_[i].Create(i + 1, &queue_, true);
+      }
+
+      // ジョブスレッドが起動するのを待つ
+      while (true)
+      {
+        if (queue_.WaitThreads() == num_task_threads_)
+        {
+          break;
+        }
+        else
+        {
+          std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+        }
+      }
 
       return true;
     }
     
     void JobScheduler::Destroy()
     {
-
+      queue_.Terminate();
+      queue_.NotifyAll();
     }
     
     /**
@@ -57,6 +84,7 @@ namespace App
      */
     void JobScheduler::Register(Job* job, Containers container)
     {
+      // TODO:ジョブ実行中なら登録を遅らせる?(別のキューに積む?)
       containers_[container].Register(job);
     }
     
@@ -66,11 +94,7 @@ namespace App
      */
     void JobScheduler::Unregister(Job* job)
     {
-      // ジョブの登録を解除する
-      for (decltype(auto) container : containers_)
-      {
-        container.Unregister(job);
-      }
+      job->GetContainer()->Unregister(job);
     }
     
     /**
@@ -85,13 +109,20 @@ namespace App
         container.MakeReady();
       }
 
-      // 各コンテナのジョブを実行
-      for (decltype(auto) container : containers_)
+      queue_.Schedule(delta_time, containers_.data(), static_cast<std::uint32_t>(containers_.size()));
+
+      Job* job = nullptr;
+      while (true)
       {
-        Job* job = nullptr;
-        while ((job = container.Pop()) != nullptr)
+        job = queue_.Pop(0);
+        if (job)
         {
           job->Execute(delta_time);
+          job->GetContainer()->NotifyFinished();
+        }
+        else
+        {
+          break;
         }
       }
     }
