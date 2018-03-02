@@ -47,8 +47,6 @@ namespace App
       containers_[Containers::kMoveUpdate].EnableMulti();
 
       num_task_threads_ = num_threads;
-
-      // TODO:0”Ô–Ú‚ÌˆÓ–¡‚Í?
       threads_ = std::make_unique<JobThread[]>(num_task_threads_);
       for (std::uint32_t i = 0; i < num_task_threads_; ++i)
       {
