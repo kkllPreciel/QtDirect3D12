@@ -82,17 +82,8 @@ namespace App
      */
     void JobScheduler::Register(Job* job, Containers container)
     {
-      // 追加するジョブのリスト
-       test_[update_.size()] = container;
-       update_.emplace_back(job);
-
-      // 更新するジョブのリスト(コンテナ番号を保持していたら追加)
-      // 登録 -> 削除
-      // 削除 -> 登録
-      // 登録(問題なし)
-      // 削除(問題なし)
       // TODO:ジョブ実行中なら登録を遅らせる?(別のキューに積む?)
-      // containers_[container].Register(job);
+      containers_[container].Register(job);
     }
     
     /**
@@ -101,11 +92,7 @@ namespace App
      */
     void JobScheduler::Unregister(Job* job)
     {
-      // 削除するジョブのリスト
-      test_[update_.size()] = Containers::kIllegal;
-      update_.emplace_back(job);
-
-      // job->GetContainer()->Unregister(job);
+      job->GetContainer()->Unregister(job);
     }
     
     /**
@@ -114,23 +101,6 @@ namespace App
      */
     void JobScheduler::Execute(std::uint64_t delta_time)
     {
-      // 各コンテナにジョブを積む
-      for (auto i = 0; i < update_.size(); ++i)
-      {
-        decltype(auto) job = update_[i];
-        decltype(auto) container = test_[i];
-
-        if (container == Containers::kIllegal)
-        {
-          job->GetContainer()->Unregister(job);
-        }
-        else
-        {
-          containers_[container].Register(job);
-        }
-      }
-      update_.clear();
-
       // 各コンテナの実行準備
       for (decltype(auto) container : containers_)
       {
