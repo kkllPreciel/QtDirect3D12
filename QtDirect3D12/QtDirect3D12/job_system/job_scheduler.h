@@ -11,6 +11,7 @@
  // include
 #include <array>
 #include <memory>
+#include <map>
 #include "job_system/job_container.h"
 #include "job_system/job_queue.h"
 #include "job_system/job_thread.h"
@@ -103,6 +104,8 @@ namespace App
       JobQueue queue_;                                ///< ジョブキュー
       std::unique_ptr<JobThread[]> threads_;          ///< ジョブスレッドリスト
       std::uint32_t num_task_threads_;                ///< タスクスレッド数
+      std::map<std::uint32_t, Containers> test_;      ///< ジョブとコンテナの関連付け用
+      std::vector<Job*> update_;                      ///< 更新するジョブ
     };
   };
 };
