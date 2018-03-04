@@ -39,8 +39,17 @@ namespace App
     bool MouseDrivenCameraMoveComponent::Create()
     {
       clicked_ = false;
+      moving_ = false;
 
       Destroy();
+
+      // ƒWƒ‡ƒu‚É“o˜^‚·‚é
+      job_ = std::make_unique<job_system::Job>();
+
+      job_->SetFunction([&](std::uint64_t delta_time) {
+        this->Update(delta_time);
+      });
+      job_system::JobScheduler::GetInstance()->Register(job_.get(), job_system::JobScheduler::kMoveUpdate);
 
       return true;
     }
@@ -67,6 +76,11 @@ namespace App
      */
     void MouseDrivenCameraMoveComponent::Update(std::uint64_t delta_time)
     {
+      if (clicked_ || false == moving_)
+      {
+        return;
+      }
+
       delta_ += delta_time;
       auto time = static_cast<float>(delta_) / static_cast<float>(time_ * 60);
 
@@ -80,7 +94,7 @@ namespace App
       // ˆÚ“®‚ªI—¹‚µ‚½‚ç©“®“I‚Éíœ‚·‚é
       if (time_ * 60 <= delta_)
       {
-        Destroy();
+        moving_ = false;
       }
     }
 
@@ -127,8 +141,6 @@ namespace App
      */
     void MouseDrivenCameraMoveComponent::OnMousePressEvent(DirectX::XMVECTOR position)
     {
-      Destroy();
-
       prev_mouse_position_ = position;
       clicked_ = true;
     }
@@ -189,8 +201,6 @@ namespace App
      */
     void MouseDrivenCameraMoveComponent::OnMouseWheelEvent(std::int32_t direction)
     {
-      Destroy();
-
       if (clicked_)
       {
         return;
@@ -219,16 +229,10 @@ namespace App
         return;
       }
 
+      delta_ = 0;
       begin_position_ = eye;
       end_position_ = target;
-
-      // ƒWƒ‡ƒu‚É“o˜^‚·‚é
-      job_ = std::make_unique<job_system::Job>();
-
-      job_->SetFunction([&](std::uint64_t delta_time) {
-        this->Update(delta_time);
-      });
-      job_system::JobScheduler::GetInstance()->Register(job_.get(), job_system::JobScheduler::kMoveUpdate);
+      moving_ = true;
     }
   };
 };
