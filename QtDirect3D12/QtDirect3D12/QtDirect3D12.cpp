@@ -65,6 +65,9 @@ QtDirect3D12::QtDirect3D12(QWidget *parent)
   // 非同期ジョブの準備
   App::job_system::AsyncJobManager::GetInstance()->Create();
 
+  // ジョブスケジューラの作成
+  App::job_system::JobScheduler::GetInstance()->Create(std::thread::hardware_concurrency() - 1);
+
   // レベルの作成
   level_ = std::make_unique<App::actor::ViewerLevel>();
   level_->SetDevice(std::move(device));
@@ -115,6 +118,16 @@ void QtDirect3D12::mainLoop()
 
     frameCount++;
 #endif
+  }
+
+  // イベントの処理
+  {
+    // レベルにホイール回転イベントを通知する
+    if (direction_)
+    {
+      level_->OnMouseWheelEvent(direction_);
+      direction_ = 0;
+    }
   }
 
   // 定数バッファを更新
@@ -187,10 +200,7 @@ void QtDirect3D12::wheelEvent(QWheelEvent* event)
   // 注視点との距離
 
   QPoint degrees = event->angleDelta() / 8;
-  const auto force = degrees.y() / std::abs(degrees.y());
-
-  // レベルにホイール回転イベントを通知する
-  level_->OnMouseWheelEvent(force);
+  direction_ = degrees.y() / std::abs(degrees.y());
 
   // TODO:滑らかに移動するようにする(ジョブに登録して移動させる?)
   // 現在の視点と移動先の視点を線形補間で指定時間で移動を行うようにする

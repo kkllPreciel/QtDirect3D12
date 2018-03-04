@@ -142,7 +142,6 @@ namespace App
       std::map<std::uint32_t, Component*>::iterator it = components_.find(_Type::GetId());
       if (it != components_.end())
       {
-        it->second->Destroy();
         return static_cast<_Type*>(it->second);
       }
 

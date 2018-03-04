@@ -138,6 +138,7 @@ namespace App
       std::uint64_t delta_;                   ///< 現在の経過時間
       DirectX::XMVECTOR prev_mouse_position_; ///< 1つ前のマウスの座標
       bool clicked_;                          ///< クリックフラグ
+      bool moving_;                           ///< 移動中フラグ
     };
   };
 };

@@ -44,6 +44,7 @@ private:
   D3D12_PRIMITIVE_TOPOLOGY topology_;               ///< プリミティブのタイプ
   std::unique_ptr<App::actor::ViewerLevel> level_;  ///< ビューア用レベル
   bool is_loading = false;                          ///< 読み込み中フラグ
+  std::uint32_t direction_ = 0;                     ///< ホイールの回転方向
 
   /**
    *  @brief  定数バッファ用構造体
